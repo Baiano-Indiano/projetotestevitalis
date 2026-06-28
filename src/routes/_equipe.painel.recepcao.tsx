@@ -139,51 +139,53 @@ function Recepcao() {
               {lista.map((t) => {
                 const urg = t.redFlags.length > 0 || t.status === "urgencia";
                 return (
-                  <TableRow key={t.id} asChild className="cursor-pointer">
-                    <Link to="/painel/validacao/$id" params={{ id: t.id }}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {urg && <AlertTriangle className="h-4 w-4 text-destructive" aria-label="Red flag" />}
-                          <div>
-                            <p className="font-medium text-text-strong">{t.animal.nome}</p>
-                            <p className="text-xs text-text-soft">
-                              {t.animal.especie === "cao" ? "Cão" : t.animal.especie === "gato" ? "Gato" : "Outro"} ·{" "}
-                              {t.animal.raca} · {t.animal.idade}
-                            </p>
-                          </div>
+                  <TableRow
+                    key={t.id}
+                    className="cursor-pointer"
+                    onClick={() => navigate({ to: "/painel/validacao/$id", params: { id: t.id } })}
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {urg && <AlertTriangle className="h-4 w-4 text-destructive" aria-label="Red flag" />}
+                        <div>
+                          <p className="font-medium text-text-strong">{t.animal.nome}</p>
+                          <p className="text-xs text-text-soft">
+                            {t.animal.especie === "cao" ? "Cão" : t.animal.especie === "gato" ? "Gato" : "Outro"} ·{" "}
+                            {t.animal.raca} · {t.animal.idade}
+                          </p>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <p className="text-sm text-text-strong">{t.tutor.nome}</p>
-                        <p className="text-xs text-text-soft">{t.tutor.telefone}</p>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-xs text-muted-foreground">
-                          {t.canal === "online" ? "Online" : "Unidade móvel"}
-                        </span>
-                        <p className="font-mono text-[11px] text-text-soft">{t.protocolo}</p>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-text-strong">
-                          {t.sugestao === "urgencia" ? "Urgência" : nomeEspecialidade(t.sugestao)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{tempoEsperaTexto(t.criadoEm)}</TableCell>
-                      <TableCell><PrioridadePill prioridade={t.prioridade} /></TableCell>
-                      <TableCell>
-                        <StatusPill
-                          status={
-                            t.status === "urgencia"
-                              ? "urgencia"
-                              : t.status === "validada"
-                                ? "validada"
-                                : t.status === "redirecionada"
-                                  ? "redirecionada"
-                                  : "aguardando"
-                          }
-                        />
-                      </TableCell>
-                    </Link>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <p className="text-sm text-text-strong">{t.tutor.nome}</p>
+                      <p className="text-xs text-text-soft">{t.tutor.telefone}</p>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs text-muted-foreground">
+                        {t.canal === "online" ? "Online" : "Unidade móvel"}
+                      </span>
+                      <p className="font-mono text-[11px] text-text-soft">{t.protocolo}</p>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-text-strong">
+                        {t.sugestao === "urgencia" ? "Urgência" : nomeEspecialidade(t.sugestao)}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{tempoEsperaTexto(t.criadoEm)}</TableCell>
+                    <TableCell><PrioridadePill prioridade={t.prioridade} /></TableCell>
+                    <TableCell>
+                      <StatusPill
+                        status={
+                          t.status === "urgencia"
+                            ? "urgencia"
+                            : t.status === "validada"
+                              ? "validada"
+                              : t.status === "redirecionada"
+                                ? "redirecionada"
+                                : "aguardando"
+                        }
+                      />
+                    </TableCell>
                   </TableRow>
                 );
               })}
