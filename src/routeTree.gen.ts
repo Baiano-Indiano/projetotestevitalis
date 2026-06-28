@@ -9,27 +9,303 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TutorRouteImport } from './routes/_tutor'
+import { Route as EquipeRouteImport } from './routes/_equipe'
+import { Route as TutorIndexRouteImport } from './routes/_tutor.index'
+import { Route as TutorTriagemRouteImport } from './routes/_tutor.triagem'
+import { Route as TutorMeusAtendimentosRouteImport } from './routes/_tutor.meus-atendimentos'
+import { Route as TutorInformacoesRouteImport } from './routes/_tutor.informacoes'
+import { Route as TutorIdentificacaoRouteImport } from './routes/_tutor.identificacao'
+import { Route as TutorEmergenciaRouteImport } from './routes/_tutor.emergencia'
+import { Route as TutorAgendarRouteImport } from './routes/_tutor.agendar'
+import { Route as EquipePainelIndexRouteImport } from './routes/_equipe.painel.index'
+import { Route as TutorTriagemResultadoRouteImport } from './routes/_tutor.triagem.resultado'
+import { Route as EquipePainelRecepcaoRouteImport } from './routes/_equipe.painel.recepcao'
 
-export interface FileRoutesByFullPath {}
-export interface FileRoutesByTo {}
+const TutorRoute = TutorRouteImport.update({
+  id: '/_tutor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeRoute = EquipeRouteImport.update({
+  id: '/_equipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TutorIndexRoute = TutorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TutorRoute,
+} as any)
+const TutorTriagemRoute = TutorTriagemRouteImport.update({
+  id: '/triagem',
+  path: '/triagem',
+  getParentRoute: () => TutorRoute,
+} as any)
+const TutorMeusAtendimentosRoute = TutorMeusAtendimentosRouteImport.update({
+  id: '/meus-atendimentos',
+  path: '/meus-atendimentos',
+  getParentRoute: () => TutorRoute,
+} as any)
+const TutorInformacoesRoute = TutorInformacoesRouteImport.update({
+  id: '/informacoes',
+  path: '/informacoes',
+  getParentRoute: () => TutorRoute,
+} as any)
+const TutorIdentificacaoRoute = TutorIdentificacaoRouteImport.update({
+  id: '/identificacao',
+  path: '/identificacao',
+  getParentRoute: () => TutorRoute,
+} as any)
+const TutorEmergenciaRoute = TutorEmergenciaRouteImport.update({
+  id: '/emergencia',
+  path: '/emergencia',
+  getParentRoute: () => TutorRoute,
+} as any)
+const TutorAgendarRoute = TutorAgendarRouteImport.update({
+  id: '/agendar',
+  path: '/agendar',
+  getParentRoute: () => TutorRoute,
+} as any)
+const EquipePainelIndexRoute = EquipePainelIndexRouteImport.update({
+  id: '/painel/',
+  path: '/painel/',
+  getParentRoute: () => EquipeRoute,
+} as any)
+const TutorTriagemResultadoRoute = TutorTriagemResultadoRouteImport.update({
+  id: '/resultado',
+  path: '/resultado',
+  getParentRoute: () => TutorTriagemRoute,
+} as any)
+const EquipePainelRecepcaoRoute = EquipePainelRecepcaoRouteImport.update({
+  id: '/painel/recepcao',
+  path: '/painel/recepcao',
+  getParentRoute: () => EquipeRoute,
+} as any)
+
+export interface FileRoutesByFullPath {
+  '/': typeof TutorIndexRoute
+  '/agendar': typeof TutorAgendarRoute
+  '/emergencia': typeof TutorEmergenciaRoute
+  '/identificacao': typeof TutorIdentificacaoRoute
+  '/informacoes': typeof TutorInformacoesRoute
+  '/meus-atendimentos': typeof TutorMeusAtendimentosRoute
+  '/triagem': typeof TutorTriagemRouteWithChildren
+  '/painel/recepcao': typeof EquipePainelRecepcaoRoute
+  '/triagem/resultado': typeof TutorTriagemResultadoRoute
+  '/painel/': typeof EquipePainelIndexRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof TutorIndexRoute
+  '/agendar': typeof TutorAgendarRoute
+  '/emergencia': typeof TutorEmergenciaRoute
+  '/identificacao': typeof TutorIdentificacaoRoute
+  '/informacoes': typeof TutorInformacoesRoute
+  '/meus-atendimentos': typeof TutorMeusAtendimentosRoute
+  '/triagem': typeof TutorTriagemRouteWithChildren
+  '/painel/recepcao': typeof EquipePainelRecepcaoRoute
+  '/triagem/resultado': typeof TutorTriagemResultadoRoute
+  '/painel': typeof EquipePainelIndexRoute
+}
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_equipe': typeof EquipeRouteWithChildren
+  '/_tutor': typeof TutorRouteWithChildren
+  '/_tutor/agendar': typeof TutorAgendarRoute
+  '/_tutor/emergencia': typeof TutorEmergenciaRoute
+  '/_tutor/identificacao': typeof TutorIdentificacaoRoute
+  '/_tutor/informacoes': typeof TutorInformacoesRoute
+  '/_tutor/meus-atendimentos': typeof TutorMeusAtendimentosRoute
+  '/_tutor/triagem': typeof TutorTriagemRouteWithChildren
+  '/_tutor/': typeof TutorIndexRoute
+  '/_equipe/painel/recepcao': typeof EquipePainelRecepcaoRoute
+  '/_tutor/triagem/resultado': typeof TutorTriagemResultadoRoute
+  '/_equipe/painel/': typeof EquipePainelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: never
+  fullPaths:
+    | '/'
+    | '/agendar'
+    | '/emergencia'
+    | '/identificacao'
+    | '/informacoes'
+    | '/meus-atendimentos'
+    | '/triagem'
+    | '/painel/recepcao'
+    | '/triagem/resultado'
+    | '/painel/'
   fileRoutesByTo: FileRoutesByTo
-  to: never
-  id: '__root__'
+  to:
+    | '/'
+    | '/agendar'
+    | '/emergencia'
+    | '/identificacao'
+    | '/informacoes'
+    | '/meus-atendimentos'
+    | '/triagem'
+    | '/painel/recepcao'
+    | '/triagem/resultado'
+    | '/painel'
+  id:
+    | '__root__'
+    | '/_equipe'
+    | '/_tutor'
+    | '/_tutor/agendar'
+    | '/_tutor/emergencia'
+    | '/_tutor/identificacao'
+    | '/_tutor/informacoes'
+    | '/_tutor/meus-atendimentos'
+    | '/_tutor/triagem'
+    | '/_tutor/'
+    | '/_equipe/painel/recepcao'
+    | '/_tutor/triagem/resultado'
+    | '/_equipe/painel/'
   fileRoutesById: FileRoutesById
 }
-export interface RootRouteChildren {}
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {}
+export interface RootRouteChildren {
+  EquipeRoute: typeof EquipeRouteWithChildren
+  TutorRoute: typeof TutorRouteWithChildren
 }
 
-const rootRouteChildren: RootRouteChildren = {}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/_tutor': {
+      id: '/_tutor'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof TutorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_equipe': {
+      id: '/_equipe'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof EquipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_tutor/': {
+      id: '/_tutor/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof TutorIndexRouteImport
+      parentRoute: typeof TutorRoute
+    }
+    '/_tutor/triagem': {
+      id: '/_tutor/triagem'
+      path: '/triagem'
+      fullPath: '/triagem'
+      preLoaderRoute: typeof TutorTriagemRouteImport
+      parentRoute: typeof TutorRoute
+    }
+    '/_tutor/meus-atendimentos': {
+      id: '/_tutor/meus-atendimentos'
+      path: '/meus-atendimentos'
+      fullPath: '/meus-atendimentos'
+      preLoaderRoute: typeof TutorMeusAtendimentosRouteImport
+      parentRoute: typeof TutorRoute
+    }
+    '/_tutor/informacoes': {
+      id: '/_tutor/informacoes'
+      path: '/informacoes'
+      fullPath: '/informacoes'
+      preLoaderRoute: typeof TutorInformacoesRouteImport
+      parentRoute: typeof TutorRoute
+    }
+    '/_tutor/identificacao': {
+      id: '/_tutor/identificacao'
+      path: '/identificacao'
+      fullPath: '/identificacao'
+      preLoaderRoute: typeof TutorIdentificacaoRouteImport
+      parentRoute: typeof TutorRoute
+    }
+    '/_tutor/emergencia': {
+      id: '/_tutor/emergencia'
+      path: '/emergencia'
+      fullPath: '/emergencia'
+      preLoaderRoute: typeof TutorEmergenciaRouteImport
+      parentRoute: typeof TutorRoute
+    }
+    '/_tutor/agendar': {
+      id: '/_tutor/agendar'
+      path: '/agendar'
+      fullPath: '/agendar'
+      preLoaderRoute: typeof TutorAgendarRouteImport
+      parentRoute: typeof TutorRoute
+    }
+    '/_equipe/painel/': {
+      id: '/_equipe/painel/'
+      path: '/painel'
+      fullPath: '/painel/'
+      preLoaderRoute: typeof EquipePainelIndexRouteImport
+      parentRoute: typeof EquipeRoute
+    }
+    '/_tutor/triagem/resultado': {
+      id: '/_tutor/triagem/resultado'
+      path: '/resultado'
+      fullPath: '/triagem/resultado'
+      preLoaderRoute: typeof TutorTriagemResultadoRouteImport
+      parentRoute: typeof TutorTriagemRoute
+    }
+    '/_equipe/painel/recepcao': {
+      id: '/_equipe/painel/recepcao'
+      path: '/painel/recepcao'
+      fullPath: '/painel/recepcao'
+      preLoaderRoute: typeof EquipePainelRecepcaoRouteImport
+      parentRoute: typeof EquipeRoute
+    }
+  }
+}
+
+interface EquipeRouteChildren {
+  EquipePainelRecepcaoRoute: typeof EquipePainelRecepcaoRoute
+  EquipePainelIndexRoute: typeof EquipePainelIndexRoute
+}
+
+const EquipeRouteChildren: EquipeRouteChildren = {
+  EquipePainelRecepcaoRoute: EquipePainelRecepcaoRoute,
+  EquipePainelIndexRoute: EquipePainelIndexRoute,
+}
+
+const EquipeRouteWithChildren =
+  EquipeRoute._addFileChildren(EquipeRouteChildren)
+
+interface TutorTriagemRouteChildren {
+  TutorTriagemResultadoRoute: typeof TutorTriagemResultadoRoute
+}
+
+const TutorTriagemRouteChildren: TutorTriagemRouteChildren = {
+  TutorTriagemResultadoRoute: TutorTriagemResultadoRoute,
+}
+
+const TutorTriagemRouteWithChildren = TutorTriagemRoute._addFileChildren(
+  TutorTriagemRouteChildren,
+)
+
+interface TutorRouteChildren {
+  TutorAgendarRoute: typeof TutorAgendarRoute
+  TutorEmergenciaRoute: typeof TutorEmergenciaRoute
+  TutorIdentificacaoRoute: typeof TutorIdentificacaoRoute
+  TutorInformacoesRoute: typeof TutorInformacoesRoute
+  TutorMeusAtendimentosRoute: typeof TutorMeusAtendimentosRoute
+  TutorTriagemRoute: typeof TutorTriagemRouteWithChildren
+  TutorIndexRoute: typeof TutorIndexRoute
+}
+
+const TutorRouteChildren: TutorRouteChildren = {
+  TutorAgendarRoute: TutorAgendarRoute,
+  TutorEmergenciaRoute: TutorEmergenciaRoute,
+  TutorIdentificacaoRoute: TutorIdentificacaoRoute,
+  TutorInformacoesRoute: TutorInformacoesRoute,
+  TutorMeusAtendimentosRoute: TutorMeusAtendimentosRoute,
+  TutorTriagemRoute: TutorTriagemRouteWithChildren,
+  TutorIndexRoute: TutorIndexRoute,
+}
+
+const TutorRouteWithChildren = TutorRoute._addFileChildren(TutorRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  EquipeRoute: EquipeRouteWithChildren,
+  TutorRoute: TutorRouteWithChildren,
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
