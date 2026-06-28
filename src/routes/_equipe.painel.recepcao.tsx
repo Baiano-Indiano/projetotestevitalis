@@ -26,6 +26,7 @@ export const Route = createFileRoute("/_equipe/painel/recepcao")({
 type Filtro = "todas" | "pendentes" | "urgencias" | "validadas";
 
 function Recepcao() {
+  const navigate = useNavigate();
   const { triagens } = useVitalisStore();
   const [filtro, setFiltro] = useState<Filtro>("todas");
   const [busca, setBusca] = useState("");
