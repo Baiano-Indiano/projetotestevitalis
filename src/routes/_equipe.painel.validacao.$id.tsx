@@ -282,7 +282,6 @@ function Detalhe() {
                     </div>
                     <p className="mt-1 text-xs text-text-soft">
                       Contribuintes:{" "}
-                      {(ranking.find(([e]) => e === esp)?.[1], null) ?? ""}
                       {(t.etapas.sintomas || [])
                         .filter((id) => sintomaPorId(id)?.pesos[esp])
                         .map((id) => sintomaPorId(id)?.nome)

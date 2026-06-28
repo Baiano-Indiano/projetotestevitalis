@@ -20,7 +20,14 @@ import { Route as TutorEmergenciaRouteImport } from './routes/_tutor.emergencia'
 import { Route as TutorAgendarRouteImport } from './routes/_tutor.agendar'
 import { Route as EquipePainelIndexRouteImport } from './routes/_equipe.painel.index'
 import { Route as TutorTriagemResultadoRouteImport } from './routes/_tutor.triagem.resultado'
+import { Route as EquipePainelValidacaoRouteImport } from './routes/_equipe.painel.validacao'
 import { Route as EquipePainelRecepcaoRouteImport } from './routes/_equipe.painel.recepcao'
+import { Route as EquipePainelExamesRouteImport } from './routes/_equipe.painel.exames'
+import { Route as EquipePainelEncaminhamentosRouteImport } from './routes/_equipe.painel.encaminhamentos'
+import { Route as EquipePainelAgendaRouteImport } from './routes/_equipe.painel.agenda'
+import { Route as EquipePainelValidacaoIndexRouteImport } from './routes/_equipe.painel.validacao.index'
+import { Route as EquipePainelValidacaoIdRouteImport } from './routes/_equipe.painel.validacao.$id'
+import { Route as EquipePainelFichaIdRouteImport } from './routes/_equipe.painel.ficha.$id'
 
 const TutorRoute = TutorRouteImport.update({
   id: '/_tutor',
@@ -75,9 +82,46 @@ const TutorTriagemResultadoRoute = TutorTriagemResultadoRouteImport.update({
   path: '/resultado',
   getParentRoute: () => TutorTriagemRoute,
 } as any)
+const EquipePainelValidacaoRoute = EquipePainelValidacaoRouteImport.update({
+  id: '/painel/validacao',
+  path: '/painel/validacao',
+  getParentRoute: () => EquipeRoute,
+} as any)
 const EquipePainelRecepcaoRoute = EquipePainelRecepcaoRouteImport.update({
   id: '/painel/recepcao',
   path: '/painel/recepcao',
+  getParentRoute: () => EquipeRoute,
+} as any)
+const EquipePainelExamesRoute = EquipePainelExamesRouteImport.update({
+  id: '/painel/exames',
+  path: '/painel/exames',
+  getParentRoute: () => EquipeRoute,
+} as any)
+const EquipePainelEncaminhamentosRoute =
+  EquipePainelEncaminhamentosRouteImport.update({
+    id: '/painel/encaminhamentos',
+    path: '/painel/encaminhamentos',
+    getParentRoute: () => EquipeRoute,
+  } as any)
+const EquipePainelAgendaRoute = EquipePainelAgendaRouteImport.update({
+  id: '/painel/agenda',
+  path: '/painel/agenda',
+  getParentRoute: () => EquipeRoute,
+} as any)
+const EquipePainelValidacaoIndexRoute =
+  EquipePainelValidacaoIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => EquipePainelValidacaoRoute,
+  } as any)
+const EquipePainelValidacaoIdRoute = EquipePainelValidacaoIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => EquipePainelValidacaoRoute,
+} as any)
+const EquipePainelFichaIdRoute = EquipePainelFichaIdRouteImport.update({
+  id: '/painel/ficha/$id',
+  path: '/painel/ficha/$id',
   getParentRoute: () => EquipeRoute,
 } as any)
 
@@ -89,9 +133,16 @@ export interface FileRoutesByFullPath {
   '/informacoes': typeof TutorInformacoesRoute
   '/meus-atendimentos': typeof TutorMeusAtendimentosRoute
   '/triagem': typeof TutorTriagemRouteWithChildren
+  '/painel/agenda': typeof EquipePainelAgendaRoute
+  '/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
+  '/painel/exames': typeof EquipePainelExamesRoute
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
+  '/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
   '/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/painel/': typeof EquipePainelIndexRoute
+  '/painel/ficha/$id': typeof EquipePainelFichaIdRoute
+  '/painel/validacao/$id': typeof EquipePainelValidacaoIdRoute
+  '/painel/validacao/': typeof EquipePainelValidacaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof TutorIndexRoute
@@ -101,9 +152,15 @@ export interface FileRoutesByTo {
   '/informacoes': typeof TutorInformacoesRoute
   '/meus-atendimentos': typeof TutorMeusAtendimentosRoute
   '/triagem': typeof TutorTriagemRouteWithChildren
+  '/painel/agenda': typeof EquipePainelAgendaRoute
+  '/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
+  '/painel/exames': typeof EquipePainelExamesRoute
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/painel': typeof EquipePainelIndexRoute
+  '/painel/ficha/$id': typeof EquipePainelFichaIdRoute
+  '/painel/validacao/$id': typeof EquipePainelValidacaoIdRoute
+  '/painel/validacao': typeof EquipePainelValidacaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,9 +173,16 @@ export interface FileRoutesById {
   '/_tutor/meus-atendimentos': typeof TutorMeusAtendimentosRoute
   '/_tutor/triagem': typeof TutorTriagemRouteWithChildren
   '/_tutor/': typeof TutorIndexRoute
+  '/_equipe/painel/agenda': typeof EquipePainelAgendaRoute
+  '/_equipe/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
+  '/_equipe/painel/exames': typeof EquipePainelExamesRoute
   '/_equipe/painel/recepcao': typeof EquipePainelRecepcaoRoute
+  '/_equipe/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
   '/_tutor/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/_equipe/painel/': typeof EquipePainelIndexRoute
+  '/_equipe/painel/ficha/$id': typeof EquipePainelFichaIdRoute
+  '/_equipe/painel/validacao/$id': typeof EquipePainelValidacaoIdRoute
+  '/_equipe/painel/validacao/': typeof EquipePainelValidacaoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,9 +194,16 @@ export interface FileRouteTypes {
     | '/informacoes'
     | '/meus-atendimentos'
     | '/triagem'
+    | '/painel/agenda'
+    | '/painel/encaminhamentos'
+    | '/painel/exames'
     | '/painel/recepcao'
+    | '/painel/validacao'
     | '/triagem/resultado'
     | '/painel/'
+    | '/painel/ficha/$id'
+    | '/painel/validacao/$id'
+    | '/painel/validacao/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -142,9 +213,15 @@ export interface FileRouteTypes {
     | '/informacoes'
     | '/meus-atendimentos'
     | '/triagem'
+    | '/painel/agenda'
+    | '/painel/encaminhamentos'
+    | '/painel/exames'
     | '/painel/recepcao'
     | '/triagem/resultado'
     | '/painel'
+    | '/painel/ficha/$id'
+    | '/painel/validacao/$id'
+    | '/painel/validacao'
   id:
     | '__root__'
     | '/_equipe'
@@ -156,9 +233,16 @@ export interface FileRouteTypes {
     | '/_tutor/meus-atendimentos'
     | '/_tutor/triagem'
     | '/_tutor/'
+    | '/_equipe/painel/agenda'
+    | '/_equipe/painel/encaminhamentos'
+    | '/_equipe/painel/exames'
     | '/_equipe/painel/recepcao'
+    | '/_equipe/painel/validacao'
     | '/_tutor/triagem/resultado'
     | '/_equipe/painel/'
+    | '/_equipe/painel/ficha/$id'
+    | '/_equipe/painel/validacao/$id'
+    | '/_equipe/painel/validacao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -245,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TutorTriagemResultadoRouteImport
       parentRoute: typeof TutorTriagemRoute
     }
+    '/_equipe/painel/validacao': {
+      id: '/_equipe/painel/validacao'
+      path: '/painel/validacao'
+      fullPath: '/painel/validacao'
+      preLoaderRoute: typeof EquipePainelValidacaoRouteImport
+      parentRoute: typeof EquipeRoute
+    }
     '/_equipe/painel/recepcao': {
       id: '/_equipe/painel/recepcao'
       path: '/painel/recepcao'
@@ -252,17 +343,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipePainelRecepcaoRouteImport
       parentRoute: typeof EquipeRoute
     }
+    '/_equipe/painel/exames': {
+      id: '/_equipe/painel/exames'
+      path: '/painel/exames'
+      fullPath: '/painel/exames'
+      preLoaderRoute: typeof EquipePainelExamesRouteImport
+      parentRoute: typeof EquipeRoute
+    }
+    '/_equipe/painel/encaminhamentos': {
+      id: '/_equipe/painel/encaminhamentos'
+      path: '/painel/encaminhamentos'
+      fullPath: '/painel/encaminhamentos'
+      preLoaderRoute: typeof EquipePainelEncaminhamentosRouteImport
+      parentRoute: typeof EquipeRoute
+    }
+    '/_equipe/painel/agenda': {
+      id: '/_equipe/painel/agenda'
+      path: '/painel/agenda'
+      fullPath: '/painel/agenda'
+      preLoaderRoute: typeof EquipePainelAgendaRouteImport
+      parentRoute: typeof EquipeRoute
+    }
+    '/_equipe/painel/validacao/': {
+      id: '/_equipe/painel/validacao/'
+      path: '/'
+      fullPath: '/painel/validacao/'
+      preLoaderRoute: typeof EquipePainelValidacaoIndexRouteImport
+      parentRoute: typeof EquipePainelValidacaoRoute
+    }
+    '/_equipe/painel/validacao/$id': {
+      id: '/_equipe/painel/validacao/$id'
+      path: '/$id'
+      fullPath: '/painel/validacao/$id'
+      preLoaderRoute: typeof EquipePainelValidacaoIdRouteImport
+      parentRoute: typeof EquipePainelValidacaoRoute
+    }
+    '/_equipe/painel/ficha/$id': {
+      id: '/_equipe/painel/ficha/$id'
+      path: '/painel/ficha/$id'
+      fullPath: '/painel/ficha/$id'
+      preLoaderRoute: typeof EquipePainelFichaIdRouteImport
+      parentRoute: typeof EquipeRoute
+    }
   }
 }
 
+interface EquipePainelValidacaoRouteChildren {
+  EquipePainelValidacaoIdRoute: typeof EquipePainelValidacaoIdRoute
+  EquipePainelValidacaoIndexRoute: typeof EquipePainelValidacaoIndexRoute
+}
+
+const EquipePainelValidacaoRouteChildren: EquipePainelValidacaoRouteChildren = {
+  EquipePainelValidacaoIdRoute: EquipePainelValidacaoIdRoute,
+  EquipePainelValidacaoIndexRoute: EquipePainelValidacaoIndexRoute,
+}
+
+const EquipePainelValidacaoRouteWithChildren =
+  EquipePainelValidacaoRoute._addFileChildren(
+    EquipePainelValidacaoRouteChildren,
+  )
+
 interface EquipeRouteChildren {
+  EquipePainelAgendaRoute: typeof EquipePainelAgendaRoute
+  EquipePainelEncaminhamentosRoute: typeof EquipePainelEncaminhamentosRoute
+  EquipePainelExamesRoute: typeof EquipePainelExamesRoute
   EquipePainelRecepcaoRoute: typeof EquipePainelRecepcaoRoute
+  EquipePainelValidacaoRoute: typeof EquipePainelValidacaoRouteWithChildren
   EquipePainelIndexRoute: typeof EquipePainelIndexRoute
+  EquipePainelFichaIdRoute: typeof EquipePainelFichaIdRoute
 }
 
 const EquipeRouteChildren: EquipeRouteChildren = {
+  EquipePainelAgendaRoute: EquipePainelAgendaRoute,
+  EquipePainelEncaminhamentosRoute: EquipePainelEncaminhamentosRoute,
+  EquipePainelExamesRoute: EquipePainelExamesRoute,
   EquipePainelRecepcaoRoute: EquipePainelRecepcaoRoute,
+  EquipePainelValidacaoRoute: EquipePainelValidacaoRouteWithChildren,
   EquipePainelIndexRoute: EquipePainelIndexRoute,
+  EquipePainelFichaIdRoute: EquipePainelFichaIdRoute,
 }
 
 const EquipeRouteWithChildren =
