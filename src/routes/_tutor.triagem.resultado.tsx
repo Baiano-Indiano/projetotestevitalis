@@ -199,3 +199,15 @@ function Passo({ label, icone: Icone, concluido, atual }: { label: string; icone
     </div>
   );
 }
+
+function ResumoLinha({ icone: Icone, rotulo, valor }: { icone: typeof PawPrint; rotulo: string; valor: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-2">
+      <Icone className="mt-0.5 h-3.5 w-3.5 shrink-0 text-text-soft" />
+      <div className="min-w-0 flex-1">
+        <dt className="text-xs text-text-soft">{rotulo}</dt>
+        <dd className="text-sm text-text-strong break-words">{valor}</dd>
+      </div>
+    </div>
+  );
+}
