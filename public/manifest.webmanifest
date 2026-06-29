@@ -1,0 +1,25 @@
+{
+  "name": "Vitalis. Saúde pública veterinária de Belém",
+  "short_name": "Vitalis",
+  "description": "Plataforma oficial de triagem e atendimento veterinário da Prefeitura de Belém.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8f9ff",
+  "theme_color": "#0050cb",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/__l5e/assets-v1/09c0e45c-a266-49e1-8dfb-4fdb08dd4b45/vitalis-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/__l5e/assets-v1/09c0e45c-a266-49e1-8dfb-4fdb08dd4b45/vitalis-logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
