@@ -172,6 +172,12 @@ interface StoreCtx {
   resetRascunho: () => void;
   ultimaTriagemId?: string;
   setUltimaTriagemId: (id?: string) => void;
+  agendamentos: Agendamento[];
+  criarAgendamento: (
+    parcial: Omit<Agendamento, "id" | "protocolo" | "criadoEm">,
+  ) => Agendamento;
+  ultimoAgendamentoId?: string;
+  setUltimoAgendamentoId: (id?: string) => void;
 }
 
 const Ctx = createContext<StoreCtx | null>(null);
