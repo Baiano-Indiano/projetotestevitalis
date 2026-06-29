@@ -290,6 +290,12 @@ export function VitalisStoreProvider({ children }: { children: ReactNode }) {
         setAgendamentos((arr) => [a, ...arr]);
         return a;
       },
+      atualizarStatusAgendamento: (id, status) => {
+        setAgendamentos((arr) => arr.map((a) => (a.id === id ? { ...a, status } : a)));
+      },
+      removerAgendamento: (id) => {
+        setAgendamentos((arr) => arr.filter((a) => a.id !== id));
+      },
       ultimoAgendamentoId,
       setUltimoAgendamentoId,
     }),
