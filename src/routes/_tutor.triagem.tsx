@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { useVitalisStore } from "@/data/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -104,29 +106,46 @@ function Triagem() {
     return aceite;
   };
 
-  const finalizar = () => {
-    const t = adicionarTriagem({
-      animal: {
-        nome: animalNome,
-        especie: especie || "outro",
-        raca: raca || "Não informada",
-        sexo: sexo || "macho",
-        idade: `${idadeValor} ${idadeUnidade}`,
-      },
-      tutor: { nome: tutorNome, telefone: tutorTel },
-      canal: "online",
-      etapas: {
-        sintomas: ids,
-        observacoes: obs,
-        chipsIA: ids,
-      },
-      redFlags: motor.redFlags,
-      scores: motor.scores,
-      sugestao: especialidadeFinal,
-      prioridade: motor.prioridade,
-    });
-    setUltimaTriagemId(t.id);
-    navigate({ to: "/triagem/resultado" });
+  const [enviando, setEnviando] = useState(false);
+
+  const finalizar = async () => {
+    if (enviando) return;
+    setEnviando(true);
+    const loadingId = toast.loading("Enviando sua triagem...");
+    try {
+      // pequena espera para feedback visual perceptível
+      await new Promise((r) => setTimeout(r, 700));
+      const t = adicionarTriagem({
+        animal: {
+          nome: animalNome,
+          especie: especie || "outro",
+          raca: raca || "Não informada",
+          sexo: sexo || "macho",
+          idade: `${idadeValor} ${idadeUnidade}`,
+        },
+        tutor: { nome: tutorNome, telefone: tutorTel },
+        canal: "online",
+        etapas: {
+          sintomas: ids,
+          observacoes: obs,
+          chipsIA: ids,
+        },
+        redFlags: motor.redFlags,
+        scores: motor.scores,
+        sugestao: especialidadeFinal,
+        prioridade: motor.prioridade,
+      });
+      setUltimaTriagemId(t.id);
+      toast.success("Triagem enviada com sucesso!", {
+        id: loadingId,
+        description: `Protocolo ${t.protocolo} gerado.`,
+      });
+      navigate({ to: "/triagem/resultado" });
+    } catch (e) {
+      console.error(e);
+      toast.error("Não foi possível enviar sua triagem. Tente novamente.", { id: loadingId });
+      setEnviando(false);
+    }
   };
 
   const progresso = Math.round((fase / TOTAL_FASES) * 100);
@@ -262,8 +281,12 @@ function Triagem() {
                 Próximo <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             ) : (
-              <Button size="lg" disabled={!aceite} onClick={finalizar}>
-                Finalizar e Enviar
+              <Button size="lg" disabled={!aceite || enviando} onClick={finalizar}>
+                {enviando ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando...</>
+                ) : (
+                  "Finalizar e Enviar"
+                )}
               </Button>
             )}
           </div>
