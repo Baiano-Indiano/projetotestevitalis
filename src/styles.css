@@ -247,3 +247,19 @@ aside:has(a[href*="lovable.dev"]) {
     padding-inline: 2rem;
   }
 }
+
+@utility card-vitalis {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 200ms var(--ease-out-vitalis), box-shadow 200ms var(--ease-out-vitalis);
+}
+
+@utility hover-lift {
+  transition: transform 200ms var(--ease-out-vitalis), box-shadow 200ms var(--ease-out-vitalis);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+}
