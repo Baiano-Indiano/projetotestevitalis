@@ -202,7 +202,7 @@ const seedAgs: Agendamento[] = [
   } satisfies Agendamento;
 });
 
-export type Papel = "tutor" | "recepcao" | "veterinario";
+export type Papel = "tutor" | "recepcao" | "veterinario" | "unidade_movel";
 
 interface StoreCtx {
   triagens: Triagem[];
