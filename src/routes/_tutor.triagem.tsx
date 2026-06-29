@@ -937,3 +937,5 @@ function RedFlagModal({ sintoma, onClose }: { sintoma: string; onClose: () => vo
       </div>
     </div>
   );
+}
+
