@@ -109,7 +109,7 @@ export function EquipeShell() {
                 ? { to: it.to as never, params: it.params as never }
                 : { to: it.to as never };
               return (
-                <li key={it.to}>
+                <li key={`${it.to}-${it.label}`}>
                   <Link
                     {...linkProps}
                     className={cn(
