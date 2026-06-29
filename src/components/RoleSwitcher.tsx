@@ -6,9 +6,6 @@ const labels: Record<Papel, string> = {
   tutor: "Tutor",
   recepcao: "Recepção / Triagem",
   veterinario: "Veterinário",
-  unidade_movel: "Equipe de Unidade Móvel",
-  laboratorio: "Laboratório Clínico",
-  imagem: "Diagnóstico por Imagem",
 };
 
 export function RoleSwitcher() {

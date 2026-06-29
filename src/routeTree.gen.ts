@@ -23,6 +23,7 @@ import { Route as TutorTriagemResultadoRouteImport } from './routes/_tutor.triag
 import { Route as TutorAgendarConfirmacaoRouteImport } from './routes/_tutor.agendar.confirmacao'
 import { Route as EquipePainelVeterinariosRouteImport } from './routes/_equipe.painel.veterinarios'
 import { Route as EquipePainelValidacaoRouteImport } from './routes/_equipe.painel.validacao'
+import { Route as EquipePainelUnidadeMovelRouteImport } from './routes/_equipe.painel.unidade-movel'
 import { Route as EquipePainelTriagensRouteImport } from './routes/_equipe.painel.triagens'
 import { Route as EquipePainelRecepcaoRouteImport } from './routes/_equipe.painel.recepcao'
 import { Route as EquipePainelLaboratorioRouteImport } from './routes/_equipe.painel.laboratorio'
@@ -107,6 +108,12 @@ const EquipePainelValidacaoRoute = EquipePainelValidacaoRouteImport.update({
   path: '/painel/validacao',
   getParentRoute: () => EquipeRoute,
 } as any)
+const EquipePainelUnidadeMovelRoute =
+  EquipePainelUnidadeMovelRouteImport.update({
+    id: '/painel/unidade-movel',
+    path: '/painel/unidade-movel',
+    getParentRoute: () => EquipeRoute,
+  } as any)
 const EquipePainelTriagensRoute = EquipePainelTriagensRouteImport.update({
   id: '/painel/triagens',
   path: '/painel/triagens',
@@ -200,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/painel/laboratorio': typeof EquipePainelLaboratorioRoute
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/painel/triagens': typeof EquipePainelTriagensRoute
+  '/painel/unidade-movel': typeof EquipePainelUnidadeMovelRoute
   '/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
   '/painel/veterinarios': typeof EquipePainelVeterinariosRoute
   '/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
@@ -228,6 +236,7 @@ export interface FileRoutesByTo {
   '/painel/laboratorio': typeof EquipePainelLaboratorioRoute
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/painel/triagens': typeof EquipePainelTriagensRoute
+  '/painel/unidade-movel': typeof EquipePainelUnidadeMovelRoute
   '/painel/veterinarios': typeof EquipePainelVeterinariosRoute
   '/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
   '/triagem/resultado': typeof TutorTriagemResultadoRoute
@@ -258,6 +267,7 @@ export interface FileRoutesById {
   '/_equipe/painel/laboratorio': typeof EquipePainelLaboratorioRoute
   '/_equipe/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/_equipe/painel/triagens': typeof EquipePainelTriagensRoute
+  '/_equipe/painel/unidade-movel': typeof EquipePainelUnidadeMovelRoute
   '/_equipe/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
   '/_equipe/painel/veterinarios': typeof EquipePainelVeterinariosRoute
   '/_tutor/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
@@ -288,6 +298,7 @@ export interface FileRouteTypes {
     | '/painel/laboratorio'
     | '/painel/recepcao'
     | '/painel/triagens'
+    | '/painel/unidade-movel'
     | '/painel/validacao'
     | '/painel/veterinarios'
     | '/agendar/confirmacao'
@@ -316,6 +327,7 @@ export interface FileRouteTypes {
     | '/painel/laboratorio'
     | '/painel/recepcao'
     | '/painel/triagens'
+    | '/painel/unidade-movel'
     | '/painel/veterinarios'
     | '/agendar/confirmacao'
     | '/triagem/resultado'
@@ -345,6 +357,7 @@ export interface FileRouteTypes {
     | '/_equipe/painel/laboratorio'
     | '/_equipe/painel/recepcao'
     | '/_equipe/painel/triagens'
+    | '/_equipe/painel/unidade-movel'
     | '/_equipe/painel/validacao'
     | '/_equipe/painel/veterinarios'
     | '/_tutor/agendar/confirmacao'
@@ -458,6 +471,13 @@ declare module '@tanstack/react-router' {
       path: '/painel/validacao'
       fullPath: '/painel/validacao'
       preLoaderRoute: typeof EquipePainelValidacaoRouteImport
+      parentRoute: typeof EquipeRoute
+    }
+    '/_equipe/painel/unidade-movel': {
+      id: '/_equipe/painel/unidade-movel'
+      path: '/painel/unidade-movel'
+      fullPath: '/painel/unidade-movel'
+      preLoaderRoute: typeof EquipePainelUnidadeMovelRouteImport
       parentRoute: typeof EquipeRoute
     }
     '/_equipe/painel/triagens': {
@@ -588,6 +608,7 @@ interface EquipeRouteChildren {
   EquipePainelLaboratorioRoute: typeof EquipePainelLaboratorioRoute
   EquipePainelRecepcaoRoute: typeof EquipePainelRecepcaoRoute
   EquipePainelTriagensRoute: typeof EquipePainelTriagensRoute
+  EquipePainelUnidadeMovelRoute: typeof EquipePainelUnidadeMovelRoute
   EquipePainelValidacaoRoute: typeof EquipePainelValidacaoRouteWithChildren
   EquipePainelVeterinariosRoute: typeof EquipePainelVeterinariosRoute
   EquipePainelIndexRoute: typeof EquipePainelIndexRoute
@@ -606,6 +627,7 @@ const EquipeRouteChildren: EquipeRouteChildren = {
   EquipePainelLaboratorioRoute: EquipePainelLaboratorioRoute,
   EquipePainelRecepcaoRoute: EquipePainelRecepcaoRoute,
   EquipePainelTriagensRoute: EquipePainelTriagensRoute,
+  EquipePainelUnidadeMovelRoute: EquipePainelUnidadeMovelRoute,
   EquipePainelValidacaoRoute: EquipePainelValidacaoRouteWithChildren,
   EquipePainelVeterinariosRoute: EquipePainelVeterinariosRoute,
   EquipePainelIndexRoute: EquipePainelIndexRoute,

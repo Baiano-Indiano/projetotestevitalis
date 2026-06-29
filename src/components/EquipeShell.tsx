@@ -1,7 +1,6 @@
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
-import { SyncIndicator } from "@/components/SyncIndicator";
 import {
   Bell,
   CalendarDays,
@@ -21,14 +20,8 @@ import {
   Users,
   Wifi,
   Bed,
-  Syringe,
-  TestTube2,
-  Cpu,
   ClipboardList,
   ScanLine,
-  Boxes,
-  BarChart3,
-  Wrench,
   Beaker,
   ChevronDown,
 } from "lucide-react";
@@ -73,50 +66,13 @@ export function EquipeShell() {
     { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
     { to: "/painel/validacao", label: "Validação Clínica", Icon: ShieldCheck },
     { to: "/painel/agenda", label: "Agenda do Veterinário", Icon: CalendarDays },
+    { to: "/painel/laboratorio", label: "Laboratório Clínico", Icon: Beaker },
+    { to: "/painel/imagem", label: "Diagnóstico por Imagem", Icon: ScanLine },
+    { to: "/painel/unidade-movel", label: "Unidade Móvel", Icon: ClipboardList },
   ];
 
-  const itemsUnidadeMovel: Item[] = [
-    { to: "/painel", label: "Dashboard", Icon: LayoutGrid, tab: "dashboard" },
-    { to: "/painel", label: "Triagem", Icon: ClipboardList, search: { tab: "triagem" }, tab: "triagem" },
-    { to: "/painel", label: "Vacinação", Icon: Syringe, search: { tab: "vacinacao" }, tab: "vacinacao" },
-    { to: "/painel", label: "Coletas", Icon: TestTube2, search: { tab: "coletas" }, tab: "coletas" },
-    { to: "/painel", label: "Microchipagem", Icon: Cpu, search: { tab: "microchip" }, tab: "microchip" },
-    { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
-  ];
-
-  // Sidebar comum a Laboratório e Diagnóstico por Imagem
-  const itemsDiagnostico: Item[] = [
-    { to: "/painel", label: "Dashboard", Icon: LayoutGrid },
-    { to: "/painel/aguardando", label: "Pacientes", Icon: Users },
-    { to: "/painel/em-atendimento", label: "Atendimentos", Icon: UserSquare2 },
-    { to: "/painel/exames", label: "Exames", Icon: FlaskConical },
-    {
-      to: "/painel/laboratorio",
-      label: "Laboratório",
-      Icon: Beaker,
-      children: [
-        { to: "/painel/laboratorio", label: "Solicitações", search: { aba: "solicitacoes" } },
-        { to: "/painel/laboratorio", label: "Em Análise", search: { aba: "analise" } },
-        { to: "/painel/laboratorio", label: "Laudos Finalizados", search: { aba: "finalizados" } },
-        { to: "/painel/laboratorio", label: "Todos os Laudos", search: { aba: "todos" } },
-      ],
-    },
-    { to: "/painel/imagem", label: "Exames de Imagem", Icon: ScanLine },
-    { to: "/painel", label: "Equipamentos", Icon: Wrench },
-    { to: "/painel/admin", label: "Relatórios", Icon: BarChart3 },
-    { to: "/painel", label: "Estoque", Icon: Boxes },
-    { to: "/painel", label: "Configurações", Icon: Settings },
-  ];
-
-  const items =
-    papel === "veterinario"
-      ? itemsVeterinario
-      : papel === "unidade_movel"
-        ? itemsUnidadeMovel
-        : papel === "laboratorio" || papel === "imagem"
-          ? itemsDiagnostico
-          : itemsRecepcao;
-  const podeNovoAtendimento = papel === "veterinario" || papel === "unidade_movel";
+  const items = papel === "veterinario" ? itemsVeterinario : itemsRecepcao;
+  const podeNovoAtendimento = papel === "veterinario";
 
 
   return (
@@ -221,7 +177,6 @@ export function EquipeShell() {
             />
           </div>
           <div className="flex items-center gap-2">
-            {papel === "unidade_movel" && <div className="hidden md:block"><SyncIndicator /></div>}
             <div className="hidden lg:block"><RoleSwitcher /></div>
             <button
               type="button"
