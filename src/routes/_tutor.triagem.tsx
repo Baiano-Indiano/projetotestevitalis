@@ -41,6 +41,9 @@ import { nomeEspecialidade, type EspecialidadeId } from "@/config/municipio";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_tutor/triagem")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    edit: typeof s.edit === "string" ? s.edit : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Triagem online. Vitalis Belém" },
