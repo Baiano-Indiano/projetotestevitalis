@@ -267,6 +267,7 @@ function Triagem() {
               <Button
                 variant="outline"
                 size="lg"
+                disabled={enviando}
                 onClick={() => setFase((fase - 1) as Fase)}
               >
                 <ArrowLeft className="mr-1.5 h-4 w-4" /> Anterior
