@@ -60,7 +60,8 @@ export function EquipeShell() {
         </div>
         <div className="px-3 pb-3">
           <Link
-            to="/painel/triagens"
+            to="/painel/ficha/$id"
+            params={{ id: "novo" }}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary-700"
           >
             <Plus className="h-4 w-4" /> Novo Atendimento
