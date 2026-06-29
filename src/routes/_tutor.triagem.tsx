@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -45,8 +45,18 @@ export const Route = createFileRoute("/_tutor/triagem")({
       { name: "description", content: "Triagem online em quatro etapas, gratuita, validada por veterinário." },
     ],
   }),
-  component: Triagem,
+  component: TriagemRoute,
 });
+
+function TriagemRoute() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  if (pathname !== "/triagem") {
+    return <Outlet />;
+  }
+
+  return <Triagem />;
+}
 
 type Fase = 1 | 2 | 3 | 4;
 const TOTAL_FASES = 4;
