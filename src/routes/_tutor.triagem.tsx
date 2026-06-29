@@ -39,6 +39,8 @@ import {
 } from "@/data/sintomas-categorias";
 import { nomeEspecialidade, type EspecialidadeId } from "@/config/municipio";
 import { cn } from "@/lib/utils";
+import { blocosTriagem, type RespostasEspecialidades } from "@/data/triagem-especialidades";
+import { BlocoEspecialidade } from "@/components/triagem/BlocoEspecialidade";
 
 export const Route = createFileRoute("/_tutor/triagem")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -63,8 +65,12 @@ function TriagemRoute() {
   return <Triagem />;
 }
 
-type Fase = 1 | 2 | 3 | 4;
-const TOTAL_FASES = 4;
+type Fase = number; // 1..10
+const TOTAL_FASES = 10;
+const FASE_REVISAO = 10;
+// Etapas 4..9 -> blocosTriagem[fase - 4]
+const faseParaBloco = (fase: number) =>
+  fase >= 4 && fase <= 9 ? blocosTriagem[fase - 4] : undefined;
 
 function Triagem() {
   const navigate = useNavigate();
