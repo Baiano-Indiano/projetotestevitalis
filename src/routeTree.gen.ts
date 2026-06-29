@@ -25,7 +25,9 @@ import { Route as EquipePainelVeterinariosRouteImport } from './routes/_equipe.p
 import { Route as EquipePainelValidacaoRouteImport } from './routes/_equipe.painel.validacao'
 import { Route as EquipePainelTriagensRouteImport } from './routes/_equipe.painel.triagens'
 import { Route as EquipePainelRecepcaoRouteImport } from './routes/_equipe.painel.recepcao'
+import { Route as EquipePainelLaboratorioRouteImport } from './routes/_equipe.painel.laboratorio'
 import { Route as EquipePainelInternacoesRouteImport } from './routes/_equipe.painel.internacoes'
+import { Route as EquipePainelImagemRouteImport } from './routes/_equipe.painel.imagem'
 import { Route as EquipePainelExamesRouteImport } from './routes/_equipe.painel.exames'
 import { Route as EquipePainelEncaminhamentosRouteImport } from './routes/_equipe.painel.encaminhamentos'
 import { Route as EquipePainelEmAtendimentoRouteImport } from './routes/_equipe.painel.em-atendimento'
@@ -115,9 +117,19 @@ const EquipePainelRecepcaoRoute = EquipePainelRecepcaoRouteImport.update({
   path: '/painel/recepcao',
   getParentRoute: () => EquipeRoute,
 } as any)
+const EquipePainelLaboratorioRoute = EquipePainelLaboratorioRouteImport.update({
+  id: '/painel/laboratorio',
+  path: '/painel/laboratorio',
+  getParentRoute: () => EquipeRoute,
+} as any)
 const EquipePainelInternacoesRoute = EquipePainelInternacoesRouteImport.update({
   id: '/painel/internacoes',
   path: '/painel/internacoes',
+  getParentRoute: () => EquipeRoute,
+} as any)
+const EquipePainelImagemRoute = EquipePainelImagemRouteImport.update({
+  id: '/painel/imagem',
+  path: '/painel/imagem',
   getParentRoute: () => EquipeRoute,
 } as any)
 const EquipePainelExamesRoute = EquipePainelExamesRouteImport.update({
@@ -183,7 +195,9 @@ export interface FileRoutesByFullPath {
   '/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
   '/painel/exames': typeof EquipePainelExamesRoute
+  '/painel/imagem': typeof EquipePainelImagemRoute
   '/painel/internacoes': typeof EquipePainelInternacoesRoute
+  '/painel/laboratorio': typeof EquipePainelLaboratorioRoute
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/painel/triagens': typeof EquipePainelTriagensRoute
   '/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
@@ -209,7 +223,9 @@ export interface FileRoutesByTo {
   '/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
   '/painel/exames': typeof EquipePainelExamesRoute
+  '/painel/imagem': typeof EquipePainelImagemRoute
   '/painel/internacoes': typeof EquipePainelInternacoesRoute
+  '/painel/laboratorio': typeof EquipePainelLaboratorioRoute
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/painel/triagens': typeof EquipePainelTriagensRoute
   '/painel/veterinarios': typeof EquipePainelVeterinariosRoute
@@ -237,7 +253,9 @@ export interface FileRoutesById {
   '/_equipe/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/_equipe/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
   '/_equipe/painel/exames': typeof EquipePainelExamesRoute
+  '/_equipe/painel/imagem': typeof EquipePainelImagemRoute
   '/_equipe/painel/internacoes': typeof EquipePainelInternacoesRoute
+  '/_equipe/painel/laboratorio': typeof EquipePainelLaboratorioRoute
   '/_equipe/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/_equipe/painel/triagens': typeof EquipePainelTriagensRoute
   '/_equipe/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
@@ -265,7 +283,9 @@ export interface FileRouteTypes {
     | '/painel/em-atendimento'
     | '/painel/encaminhamentos'
     | '/painel/exames'
+    | '/painel/imagem'
     | '/painel/internacoes'
+    | '/painel/laboratorio'
     | '/painel/recepcao'
     | '/painel/triagens'
     | '/painel/validacao'
@@ -291,7 +311,9 @@ export interface FileRouteTypes {
     | '/painel/em-atendimento'
     | '/painel/encaminhamentos'
     | '/painel/exames'
+    | '/painel/imagem'
     | '/painel/internacoes'
+    | '/painel/laboratorio'
     | '/painel/recepcao'
     | '/painel/triagens'
     | '/painel/veterinarios'
@@ -318,7 +340,9 @@ export interface FileRouteTypes {
     | '/_equipe/painel/em-atendimento'
     | '/_equipe/painel/encaminhamentos'
     | '/_equipe/painel/exames'
+    | '/_equipe/painel/imagem'
     | '/_equipe/painel/internacoes'
+    | '/_equipe/painel/laboratorio'
     | '/_equipe/painel/recepcao'
     | '/_equipe/painel/triagens'
     | '/_equipe/painel/validacao'
@@ -450,11 +474,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipePainelRecepcaoRouteImport
       parentRoute: typeof EquipeRoute
     }
+    '/_equipe/painel/laboratorio': {
+      id: '/_equipe/painel/laboratorio'
+      path: '/painel/laboratorio'
+      fullPath: '/painel/laboratorio'
+      preLoaderRoute: typeof EquipePainelLaboratorioRouteImport
+      parentRoute: typeof EquipeRoute
+    }
     '/_equipe/painel/internacoes': {
       id: '/_equipe/painel/internacoes'
       path: '/painel/internacoes'
       fullPath: '/painel/internacoes'
       preLoaderRoute: typeof EquipePainelInternacoesRouteImport
+      parentRoute: typeof EquipeRoute
+    }
+    '/_equipe/painel/imagem': {
+      id: '/_equipe/painel/imagem'
+      path: '/painel/imagem'
+      fullPath: '/painel/imagem'
+      preLoaderRoute: typeof EquipePainelImagemRouteImport
       parentRoute: typeof EquipeRoute
     }
     '/_equipe/painel/exames': {
@@ -545,7 +583,9 @@ interface EquipeRouteChildren {
   EquipePainelEmAtendimentoRoute: typeof EquipePainelEmAtendimentoRoute
   EquipePainelEncaminhamentosRoute: typeof EquipePainelEncaminhamentosRoute
   EquipePainelExamesRoute: typeof EquipePainelExamesRoute
+  EquipePainelImagemRoute: typeof EquipePainelImagemRoute
   EquipePainelInternacoesRoute: typeof EquipePainelInternacoesRoute
+  EquipePainelLaboratorioRoute: typeof EquipePainelLaboratorioRoute
   EquipePainelRecepcaoRoute: typeof EquipePainelRecepcaoRoute
   EquipePainelTriagensRoute: typeof EquipePainelTriagensRoute
   EquipePainelValidacaoRoute: typeof EquipePainelValidacaoRouteWithChildren
@@ -561,7 +601,9 @@ const EquipeRouteChildren: EquipeRouteChildren = {
   EquipePainelEmAtendimentoRoute: EquipePainelEmAtendimentoRoute,
   EquipePainelEncaminhamentosRoute: EquipePainelEncaminhamentosRoute,
   EquipePainelExamesRoute: EquipePainelExamesRoute,
+  EquipePainelImagemRoute: EquipePainelImagemRoute,
   EquipePainelInternacoesRoute: EquipePainelInternacoesRoute,
+  EquipePainelLaboratorioRoute: EquipePainelLaboratorioRoute,
   EquipePainelRecepcaoRoute: EquipePainelRecepcaoRoute,
   EquipePainelTriagensRoute: EquipePainelTriagensRoute,
   EquipePainelValidacaoRoute: EquipePainelValidacaoRouteWithChildren,

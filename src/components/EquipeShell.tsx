@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
+import { SyncIndicator } from "@/components/SyncIndicator";
 import {
   Bell,
   CalendarDays,
@@ -24,8 +25,14 @@ import {
   TestTube2,
   Cpu,
   ClipboardList,
+  ScanLine,
+  Boxes,
+  BarChart3,
+  Wrench,
+  Beaker,
+  ChevronDown,
 } from "lucide-react";
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useVitalisStore } from "@/data/store";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +44,7 @@ interface Item {
   params?: Record<string, string>;
   search?: Record<string, string>;
   tab?: string;
+  children?: { to: string; label: string; search?: Record<string, string> }[];
 }
 
 
@@ -45,6 +53,7 @@ export function EquipeShell() {
   const pendentes = triagens.filter((t) => t.status === "pendente" || t.status === "urgencia").length;
   const urgencias = triagens.filter((t) => t.status === "urgencia").length;
   const location = useLocation();
+  const [labOpen, setLabOpen] = useState(true);
 
   const itemsRecepcao: Item[] = [
     { to: "/painel", label: "Painel da Recepção", Icon: LayoutGrid },
@@ -75,8 +84,40 @@ export function EquipeShell() {
     { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
   ];
 
+  // Sidebar comum a Laboratório e Diagnóstico por Imagem
+  const itemsDiagnostico = (papelAtivo: "laboratorio" | "imagem"): Item[] => [
+    { to: "/painel", label: "Dashboard", Icon: LayoutGrid },
+    { to: "/painel/aguardando", label: "Pacientes", Icon: Users },
+    { to: "/painel/em-atendimento", label: "Atendimentos", Icon: UserSquare2 },
+    { to: "/painel/exames", label: "Exames", Icon: FlaskConical },
+    {
+      to: "/painel/laboratorio",
+      label: "Laboratório",
+      Icon: Beaker,
+      children: [
+        { to: "/painel/laboratorio", label: "Solicitações", search: { aba: "solicitacoes" } },
+        { to: "/painel/laboratorio", label: "Em Análise", search: { aba: "analise" } },
+        { to: "/painel/laboratorio", label: "Laudos Finalizados", search: { aba: "finalizados" } },
+        { to: "/painel/laboratorio", label: "Todos os Laudos", search: { aba: "todos" } },
+      ],
+    },
+    { to: "/painel/imagem", label: "Exames de Imagem", Icon: ScanLine },
+    { to: "/painel", label: "Equipamentos", Icon: Wrench },
+    { to: "/painel/admin", label: "Relatórios", Icon: BarChart3 },
+    { to: "/painel", label: "Estoque", Icon: Boxes },
+    { to: "/painel", label: "Configurações", Icon: Settings },
+    // Destaque visual: rota atual
+    ...(papelAtivo === "imagem" ? [] : []),
+  ];
+
   const items =
-    papel === "veterinario" ? itemsVeterinario : papel === "unidade_movel" ? itemsUnidadeMovel : itemsRecepcao;
+    papel === "veterinario"
+      ? itemsVeterinario
+      : papel === "unidade_movel"
+        ? itemsUnidadeMovel
+        : papel === "laboratorio" || papel === "imagem"
+          ? itemsDiagnostico(papel)
+          : itemsRecepcao;
   const podeNovoAtendimento = papel === "veterinario" || papel === "unidade_movel";
 
 
