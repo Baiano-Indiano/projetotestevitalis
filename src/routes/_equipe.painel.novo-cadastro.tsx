@@ -81,7 +81,7 @@ function NovoCadastroPage() {
   }, []);
 
   return (
-    <div className="pb-32">
+    <div className="flex min-h-full flex-col">
       {/* Header */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
