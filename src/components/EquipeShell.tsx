@@ -30,7 +30,9 @@ interface Item {
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
   badge?: () => ReactNode;
+  params?: Record<string, string>;
 }
+
 
 export function EquipeShell() {
   const { triagens, papel } = useVitalisStore();
@@ -38,19 +40,29 @@ export function EquipeShell() {
   const urgencias = triagens.filter((t) => t.status === "urgencia").length;
   const location = useLocation();
 
-  const items: Item[] = [
+  const itemsRecepcao: Item[] = [
     { to: "/painel", label: "Painel da Recepção", Icon: LayoutGrid },
     { to: "/painel/aguardando", label: "Pacientes Aguardando", Icon: Users, badge: () => pendentes > 0 ? <Badge count={pendentes} /> : null },
     { to: "/painel/triagens", label: "Triagens Online", Icon: Wifi, badge: () => urgencias > 0 ? <Badge count={urgencias} tone="danger" /> : null },
-    { to: "/painel/veterinarios", label: "Veterinários", Icon: Stethoscope },
     { to: "/painel/em-atendimento", label: "Em Atendimento", Icon: UserSquare2 },
     { to: "/painel/agenda", label: "Agendamentos", Icon: CalendarDays },
     { to: "/painel/internacoes", label: "Internações", Icon: Bed },
+    { to: "/painel/veterinarios", label: "Veterinários", Icon: Stethoscope },
+  ];
+
+  const itemsVeterinario: Item[] = [
+    { to: "/painel", label: "Painel do Veterinário", Icon: LayoutGrid },
+    { to: "/painel/em-atendimento", label: "Pacientes em Atendimento", Icon: UserSquare2 },
+    { to: "/painel/ficha/$id", label: "Prontuários", Icon: FileText, params: { id: "novo" } },
     { to: "/painel/exames", label: "Solicitações de Exames", Icon: FlaskConical },
     { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
     { to: "/painel/validacao", label: "Validação Clínica", Icon: ShieldCheck },
-    { to: "/painel/admin", label: "Visão Administrativa", Icon: FileText },
+    { to: "/painel/agenda", label: "Agenda do Veterinário", Icon: CalendarDays },
   ];
+
+  const items = papel === "veterinario" ? itemsVeterinario : itemsRecepcao;
+  const podeNovoAtendimento = papel === "veterinario";
+
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -60,26 +72,32 @@ export function EquipeShell() {
             <Logo size="lg" />
           </Link>
         </div>
-        <div className="px-3 pt-4 pb-3">
-          <Link
-            to="/painel/ficha/$id"
-            params={{ id: "novo" }}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary-700"
-          >
-            <Plus className="h-4 w-4" /> Novo Atendimento
-          </Link>
-        </div>
-        <nav className="flex-1 overflow-y-auto px-3 pb-3">
+        {podeNovoAtendimento && (
+          <div className="px-3 pt-4 pb-3">
+            <Link
+              to="/painel/ficha/$id"
+              params={{ id: "novo" }}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary-700"
+            >
+              <Plus className="h-4 w-4" /> Novo Atendimento
+            </Link>
+          </div>
+        )}
+        <nav className="flex-1 overflow-y-auto px-3 pb-3 pt-2">
           <ul className="flex flex-col gap-0.5">
             {items.map((it) => {
+              const basePath = it.params ? it.to.replace(/\$(\w+)/g, (_, k) => it.params![k] ?? "") : it.to;
               const active =
                 it.to === "/painel"
                   ? location.pathname === "/painel"
-                  : location.pathname.startsWith(it.to);
+                  : location.pathname.startsWith(basePath.split("/$")[0]);
+              const linkProps = it.params
+                ? { to: it.to as never, params: it.params as never }
+                : { to: it.to as never };
               return (
                 <li key={it.to}>
                   <Link
-                    to={it.to}
+                    {...linkProps}
                     className={cn(
                       "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       active
@@ -98,6 +116,7 @@ export function EquipeShell() {
             })}
           </ul>
         </nav>
+
         <div className="border-t border-border p-3">
           <Link to="/painel" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted">
             <LifeBuoy className="h-4 w-4" /> Suporte
