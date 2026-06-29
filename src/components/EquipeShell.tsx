@@ -67,11 +67,11 @@ export function EquipeShell() {
   ];
 
   const itemsUnidadeMovel: Item[] = [
-    { to: "/painel", label: "Dashboard", Icon: LayoutGrid },
-    { to: "/painel", label: "Triagem", Icon: ClipboardList },
-    { to: "/painel", label: "Vacinação", Icon: Syringe },
-    { to: "/painel", label: "Coletas", Icon: TestTube2 },
-    { to: "/painel", label: "Microchipagem", Icon: Cpu },
+    { to: "/painel", label: "Dashboard", Icon: LayoutGrid, tab: "dashboard" },
+    { to: "/painel", label: "Triagem", Icon: ClipboardList, search: { tab: "triagem" }, tab: "triagem" },
+    { to: "/painel", label: "Vacinação", Icon: Syringe, search: { tab: "vacinacao" }, tab: "vacinacao" },
+    { to: "/painel", label: "Coletas", Icon: TestTube2, search: { tab: "coletas" }, tab: "coletas" },
+    { to: "/painel", label: "Microchipagem", Icon: Cpu, search: { tab: "microchip" }, tab: "microchip" },
     { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
   ];
 
