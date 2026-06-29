@@ -76,7 +76,7 @@ export function TutorShell() {
       <footer className="border-t border-border bg-surface">
         <div className="container-app flex flex-col items-start justify-between gap-4 py-8 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
-            <Logo mark />
+            <Logo mark size="md" />
             <div>
               <p className="text-sm font-medium text-text-strong">{municipio.nomeRede}</p>
               <p className="text-xs text-text-soft">{municipio.prefeitura}</p>
