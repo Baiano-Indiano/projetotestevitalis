@@ -64,6 +64,9 @@ function Triagem() {
   const [tutorEnd, setTutorEnd] = useState("");
   const [animalNome, setAnimalNome] = useState("");
   const [raca, setRaca] = useState("");
+  const [sexo, setSexo] = useState<"macho" | "femea" | "">("");
+  const [pelagem, setPelagem] = useState("");
+  const [peso, setPeso] = useState("");
 
   // Fases 2 e 3 — sintomas
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
@@ -97,8 +100,8 @@ function Triagem() {
 
   const podeAvancar = (): boolean => {
     if (fase === 1) return valida1();
-    if (fase === 2 || fase === 3) return true; // sintomas opcionais por etapa
-    return aceite && ids.length > 0;
+    if (fase === 2 || fase === 3) return true;
+    return aceite;
   };
 
   const finalizar = () => {
@@ -107,7 +110,7 @@ function Triagem() {
         nome: animalNome,
         especie: especie || "outro",
         raca: raca || "Não informada",
-        sexo: "macho",
+        sexo: sexo || "macho",
         idade: `${idadeValor} ${idadeUnidade}`,
       },
       tutor: { nome: tutorNome, telefone: tutorTel },
@@ -180,6 +183,9 @@ function Triagem() {
               tutorEnd={tutorEnd} setTutorEnd={setTutorEnd}
               animalNome={animalNome} setAnimalNome={setAnimalNome}
               raca={raca} setRaca={setRaca}
+              sexo={sexo} setSexo={setSexo}
+              pelagem={pelagem} setPelagem={setPelagem}
+              peso={peso} setPeso={setPeso}
             />
           )}
 
@@ -256,7 +262,7 @@ function Triagem() {
                 Próximo <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             ) : (
-              <Button size="lg" disabled={!aceite || ids.length === 0} onClick={finalizar}>
+              <Button size="lg" disabled={!aceite} onClick={finalizar}>
                 Finalizar e Enviar
               </Button>
             )}
@@ -297,6 +303,9 @@ function FaseInicial(props: {
   tutorEnd: string; setTutorEnd: (v: string) => void;
   animalNome: string; setAnimalNome: (v: string) => void;
   raca: string; setRaca: (v: string) => void;
+  sexo: "macho" | "femea" | ""; setSexo: (v: "macho" | "femea") => void;
+  pelagem: string; setPelagem: (v: string) => void;
+  peso: string; setPeso: (v: string) => void;
 }) {
   return (
     <div>
@@ -374,6 +383,36 @@ function FaseInicial(props: {
           </Campo>
           <Campo label="Raça (opcional)">
             <Input value={props.raca} onChange={(e) => props.setRaca(e.target.value)} placeholder="Ex: Labrador, SRD" />
+          </Campo>
+          <Campo label="Sexo">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => props.setSexo("macho")}
+                className={cn(
+                  "rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
+                  props.sexo === "macho" ? "border-primary bg-primary-50 text-primary" : "border-border bg-background text-text-strong hover:border-primary/40",
+                )}
+              >
+                Macho
+              </button>
+              <button
+                type="button"
+                onClick={() => props.setSexo("femea")}
+                className={cn(
+                  "rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
+                  props.sexo === "femea" ? "border-primary bg-primary-50 text-primary" : "border-border bg-background text-text-strong hover:border-primary/40",
+                )}
+              >
+                Fêmea
+              </button>
+            </div>
+          </Campo>
+          <Campo label="Pelagem (opcional)">
+            <Input value={props.pelagem} onChange={(e) => props.setPelagem(e.target.value)} placeholder="Ex: curta preta, longa caramelo" />
+          </Campo>
+          <Campo label="Peso aproximado (opcional)">
+            <Input value={props.peso} onChange={(e) => props.setPeso(e.target.value)} placeholder="Ex: 8 kg" inputMode="decimal" />
           </Campo>
         </div>
       </SectionCard>
