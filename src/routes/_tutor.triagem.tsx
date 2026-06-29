@@ -151,11 +151,20 @@ function Triagem() {
   const valida1 = () =>
     Boolean(especie && idadeValor && tutorNome && tutorTel && tutorEnd && animalNome);
 
+  const [redFlagAtivo, setRedFlagAtivo] = useState<{ id: string; label: string } | null>(null);
+
   const toggle = (id: string) => {
     setSelecionados((s) => {
       const n = new Set(s);
-      if (n.has(id)) n.delete(id);
-      else n.add(id);
+      if (n.has(id)) {
+        n.delete(id);
+      } else {
+        n.add(id);
+        const item = getItemById(id);
+        if (item?.redFlag) {
+          setRedFlagAtivo({ id, label: item.label });
+        }
+      }
       return n;
     });
   };
@@ -245,6 +254,13 @@ function Triagem() {
           index={lightboxIdx}
           onClose={() => setLightboxIdx(null)}
           onIndexChange={setLightboxIdx}
+        />
+      )}
+
+      {redFlagAtivo && (
+        <RedFlagModal
+          sintoma={redFlagAtivo.label}
+          onClose={() => setRedFlagAtivo(null)}
         />
       )}
 
@@ -856,3 +872,70 @@ function Item({ rotulo, valor, className }: { rotulo: string; valor: string; cla
     </div>
   );
 }
+
+function RedFlagModal({ sintoma, onClose }: { sintoma: string; onClose: () => void }) {
+  const hospitalNome = "Hospital Municipal Veterinário";
+  const hospitalEndereco = "Av. José Bonifácio, 578 - Fátima, Belém - PA";
+  const hospitalTel = "(91) 3000-0002";
+  const rotaUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(hospitalEndereco)}`;
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="rf-title"
+    >
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-destructive/30 bg-surface shadow-2xl">
+        <div className="flex items-start gap-3 bg-destructive-50 px-5 py-4">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-destructive text-destructive-foreground">
+            <AlertTriangle className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-destructive">Sinal de emergência</p>
+            <h2 id="rf-title" className="font-display text-lg font-semibold text-destructive-700">
+              {sintoma}
+            </h2>
+          </div>
+        </div>
+        <div className="space-y-3 px-5 py-4 text-sm text-text-strong">
+          <p className="font-semibold">Primeiros socorros imediatos:</p>
+          <ol className="list-decimal space-y-1.5 pl-5 text-muted-foreground">
+            <li>Mantenha o animal calmo, em local fresco e ventilado.</li>
+            <li>Evite oferecer comida, água ou medicamentos sem orientação.</li>
+            <li>Se houver sangramento, faça compressão leve com pano limpo.</li>
+            <li>Transporte com cuidado, evitando movimentos bruscos.</li>
+          </ol>
+          <div className="rounded-lg border border-destructive/30 bg-destructive-50/50 p-3 text-xs">
+            <p className="font-semibold text-destructive-700">Procure atendimento agora</p>
+            <p className="mt-1 text-text-strong">{hospitalNome}</p>
+            <p className="text-muted-foreground">{hospitalEndereco}</p>
+          </div>
+        </div>
+        <div className="grid gap-2 border-t border-border px-5 py-4 sm:grid-cols-2">
+          <a
+            href={rotaUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90"
+          >
+            Traçar rota agora
+          </a>
+          <a
+            href={`tel:${hospitalTel.replace(/\D/g, "")}`}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-destructive/40 px-4 py-2.5 text-sm font-semibold text-destructive-700 hover:bg-destructive-50"
+          >
+            Ligar {hospitalTel}
+          </a>
+          <button
+            type="button"
+            onClick={onClose}
+            className="sm:col-span-2 mt-1 text-center text-xs font-medium text-muted-foreground hover:text-text-strong"
+          >
+            Entendi, continuar a triagem mesmo assim
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
