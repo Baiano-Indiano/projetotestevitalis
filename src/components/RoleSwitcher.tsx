@@ -15,8 +15,7 @@ export function RoleSwitcher() {
   const onChange = (v: Papel) => {
     setPapel(v);
     if (v === "tutor") navigate({ to: "/" });
-    else if (v === "recepcao") navigate({ to: "/painel/recepcao" });
-    else navigate({ to: "/painel/validacao" });
+    else navigate({ to: "/painel" });
   };
 
   return (
