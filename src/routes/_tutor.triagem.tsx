@@ -106,29 +106,46 @@ function Triagem() {
     return aceite;
   };
 
-  const finalizar = () => {
-    const t = adicionarTriagem({
-      animal: {
-        nome: animalNome,
-        especie: especie || "outro",
-        raca: raca || "Não informada",
-        sexo: sexo || "macho",
-        idade: `${idadeValor} ${idadeUnidade}`,
-      },
-      tutor: { nome: tutorNome, telefone: tutorTel },
-      canal: "online",
-      etapas: {
-        sintomas: ids,
-        observacoes: obs,
-        chipsIA: ids,
-      },
-      redFlags: motor.redFlags,
-      scores: motor.scores,
-      sugestao: especialidadeFinal,
-      prioridade: motor.prioridade,
-    });
-    setUltimaTriagemId(t.id);
-    navigate({ to: "/triagem/resultado" });
+  const [enviando, setEnviando] = useState(false);
+
+  const finalizar = async () => {
+    if (enviando) return;
+    setEnviando(true);
+    const loadingId = toast.loading("Enviando sua triagem...");
+    try {
+      // pequena espera para feedback visual perceptível
+      await new Promise((r) => setTimeout(r, 700));
+      const t = adicionarTriagem({
+        animal: {
+          nome: animalNome,
+          especie: especie || "outro",
+          raca: raca || "Não informada",
+          sexo: sexo || "macho",
+          idade: `${idadeValor} ${idadeUnidade}`,
+        },
+        tutor: { nome: tutorNome, telefone: tutorTel },
+        canal: "online",
+        etapas: {
+          sintomas: ids,
+          observacoes: obs,
+          chipsIA: ids,
+        },
+        redFlags: motor.redFlags,
+        scores: motor.scores,
+        sugestao: especialidadeFinal,
+        prioridade: motor.prioridade,
+      });
+      setUltimaTriagemId(t.id);
+      toast.success("Triagem enviada com sucesso!", {
+        id: loadingId,
+        description: `Protocolo ${t.protocolo} gerado.`,
+      });
+      navigate({ to: "/triagem/resultado" });
+    } catch (e) {
+      console.error(e);
+      toast.error("Não foi possível enviar sua triagem. Tente novamente.", { id: loadingId });
+      setEnviando(false);
+    }
   };
 
   const progresso = Math.round((fase / TOTAL_FASES) * 100);
