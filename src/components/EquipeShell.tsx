@@ -85,7 +85,7 @@ export function EquipeShell() {
   ];
 
   // Sidebar comum a Laboratório e Diagnóstico por Imagem
-  const itemsDiagnostico = (papelAtivo: "laboratorio" | "imagem"): Item[] => [
+  const itemsDiagnostico: Item[] = [
     { to: "/painel", label: "Dashboard", Icon: LayoutGrid },
     { to: "/painel/aguardando", label: "Pacientes", Icon: Users },
     { to: "/painel/em-atendimento", label: "Atendimentos", Icon: UserSquare2 },
@@ -106,8 +106,6 @@ export function EquipeShell() {
     { to: "/painel/admin", label: "Relatórios", Icon: BarChart3 },
     { to: "/painel", label: "Estoque", Icon: Boxes },
     { to: "/painel", label: "Configurações", Icon: Settings },
-    // Destaque visual: rota atual
-    ...(papelAtivo === "imagem" ? [] : []),
   ];
 
   const items =
@@ -116,7 +114,7 @@ export function EquipeShell() {
       : papel === "unidade_movel"
         ? itemsUnidadeMovel
         : papel === "laboratorio" || papel === "imagem"
-          ? itemsDiagnostico(papel)
+          ? itemsDiagnostico
           : itemsRecepcao;
   const podeNovoAtendimento = papel === "veterinario" || papel === "unidade_movel";
 
