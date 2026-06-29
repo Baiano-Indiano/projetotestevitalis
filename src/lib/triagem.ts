@@ -47,6 +47,14 @@ export function gerarProtocolo(seq: number): string {
   return `VT-${ano}-${(800 + seq).toString().padStart(6, "0")}`;
 }
 
+let seqAgendamento = 0;
+export function gerarProtocoloAgendamento(): string {
+  const ano = new Date().getFullYear();
+  seqAgendamento += 1;
+  const base = Math.floor(Date.now() / 1000) % 100000;
+  return `AG-${ano}-${(base + seqAgendamento).toString().padStart(6, "0")}`;
+}
+
 export function minutosDesde(iso: string): number {
   return Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
 }
