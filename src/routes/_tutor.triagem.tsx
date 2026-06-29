@@ -304,24 +304,10 @@ function Triagem() {
 
       <div className="container-app py-6 md:py-10">
         <div className="mx-auto max-w-2xl">
-          {/* Cabeçalho com progresso */}
-          <div>
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-primary">
-              {tituloFase[fase].titulo}
-            </h1>
-            <div className="mt-1 flex items-baseline justify-between">
-              <p className="text-base text-muted-foreground">{tituloFase[fase].subtitulo}</p>
-              <span className="text-sm font-semibold text-primary">
-                Etapa {fase} de {TOTAL_FASES}
-              </span>
-            </div>
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-primary via-primary to-success transition-all"
-                style={{ width: `${progresso}%` }}
-              />
-            </div>
-          </div>
+          {/* Tabs: Triagem Inicial / Especialidade / Revisão */}
+          <TabsHeader fase={fase} progresso={progresso} />
+          <p className="mt-3 text-sm text-muted-foreground">{tituloFase(fase).subtitulo}</p>
+
 
           {fase === 1 && (
             <FaseInicial
