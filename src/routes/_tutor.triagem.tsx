@@ -429,7 +429,17 @@ function Triagem() {
             />
           )}
 
-          {fase === 4 && (
+          {fase >= 4 && fase <= 9 && faseParaBloco(fase) && (
+            <BlocoEspecialidade
+              bloco={faseParaBloco(fase)!}
+              respostas={respostas[faseParaBloco(fase)!.id] ?? {}}
+              setResposta={(perg, val) =>
+                setRespostaBloco(faseParaBloco(fase)!.id, perg, val)
+              }
+            />
+          )}
+
+          {fase === FASE_REVISAO && (
             <FaseRevisao
               tutorNome={tutorNome}
               tutorTel={tutorTel}
@@ -448,25 +458,12 @@ function Triagem() {
           )}
 
           {/* Ações */}
-          <div className={cn(
-            "mt-6 grid gap-3",
-            fase === 1 ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2",
-          )}>
-            {fase > 1 && (
-              <Button
-                variant="outline"
-                size="lg"
-                disabled={enviando}
-                onClick={() => setFase((fase - 1) as Fase)}
-              >
-                <ArrowLeft className="mr-1.5 h-4 w-4" /> Anterior
-              </Button>
-            )}
+          <div className="mt-6 flex flex-col gap-3">
             {fase < TOTAL_FASES ? (
               <Button
                 size="lg"
                 disabled={!podeAvancar()}
-                onClick={() => setFase((fase + 1) as Fase)}
+                onClick={() => setFase(fase + 1)}
               >
                 Próximo <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
@@ -479,12 +476,89 @@ function Triagem() {
                 )}
               </Button>
             )}
+            {fase > 1 && (
+              <Button
+                variant="outline"
+                size="lg"
+                disabled={enviando}
+                onClick={() => setFase(fase - 1)}
+              >
+                <ArrowLeft className="mr-1.5 h-4 w-4" /> Anterior
+              </Button>
+            )}
           </div>
         </div>
+      </div>
+
+      <FooterInstitucional />
+    </div>
+  );
+}
+
+function TabsHeader({ fase, progresso }: { fase: number; progresso: number }) {
+  const bloco = faseParaBloco(fase);
+  const especialidadeLabel = bloco ? bloco.nome : "Especialidade";
+  const ativo: "inicial" | "esp" | "revisao" =
+    fase <= 3 ? "inicial" : fase === FASE_REVISAO ? "revisao" : "esp";
+  const Tab = ({ label, on, disabled }: { label: string; on: boolean; disabled?: boolean }) => (
+    <div
+      className={cn(
+        "flex-1 px-1 pb-2 text-center text-sm font-medium transition-colors",
+        on ? "text-primary" : disabled ? "text-muted-foreground/60" : "text-muted-foreground",
+      )}
+    >
+      {label}
+    </div>
+  );
+  return (
+    <div>
+      <div className="flex items-end gap-2">
+        <Tab label="Triagem Inicial" on={ativo === "inicial"} />
+        <Tab label={especialidadeLabel} on={ativo === "esp"} disabled={!bloco} />
+        <Tab label="Revisão" on={ativo === "revisao"} />
+      </div>
+      <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-primary to-success transition-all"
+          style={{ width: `${progresso}%` }}
+        />
       </div>
     </div>
   );
 }
+
+function FooterInstitucional() {
+  return (
+    <footer className="mt-10 border-t border-border bg-surface py-8">
+      <div className="container-app mx-auto max-w-2xl text-center">
+        <p className="font-display text-xl font-semibold text-primary">Vitalis Belém</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          © 2024 Vitalis Belém — Instituto Municipal de Medicina Veterinária
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs">
+          <Link to="/informacoes" className="text-muted-foreground underline hover:text-text-strong">
+            Privacidade
+          </Link>
+          <Link to="/informacoes" className="text-muted-foreground underline hover:text-text-strong">
+            Termos de Uso
+          </Link>
+          <Link to="/informacoes" className="text-muted-foreground underline hover:text-text-strong">
+            Contato
+          </Link>
+          <a
+            href="https://www.belem.pa.gov.br"
+            target="_blank"
+            rel="noreferrer"
+            className="text-muted-foreground underline hover:text-text-strong"
+          >
+            Prefeitura
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 
 function SectionCard({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
