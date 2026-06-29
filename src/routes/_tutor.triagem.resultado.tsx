@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useVitalisStore } from "@/data/store";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Copy, Eye, Download, Info, FileCheck, Clock, Send, PawPrint, Stethoscope, Flag } from "lucide-react";
+import { CheckCircle2, Copy, Eye, Download, Info, FileCheck, Clock, Send, PawPrint, Stethoscope, Flag, User2, Phone, Calendar, ListChecks } from "lucide-react";
+import { getItemById } from "@/data/sintomas-categorias";
 import { nomeEspecialidade } from "@/config/municipio";
 import { cn } from "@/lib/utils";
 
