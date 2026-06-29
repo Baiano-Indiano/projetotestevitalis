@@ -64,6 +64,9 @@ function Triagem() {
   const [tutorEnd, setTutorEnd] = useState("");
   const [animalNome, setAnimalNome] = useState("");
   const [raca, setRaca] = useState("");
+  const [sexo, setSexo] = useState<"macho" | "femea" | "">("");
+  const [pelagem, setPelagem] = useState("");
+  const [peso, setPeso] = useState("");
 
   // Fases 2 e 3 — sintomas
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
