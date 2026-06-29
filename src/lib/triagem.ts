@@ -43,7 +43,8 @@ export function calcularMotor(sintomaIds: string[]): MotorResultado {
 }
 
 export function gerarProtocolo(seq: number): string {
-  return `TRG-${(2800 + seq).toString().padStart(4, "0")}`;
+  const ano = new Date().getFullYear();
+  return `VT-${ano}-${(800 + seq).toString().padStart(6, "0")}`;
 }
 
 export function minutosDesde(iso: string): number {
