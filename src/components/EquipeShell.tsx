@@ -53,7 +53,7 @@ export function EquipeShell() {
   const itemsVeterinario: Item[] = [
     { to: "/painel", label: "Painel do Veterinário", Icon: LayoutGrid },
     { to: "/painel/em-atendimento", label: "Pacientes em Atendimento", Icon: UserSquare2 },
-    { to: "/painel/ficha/$id", label: "Prontuários", Icon: FileText },
+    { to: "/painel/ficha/$id", label: "Prontuários", Icon: FileText, params: { id: "novo" } },
     { to: "/painel/exames", label: "Solicitações de Exames", Icon: FlaskConical },
     { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
     { to: "/painel/validacao", label: "Validação Clínica", Icon: ShieldCheck },
