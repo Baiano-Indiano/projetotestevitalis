@@ -52,6 +52,14 @@ function Resultado() {
     <div className="bg-[radial-gradient(ellipse_at_top,var(--color-primary-50)_0%,var(--color-background)_60%)] py-8 md:py-14">
       <div className="container-app">
         <div className="mx-auto max-w-xl">
+          {confirmVisivel && (
+            <div className="mb-4 flex items-center gap-3 rounded-xl border border-success/30 bg-success-50 px-4 py-3 text-sm shadow-sm animate-in fade-in slide-in-from-top-2">
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
+              <p className="font-medium text-success-700">
+                Triagem confirmada. Protocolo <span className="font-mono font-bold">{t.protocolo}</span> gerado.
+              </p>
+            </div>
+          )}
           <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm md:p-8">
             {/* Ícone de sucesso */}
             <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-success-50">
