@@ -136,7 +136,7 @@ function Triagem() {
       },
       redFlags: motor.redFlags,
       scores: motor.scores,
-      sugestao: especialidadeFinal === "geral" ? motor.sugestao : (especialidadeFinal as EspecialidadeId | "urgencia"),
+      sugestao: especialidadeFinal === ("geral" as never) ? motor.sugestao : (especialidadeFinal as EspecialidadeId | "urgencia"),
       prioridade: motor.prioridade,
     });
     setUltimaTriagemId(t.id);
