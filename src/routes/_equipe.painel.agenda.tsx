@@ -166,7 +166,7 @@ function AgendaPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <KPI icon={<CalendarDays className="h-4 w-4" />} label="Agendamentos do dia" valor={kpis.total} />
         <KPI icon={<CheckCircle2 className="h-4 w-4 text-success" />} label="Confirmados / check-in" valor={kpis.confirmados} />
-        <KPI icon={<Stethoscope className="h-4 w-4 text-violet-500" />} label="Concluídos" valor={kpis.concluidos} />
+        <KPI icon={<Stethoscope className="h-4 w-4 text-primary-600" />} label="Concluídos" valor={kpis.concluidos} />
         <KPI icon={<Users className="h-4 w-4 text-primary" />} label="Ocupação" valor={`${kpis.ocup}%`} />
       </div>
 
