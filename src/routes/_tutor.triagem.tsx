@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/_tutor/triagem")({
 });
 
 function TriagemRoute() {
-  const { pathname } = useLocation();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   if (pathname !== "/triagem") {
     return <Outlet />;
