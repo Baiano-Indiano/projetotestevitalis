@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TutorRouteImport } from './routes/_tutor'
 import { Route as EquipeRouteImport } from './routes/_equipe'
 import { Route as TutorIndexRouteImport } from './routes/_tutor.index'
+import { Route as TutorUnidadesRouteImport } from './routes/_tutor.unidades'
 import { Route as TutorTriagemRouteImport } from './routes/_tutor.triagem'
 import { Route as TutorMeusAtendimentosRouteImport } from './routes/_tutor.meus-atendimentos'
 import { Route as TutorInformacoesRouteImport } from './routes/_tutor.informacoes'
@@ -47,6 +48,11 @@ const EquipeRoute = EquipeRouteImport.update({
 const TutorIndexRoute = TutorIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => TutorRoute,
+} as any)
+const TutorUnidadesRoute = TutorUnidadesRouteImport.update({
+  id: '/unidades',
+  path: '/unidades',
   getParentRoute: () => TutorRoute,
 } as any)
 const TutorTriagemRoute = TutorTriagemRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/informacoes': typeof TutorInformacoesRoute
   '/meus-atendimentos': typeof TutorMeusAtendimentosRoute
   '/triagem': typeof TutorTriagemRouteWithChildren
+  '/unidades': typeof TutorUnidadesRoute
   '/painel/admin': typeof EquipePainelAdminRoute
   '/painel/agenda': typeof EquipePainelAgendaRoute
   '/painel/aguardando': typeof EquipePainelAguardandoRoute
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/informacoes': typeof TutorInformacoesRoute
   '/meus-atendimentos': typeof TutorMeusAtendimentosRoute
   '/triagem': typeof TutorTriagemRouteWithChildren
+  '/unidades': typeof TutorUnidadesRoute
   '/painel/admin': typeof EquipePainelAdminRoute
   '/painel/agenda': typeof EquipePainelAgendaRoute
   '/painel/aguardando': typeof EquipePainelAguardandoRoute
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/_tutor/informacoes': typeof TutorInformacoesRoute
   '/_tutor/meus-atendimentos': typeof TutorMeusAtendimentosRoute
   '/_tutor/triagem': typeof TutorTriagemRouteWithChildren
+  '/_tutor/unidades': typeof TutorUnidadesRoute
   '/_tutor/': typeof TutorIndexRoute
   '/_equipe/painel/admin': typeof EquipePainelAdminRoute
   '/_equipe/painel/agenda': typeof EquipePainelAgendaRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/informacoes'
     | '/meus-atendimentos'
     | '/triagem'
+    | '/unidades'
     | '/painel/admin'
     | '/painel/agenda'
     | '/painel/aguardando'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/informacoes'
     | '/meus-atendimentos'
     | '/triagem'
+    | '/unidades'
     | '/painel/admin'
     | '/painel/agenda'
     | '/painel/aguardando'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/_tutor/informacoes'
     | '/_tutor/meus-atendimentos'
     | '/_tutor/triagem'
+    | '/_tutor/unidades'
     | '/_tutor/'
     | '/_equipe/painel/admin'
     | '/_equipe/painel/agenda'
@@ -357,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof TutorIndexRouteImport
+      parentRoute: typeof TutorRoute
+    }
+    '/_tutor/unidades': {
+      id: '/_tutor/unidades'
+      path: '/unidades'
+      fullPath: '/unidades'
+      preLoaderRoute: typeof TutorUnidadesRouteImport
       parentRoute: typeof TutorRoute
     }
     '/_tutor/triagem': {
@@ -604,6 +623,7 @@ interface TutorRouteChildren {
   TutorInformacoesRoute: typeof TutorInformacoesRoute
   TutorMeusAtendimentosRoute: typeof TutorMeusAtendimentosRoute
   TutorTriagemRoute: typeof TutorTriagemRouteWithChildren
+  TutorUnidadesRoute: typeof TutorUnidadesRoute
   TutorIndexRoute: typeof TutorIndexRoute
 }
 
@@ -614,6 +634,7 @@ const TutorRouteChildren: TutorRouteChildren = {
   TutorInformacoesRoute: TutorInformacoesRoute,
   TutorMeusAtendimentosRoute: TutorMeusAtendimentosRoute,
   TutorTriagemRoute: TutorTriagemRouteWithChildren,
+  TutorUnidadesRoute: TutorUnidadesRoute,
   TutorIndexRoute: TutorIndexRoute,
 }
 
