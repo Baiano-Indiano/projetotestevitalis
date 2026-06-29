@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -17,7 +16,6 @@ import {
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
   PawPrint,
   Cat,
   Calendar as CalendarIcon,
@@ -28,8 +26,13 @@ import {
   AlertTriangle,
   Info,
 } from "lucide-react";
-import { calcularMotor } from "@/lib/triagem";
-import { blocosEspecialidade, motivosConsulta, type BlocoEspecialidade } from "@/data/especialidades-perguntas";
+import {
+  categoriasParte1,
+  categoriasParte2,
+  calcularDeSelecionados,
+  getItemById,
+  type CategoriaSintoma,
+} from "@/data/sintomas-categorias";
 import { nomeEspecialidade, type EspecialidadeId } from "@/config/municipio";
 import { cn } from "@/lib/utils";
 
@@ -37,14 +40,14 @@ export const Route = createFileRoute("/_tutor/triagem")({
   head: () => ({
     meta: [
       { title: "Triagem online. Vitalis Belém" },
-      { name: "description", content: "Triagem online em três etapas, gratuita, validada por veterinário." },
+      { name: "description", content: "Triagem online em quatro etapas, gratuita, validada por veterinário." },
     ],
   }),
   component: Triagem,
 });
 
-type Fase = 1 | 2 | 3;
-type Respostas = Record<string, string | string[] | number>;
+type Fase = 1 | 2 | 3 | 4;
+const TOTAL_FASES = 4;
 
 function Triagem() {
   const navigate = useNavigate();
@@ -61,62 +64,42 @@ function Triagem() {
   const [tutorEnd, setTutorEnd] = useState("");
   const [animalNome, setAnimalNome] = useState("");
   const [raca, setRaca] = useState("");
-  const [motivo, setMotivo] = useState<EspecialidadeId | "geral" | "">("");
 
-  // Fase 2 – respostas por especialidade
-  const [respostas, setRespostas] = useState<Respostas>({});
+  // Fases 2 e 3 — sintomas
+  const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
+  const [obs, setObs] = useState("");
 
   // Aceite
   const [aceite, setAceite] = useState(false);
 
-  const bloco: BlocoEspecialidade | null = motivo ? blocosEspecialidade[motivo] : null;
-  const Icone = bloco?.icone ?? Stethoscope;
-
   const valida1 = () =>
-    Boolean(especie && idadeValor && tutorNome && tutorTel && tutorEnd && animalNome && motivo);
+    Boolean(especie && idadeValor && tutorNome && tutorTel && tutorEnd && animalNome);
 
-  // mapeia respostas em sintoma ids genéricos para o motor
-  const sintomasInferidos = useMemo(() => {
-    const ids: string[] = [];
-    if (!bloco) return ids;
-    const map: Record<string, string> = {
-      coceira: "prurido",
-      cansaco: "cansaco",
-      respirar: "dispneia",
-      desmaio: "colapso",
-      manqueira: "claudicacao",
-      trauma: "trauma",
-      sangramento: "sangramento",
-      nodulo: "nodulo",
-      sede: "sede",
-      peso: "perda-peso",
-    };
-    for (const p of bloco.perguntas) {
-      const r = respostas[p.id];
-      if (p.tipo === "simnao" && r === "Sim" && map[p.id]) ids.push(map[p.id]);
-    }
-    if (motivo && motivo !== "geral") {
-      // garante peso mínimo para a especialidade escolhida
-      const stubBySpec: Record<EspecialidadeId, string> = {
-        cardiologia: "tosse",
-        dermatologia: "prurido",
-        ortopedia: "claudicacao",
-        traumatologia: "trauma",
-        nefrologia: "poliuria",
-        oncologia: "nodulo",
-        endocrinologia: "sede",
-      };
-      const stub = stubBySpec[motivo as EspecialidadeId];
-      if (stub && !ids.includes(stub)) ids.push(stub);
-    }
-    return ids;
-  }, [bloco, respostas, motivo]);
+  const toggle = (id: string) => {
+    setSelecionados((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  };
 
-  const motor = useMemo(() => calcularMotor(sintomasInferidos), [sintomasInferidos]);
-  const especialidadeFinal: EspecialidadeId | "urgencia" | "geral" =
-    motor.redFlags.length > 0
-      ? "urgencia"
-      : motor.sugestao ?? (motivo === "geral" ? "geral" : (motivo as EspecialidadeId));
+  const ids = useMemo(() => Array.from(selecionados), [selecionados]);
+  const motor = useMemo(() => calcularDeSelecionados(ids), [ids]);
+  const especialidadeFinal: EspecialidadeId | "urgencia" = motor.sugestao;
+
+  const tituloFase: Record<Fase, { titulo: string; subtitulo: string }> = {
+    1: { titulo: "Triagem", subtitulo: "Dados iniciais" },
+    2: { titulo: "Triagem", subtitulo: "Sintomas Detalhados" },
+    3: { titulo: "Triagem", subtitulo: "Sintomas Detalhados (Continuação)" },
+    4: { titulo: "Triagem", subtitulo: "Revisão e envio" },
+  };
+
+  const podeAvancar = (): boolean => {
+    if (fase === 1) return valida1();
+    if (fase === 2 || fase === 3) return true; // sintomas opcionais por etapa
+    return aceite && ids.length > 0;
+  };
 
   const finalizar = () => {
     const t = adicionarTriagem({
@@ -130,26 +113,28 @@ function Triagem() {
       tutor: { nome: tutorNome, telefone: tutorTel },
       canal: "online",
       etapas: {
-        sintomas: sintomasInferidos,
-        observacoes: typeof respostas.obs === "string" ? respostas.obs : "",
-        chipsIA: sintomasInferidos,
+        sintomas: ids,
+        observacoes: obs,
+        chipsIA: ids,
       },
       redFlags: motor.redFlags,
       scores: motor.scores,
-      sugestao: especialidadeFinal === ("geral" as never) ? motor.sugestao : (especialidadeFinal as EspecialidadeId | "urgencia"),
+      sugestao: especialidadeFinal,
       prioridade: motor.prioridade,
     });
     setUltimaTriagemId(t.id);
     navigate({ to: "/triagem/resultado" });
   };
 
+  const progresso = Math.round((fase / TOTAL_FASES) * 100);
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-background">
-      {/* Top bar com cancelar */}
+      {/* Top bar */}
       <div className="border-b border-border bg-surface">
         <div className="container-app flex h-14 items-center justify-between">
           <span className="font-display text-sm font-semibold text-text-strong">
-            {fase === 1 ? "Triagem Online" : fase === 2 ? bloco?.nome : "Revisão"}
+            Triagem
           </span>
           <Link
             to="/"
@@ -162,8 +147,24 @@ function Triagem() {
 
       <div className="container-app py-6 md:py-10">
         <div className="mx-auto max-w-2xl">
-          {/* Tabs de progresso */}
-          <Tabs fase={fase} bloco={bloco} />
+          {/* Cabeçalho com progresso */}
+          <div>
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-primary">
+              {tituloFase[fase].titulo}
+            </h1>
+            <div className="mt-1 flex items-baseline justify-between">
+              <p className="text-base text-muted-foreground">{tituloFase[fase].subtitulo}</p>
+              <span className="text-sm font-semibold text-primary">
+                Etapa {fase} de {TOTAL_FASES}
+              </span>
+            </div>
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-primary via-primary to-success transition-all"
+                style={{ width: `${progresso}%` }}
+              />
+            </div>
+          </div>
 
           {fase === 1 && (
             <FaseInicial
@@ -179,20 +180,42 @@ function Triagem() {
               tutorEnd={tutorEnd} setTutorEnd={setTutorEnd}
               animalNome={animalNome} setAnimalNome={setAnimalNome}
               raca={raca} setRaca={setRaca}
-              motivo={motivo} setMotivo={setMotivo}
             />
           )}
 
-          {fase === 2 && bloco && (
-            <FaseEspecialidade
-              bloco={bloco}
-              Icone={Icone}
-              respostas={respostas}
-              setRespostas={setRespostas}
+          {fase === 2 && (
+            <FaseSintomas
+              categorias={categoriasParte1}
+              selecionados={selecionados}
+              toggle={toggle}
+              instrucao="Selecione todos os sintomas que o paciente está apresentando no momento."
             />
           )}
 
           {fase === 3 && (
+            <FaseSintomas
+              categorias={categoriasParte2}
+              selecionados={selecionados}
+              toggle={toggle}
+              instrucao="Continue marcando os sintomas observados. Quanto mais detalhes, mais preciso o encaminhamento."
+              extra={
+                <div className="mt-6">
+                  <Label className="text-sm font-semibold text-text-strong">
+                    Observações adicionais (opcional)
+                  </Label>
+                  <Textarea
+                    rows={4}
+                    className="mt-2"
+                    placeholder="Há quanto tempo começou? Algo mais que devemos saber?"
+                    value={obs}
+                    onChange={(e) => setObs(e.target.value)}
+                  />
+                </div>
+              }
+            />
+          )}
+
+          {fase === 4 && (
             <FaseRevisao
               tutorNome={tutorNome}
               tutorTel={tutorTel}
@@ -202,8 +225,9 @@ function Triagem() {
               raca={raca}
               idade={`${idadeValor} ${idadeUnidade}`}
               especialidade={especialidadeFinal}
-              respostas={respostas}
-              bloco={bloco}
+              selecionados={ids}
+              redFlags={motor.redFlags}
+              obs={obs}
               aceite={aceite}
               setAceite={setAceite}
             />
@@ -214,78 +238,30 @@ function Triagem() {
             "mt-6 grid gap-3",
             fase === 1 ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2",
           )}>
-            {fase === 3 ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setFase(2)}
-                  className="bg-primary-50 text-primary-800 border-transparent hover:bg-primary-100"
-                >
-                  Voltar e Editar
-                </Button>
-                <Button
-                  size="lg"
-                  disabled={!aceite}
-                  onClick={finalizar}
-                >
-                  Finalizar e Enviar
-                </Button>
-              </>
-            ) : fase === 2 ? (
-              <>
-                <Button variant="outline" size="lg" onClick={() => setFase(1)}>
-                  <ArrowLeft className="mr-1.5 h-4 w-4" /> Anterior
-                </Button>
-                <Button size="lg" onClick={() => setFase(3)}>
-                  Próximo <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Button>
-              </>
-            ) : (
+            {fase > 1 && (
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setFase((fase - 1) as Fase)}
+              >
+                <ArrowLeft className="mr-1.5 h-4 w-4" /> Anterior
+              </Button>
+            )}
+            {fase < TOTAL_FASES ? (
               <Button
                 size="lg"
-                disabled={!valida1()}
-                onClick={() => setFase(2)}
+                disabled={!podeAvancar()}
+                onClick={() => setFase((fase + 1) as Fase)}
               >
                 Próximo <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button size="lg" disabled={!aceite || ids.length === 0} onClick={finalizar}>
+                Finalizar e Enviar
               </Button>
             )}
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function Tabs({ fase, bloco }: { fase: Fase; bloco: BlocoEspecialidade | null }) {
-  const items = [
-    { id: 1, label: "Triagem Inicial" },
-    { id: 2, label: bloco?.nome ?? "Especialidade" },
-    { id: 3, label: "Revisão" },
-  ];
-  return (
-    <div>
-      <div className="grid grid-cols-3 text-center text-xs font-medium md:text-sm">
-        {items.map((it) => {
-          const ativo = fase === it.id;
-          const passou = fase > it.id;
-          return (
-            <div
-              key={it.id}
-              className={cn(
-                "pb-2 transition-colors",
-                ativo ? "text-primary" : passou ? "text-success-700" : "text-text-soft",
-              )}
-            >
-              {it.label}
-            </div>
-          );
-        })}
-      </div>
-      <div className="grid h-1 grid-cols-3 overflow-hidden rounded-full bg-muted">
-        <div className={cn("transition-colors", fase >= 1 ? "bg-success" : "bg-muted")} />
-        <div className={cn("transition-colors", fase >= 2 ? (fase > 2 ? "bg-success" : "bg-primary") : "bg-muted")} />
-        <div className={cn("transition-colors", fase >= 3 ? "bg-primary" : "bg-muted")} />
       </div>
     </div>
   );
@@ -321,18 +297,9 @@ function FaseInicial(props: {
   tutorEnd: string; setTutorEnd: (v: string) => void;
   animalNome: string; setAnimalNome: (v: string) => void;
   raca: string; setRaca: (v: string) => void;
-  motivo: EspecialidadeId | "geral" | "";
-  setMotivo: (v: EspecialidadeId | "geral") => void;
 }) {
   return (
-    <div className="mt-6">
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
-        Triagem Online
-      </h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Ajude-nos a entender a situação do seu animal para um atendimento mais ágil.
-      </p>
-
+    <div>
       <SectionCard>
         <SectionHeader icon={PawPrint} titulo="Qual a espécie do seu animal?" />
         <div className="grid grid-cols-2 gap-3">
@@ -400,28 +367,13 @@ function FaseInicial(props: {
       </SectionCard>
 
       <SectionCard>
-        <SectionHeader icon={ClipboardList} titulo="Dados do Animal e Motivo" />
+        <SectionHeader icon={ClipboardList} titulo="Dados do Animal" />
         <div className="grid gap-3">
           <Campo label="Nome do animal">
             <Input value={props.animalNome} onChange={(e) => props.setAnimalNome(e.target.value)} placeholder="Ex: Rex" />
           </Campo>
           <Campo label="Raça (opcional)">
             <Input value={props.raca} onChange={(e) => props.setRaca(e.target.value)} placeholder="Ex: Labrador, SRD" />
-          </Campo>
-          <Campo label="Motivo principal da consulta">
-            <Select value={props.motivo || undefined} onValueChange={(v) => props.setMotivo(v as EspecialidadeId | "geral")}>
-              <SelectTrigger><SelectValue placeholder="Selecione o motivo" /></SelectTrigger>
-              <SelectContent>
-                {motivosConsulta.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{m.label}</span>
-                      <span className="text-xs text-text-soft">{m.desc}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </Campo>
         </div>
       </SectionCard>
@@ -457,133 +409,82 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function FaseEspecialidade({
-  bloco,
-  Icone,
-  respostas,
-  setRespostas,
+function FaseSintomas({
+  categorias,
+  selecionados,
+  toggle,
+  instrucao,
+  extra,
 }: {
-  bloco: BlocoEspecialidade;
-  Icone: typeof PawPrint;
-  respostas: Respostas;
-  setRespostas: (r: Respostas) => void;
+  categorias: CategoriaSintoma[];
+  selecionados: Set<string>;
+  toggle: (id: string) => void;
+  instrucao: string;
+  extra?: React.ReactNode;
 }) {
-  const setR = (id: string, v: string | string[] | number) =>
-    setRespostas({ ...respostas, [id]: v });
-
   return (
-    <SectionCard>
-      <div className="mb-4 flex items-start gap-3 rounded-xl bg-destructive-50/40 p-4">
-        <span className="grid h-10 w-10 place-items-center rounded-full bg-destructive-50 text-destructive">
-          <Icone className="h-5 w-5" />
-        </span>
-        <div>
-          <h2 className="font-display text-lg font-semibold text-text-strong">{bloco.titulo}</h2>
-          <p className="text-sm text-muted-foreground">{bloco.subtitulo}</p>
-        </div>
+    <div>
+      <p className="mt-4 text-sm text-muted-foreground">{instrucao}</p>
+      <div className="mt-4 space-y-4">
+        {categorias.map((cat) => (
+          <CategoriaCard key={cat.id} categoria={cat} selecionados={selecionados} toggle={toggle} />
+        ))}
       </div>
+      {extra}
+    </div>
+  );
+}
 
-      <div className="space-y-5">
-        {bloco.perguntas.map((p, i) => {
-          const num = i + 1;
-          const valor = respostas[p.id];
+function CategoriaCard({
+  categoria,
+  selecionados,
+  toggle,
+}: {
+  categoria: CategoriaSintoma;
+  selecionados: Set<string>;
+  toggle: (id: string) => void;
+}) {
+  const Icone = categoria.icone;
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border border-border bg-surface border-t-4 p-4 shadow-sm",
+        categoria.cor,
+      )}
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <Icone className={cn("h-5 w-5", categoria.textoCor)} />
+        <h2 className={cn("font-display text-base font-bold uppercase tracking-wide", categoria.textoCor)}>
+          {categoria.nome}
+        </h2>
+      </div>
+      <div className="space-y-1">
+        {categoria.itens.map((it) => {
+          const ativo = selecionados.has(it.id);
           return (
-            <div key={p.id} className="space-y-2">
-              <Label className="block text-sm font-semibold text-text-strong">
-                {num}. {p.label}
-              </Label>
-
-              {p.tipo === "simnao" && (
-                <div className="grid grid-cols-2 gap-3">
-                  {["Sim", "Não"].map((opt) => {
-                    const ativo = valor === opt;
-                    return (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => setR(p.id, opt)}
-                        className={cn(
-                          "flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-all",
-                          ativo ? "border-primary bg-primary-50 text-primary-800 font-medium" : "border-border bg-background hover:border-primary/40",
-                        )}
-                      >
-                        <span className={cn("grid h-4 w-4 place-items-center rounded-full border-2", ativo ? "border-primary" : "border-border")}>
-                          {ativo && <span className="h-2 w-2 rounded-full bg-primary" />}
-                        </span>
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
+            <label
+              key={it.id}
+              className={cn(
+                "flex cursor-pointer items-start gap-3 rounded-lg px-2 py-2 transition-colors",
+                ativo ? "bg-primary-50" : "hover:bg-muted",
               )}
-
-              {p.tipo === "checkbox" && p.opcoes && (
-                <div className="space-y-2">
-                  {p.opcoes.map((opt) => {
-                    const arr = Array.isArray(valor) ? valor : [];
-                    const ativo = arr.includes(opt);
-                    return (
-                      <label
-                        key={opt}
-                        className={cn(
-                          "flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 transition-colors",
-                          ativo ? "border-primary bg-primary-50" : "border-border bg-background hover:bg-muted",
-                        )}
-                      >
-                        <Checkbox
-                          checked={ativo}
-                          onCheckedChange={() => setR(p.id, ativo ? arr.filter((x) => x !== opt) : [...arr, opt])}
-                        />
-                        <span className="text-sm text-text-strong">{opt}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
-
-              {p.tipo === "select" && p.opcoes && (
-                <Select value={(valor as string) || undefined} onValueChange={(v) => setR(p.id, v)}>
-                  <SelectTrigger><SelectValue placeholder={p.opcoes[0]} /></SelectTrigger>
-                  <SelectContent>
-                    {p.opcoes.slice(1).map((o) => (
-                      <SelectItem key={o} value={o}>{o}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-
-              {p.tipo === "slider" && (
-                <div className="rounded-lg border border-border bg-background p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs text-text-soft">{p.minLabel}</span>
-                    <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                      {(valor as number) ?? 3}
-                    </span>
-                    <span className="text-xs text-text-soft">{p.maxLabel}</span>
-                  </div>
-                  <Slider
-                    min={p.min ?? 1}
-                    max={p.max ?? 5}
-                    step={1}
-                    value={[(valor as number) ?? 3]}
-                    onValueChange={(v) => setR(p.id, v[0])}
-                  />
-                </div>
-              )}
-
-              {p.tipo === "textarea" && (
-                <Textarea
-                  rows={4}
-                  placeholder={p.placeholder}
-                  value={(valor as string) || ""}
-                  onChange={(e) => setR(p.id, e.target.value)}
-                />
-              )}
-            </div>
+            >
+              <Checkbox
+                checked={ativo}
+                onCheckedChange={() => toggle(it.id)}
+                className="mt-0.5"
+              />
+              <span className="text-sm leading-snug text-text-strong">
+                {it.label}
+                {it.redFlag && (
+                  <AlertTriangle className="ml-1 inline h-3.5 w-3.5 text-destructive align-text-bottom" />
+                )}
+              </span>
+            </label>
           );
         })}
       </div>
-    </SectionCard>
+    </div>
   );
 }
 
@@ -591,37 +492,37 @@ function FaseRevisao({
   tutorNome, tutorTel, tutorEnd,
   animalNome, especie, raca, idade,
   especialidade,
-  respostas,
-  bloco,
+  selecionados,
+  redFlags,
+  obs,
   aceite, setAceite,
 }: {
   tutorNome: string; tutorTel: string; tutorEnd: string;
   animalNome: string; especie: string; raca: string; idade: string;
-  especialidade: EspecialidadeId | "urgencia" | "geral";
-  respostas: Respostas;
-  bloco: BlocoEspecialidade | null;
+  especialidade: EspecialidadeId | "urgencia";
+  selecionados: string[];
+  redFlags: string[];
+  obs: string;
   aceite: boolean; setAceite: (v: boolean) => void;
 }) {
   const especieLabel = especie === "cao" ? "Canina" : especie === "gato" ? "Felina" : "Outro";
-  const especialidadeLabel = especialidade === "urgencia" ? "Urgência" : especialidade === "geral" ? "Clínica Geral" : nomeEspecialidade(especialidade as EspecialidadeId);
-
-  const resumoSintomas: string[] = [];
-  if (bloco) {
-    for (const p of bloco.perguntas) {
-      const r = respostas[p.id];
-      if (p.tipo === "simnao" && r) resumoSintomas.push(`${r === "Sim" ? "" : "Sem "}${p.label.replace(/\?$/, "").toLowerCase()}`);
-      if (p.tipo === "checkbox" && Array.isArray(r) && r.length) resumoSintomas.push(`${p.label.replace(/:$/, "")}: ${r.join(", ")}`);
-      if (p.tipo === "select" && typeof r === "string" && r) resumoSintomas.push(`${p.label.replace(/:$/, "")}: ${r}`);
-      if (p.tipo === "slider" && r) resumoSintomas.push(`Intensidade: ${r}/5`);
-    }
-  }
-  const obs = typeof respostas.obs === "string" ? respostas.obs : "";
+  const especialidadeLabel = especialidade === "urgencia" ? "Urgência" : nomeEspecialidade(especialidade);
 
   return (
     <SectionCard>
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
-        Revisão das Informações
-      </h1>
+      {redFlags.length > 0 && (
+        <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive-50 p-4 text-destructive-700">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <p className="font-display text-sm font-semibold">Sinais de alerta detectados</p>
+              <p className="mt-1 text-xs">
+                Identificamos {redFlags.length} sinal(is) que requer(em) avaliação imediata. O atendimento será priorizado.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Bloco titulo="Dados do Tutor" icone={UserCircle2}>
         <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
@@ -640,23 +541,38 @@ function FaseRevisao({
         </div>
       </Bloco>
 
-      <Bloco titulo="Motivo da Consulta" icone={ClipboardList}>
+      <Bloco titulo="Encaminhamento sugerido" icone={Stethoscope}>
         <div className="rounded-lg bg-primary-50 px-4 py-3">
           <p className="text-sm font-medium text-primary-800">
-            <span className="mr-1 text-success">●</span>
-            Especialidade Identificada: {especialidadeLabel}
+            <span className={cn("mr-1", especialidade === "urgencia" ? "text-destructive" : "text-success")}>●</span>
+            {especialidadeLabel}
+          </p>
+          <p className="mt-1 text-xs text-text-soft">
+            Calculado a partir dos {selecionados.length} sintoma(s) marcado(s). Validado por veterinário antes do atendimento.
           </p>
         </div>
       </Bloco>
 
-      {resumoSintomas.length > 0 && (
-        <Bloco titulo="Resumo da Triagem" icone={Stethoscope}>
-          <ul className="space-y-1.5 text-sm text-text-strong">
-            {resumoSintomas.map((s, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-primary">•</span> {s}
-              </li>
-            ))}
+      {selecionados.length > 0 && (
+        <Bloco titulo={`Sintomas marcados (${selecionados.length})`} icone={ClipboardList}>
+          <ul className="flex flex-wrap gap-2">
+            {selecionados.map((id) => {
+              const it = getItemById(id);
+              if (!it) return null;
+              return (
+                <li
+                  key={id}
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-xs",
+                    it.redFlag
+                      ? "border-destructive/40 bg-destructive-50 text-destructive-700"
+                      : "border-border bg-muted text-text-strong",
+                  )}
+                >
+                  {it.label}
+                </li>
+              );
+            })}
           </ul>
         </Bloco>
       )}
