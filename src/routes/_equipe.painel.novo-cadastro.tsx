@@ -46,7 +46,7 @@ const STEPS = [
   { n: 5, label: "Concluir" },
 ];
 
-const MOTIVOS = [
+const MOTIVOS: { id: string; label: string; Icon: React.ComponentType<{ className?: string }>; danger?: boolean }[] = [
   { id: "consulta", label: "Consulta", Icon: Stethoscope },
   { id: "vacinacao", label: "Vacinação", Icon: Syringe },
   { id: "retorno", label: "Retorno", Icon: RotateCcw },
@@ -56,7 +56,7 @@ const MOTIVOS = [
   { id: "especialidade", label: "Especialidade", Icon: UserRound },
   { id: "internacao", label: "Internação", Icon: BedDouble },
   { id: "unidade-movel", label: "Unidade Móvel", Icon: Truck },
-] as const;
+];
 
 const PERGUNTAS = [
   "Está comendo normalmente?",

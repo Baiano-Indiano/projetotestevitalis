@@ -26,6 +26,7 @@ import { Route as EquipePainelValidacaoRouteImport } from './routes/_equipe.pain
 import { Route as EquipePainelUnidadeMovelRouteImport } from './routes/_equipe.painel.unidade-movel'
 import { Route as EquipePainelTriagensRouteImport } from './routes/_equipe.painel.triagens'
 import { Route as EquipePainelRecepcaoRouteImport } from './routes/_equipe.painel.recepcao'
+import { Route as EquipePainelNovoCadastroRouteImport } from './routes/_equipe.painel.novo-cadastro'
 import { Route as EquipePainelLaboratorioRouteImport } from './routes/_equipe.painel.laboratorio'
 import { Route as EquipePainelInternacoesRouteImport } from './routes/_equipe.painel.internacoes'
 import { Route as EquipePainelImagemRouteImport } from './routes/_equipe.painel.imagem'
@@ -124,6 +125,12 @@ const EquipePainelRecepcaoRoute = EquipePainelRecepcaoRouteImport.update({
   path: '/painel/recepcao',
   getParentRoute: () => EquipeRoute,
 } as any)
+const EquipePainelNovoCadastroRoute =
+  EquipePainelNovoCadastroRouteImport.update({
+    id: '/painel/novo-cadastro',
+    path: '/painel/novo-cadastro',
+    getParentRoute: () => EquipeRoute,
+  } as any)
 const EquipePainelLaboratorioRoute = EquipePainelLaboratorioRouteImport.update({
   id: '/painel/laboratorio',
   path: '/painel/laboratorio',
@@ -205,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/painel/imagem': typeof EquipePainelImagemRoute
   '/painel/internacoes': typeof EquipePainelInternacoesRoute
   '/painel/laboratorio': typeof EquipePainelLaboratorioRoute
+  '/painel/novo-cadastro': typeof EquipePainelNovoCadastroRoute
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/painel/triagens': typeof EquipePainelTriagensRoute
   '/painel/unidade-movel': typeof EquipePainelUnidadeMovelRoute
@@ -234,6 +242,7 @@ export interface FileRoutesByTo {
   '/painel/imagem': typeof EquipePainelImagemRoute
   '/painel/internacoes': typeof EquipePainelInternacoesRoute
   '/painel/laboratorio': typeof EquipePainelLaboratorioRoute
+  '/painel/novo-cadastro': typeof EquipePainelNovoCadastroRoute
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/painel/triagens': typeof EquipePainelTriagensRoute
   '/painel/unidade-movel': typeof EquipePainelUnidadeMovelRoute
@@ -265,6 +274,7 @@ export interface FileRoutesById {
   '/_equipe/painel/imagem': typeof EquipePainelImagemRoute
   '/_equipe/painel/internacoes': typeof EquipePainelInternacoesRoute
   '/_equipe/painel/laboratorio': typeof EquipePainelLaboratorioRoute
+  '/_equipe/painel/novo-cadastro': typeof EquipePainelNovoCadastroRoute
   '/_equipe/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/_equipe/painel/triagens': typeof EquipePainelTriagensRoute
   '/_equipe/painel/unidade-movel': typeof EquipePainelUnidadeMovelRoute
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/painel/imagem'
     | '/painel/internacoes'
     | '/painel/laboratorio'
+    | '/painel/novo-cadastro'
     | '/painel/recepcao'
     | '/painel/triagens'
     | '/painel/unidade-movel'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/painel/imagem'
     | '/painel/internacoes'
     | '/painel/laboratorio'
+    | '/painel/novo-cadastro'
     | '/painel/recepcao'
     | '/painel/triagens'
     | '/painel/unidade-movel'
@@ -355,6 +367,7 @@ export interface FileRouteTypes {
     | '/_equipe/painel/imagem'
     | '/_equipe/painel/internacoes'
     | '/_equipe/painel/laboratorio'
+    | '/_equipe/painel/novo-cadastro'
     | '/_equipe/painel/recepcao'
     | '/_equipe/painel/triagens'
     | '/_equipe/painel/unidade-movel'
@@ -494,6 +507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipePainelRecepcaoRouteImport
       parentRoute: typeof EquipeRoute
     }
+    '/_equipe/painel/novo-cadastro': {
+      id: '/_equipe/painel/novo-cadastro'
+      path: '/painel/novo-cadastro'
+      fullPath: '/painel/novo-cadastro'
+      preLoaderRoute: typeof EquipePainelNovoCadastroRouteImport
+      parentRoute: typeof EquipeRoute
+    }
     '/_equipe/painel/laboratorio': {
       id: '/_equipe/painel/laboratorio'
       path: '/painel/laboratorio'
@@ -606,6 +626,7 @@ interface EquipeRouteChildren {
   EquipePainelImagemRoute: typeof EquipePainelImagemRoute
   EquipePainelInternacoesRoute: typeof EquipePainelInternacoesRoute
   EquipePainelLaboratorioRoute: typeof EquipePainelLaboratorioRoute
+  EquipePainelNovoCadastroRoute: typeof EquipePainelNovoCadastroRoute
   EquipePainelRecepcaoRoute: typeof EquipePainelRecepcaoRoute
   EquipePainelTriagensRoute: typeof EquipePainelTriagensRoute
   EquipePainelUnidadeMovelRoute: typeof EquipePainelUnidadeMovelRoute
@@ -625,6 +646,7 @@ const EquipeRouteChildren: EquipeRouteChildren = {
   EquipePainelImagemRoute: EquipePainelImagemRoute,
   EquipePainelInternacoesRoute: EquipePainelInternacoesRoute,
   EquipePainelLaboratorioRoute: EquipePainelLaboratorioRoute,
+  EquipePainelNovoCadastroRoute: EquipePainelNovoCadastroRoute,
   EquipePainelRecepcaoRoute: EquipePainelRecepcaoRoute,
   EquipePainelTriagensRoute: EquipePainelTriagensRoute,
   EquipePainelUnidadeMovelRoute: EquipePainelUnidadeMovelRoute,
