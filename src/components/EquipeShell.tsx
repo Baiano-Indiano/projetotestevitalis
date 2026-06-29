@@ -20,6 +20,10 @@ import {
   Users,
   Wifi,
   Bed,
+  Syringe,
+  TestTube2,
+  Cpu,
+  ClipboardList,
 } from "lucide-react";
 import { type ReactNode } from "react";
 import { useVitalisStore } from "@/data/store";
@@ -60,8 +64,18 @@ export function EquipeShell() {
     { to: "/painel/agenda", label: "Agenda do Veterinário", Icon: CalendarDays },
   ];
 
-  const items = papel === "veterinario" ? itemsVeterinario : itemsRecepcao;
-  const podeNovoAtendimento = papel === "veterinario";
+  const itemsUnidadeMovel: Item[] = [
+    { to: "/painel", label: "Dashboard", Icon: LayoutGrid },
+    { to: "/painel", label: "Triagem", Icon: ClipboardList },
+    { to: "/painel", label: "Vacinação", Icon: Syringe },
+    { to: "/painel", label: "Coletas", Icon: TestTube2 },
+    { to: "/painel", label: "Microchipagem", Icon: Cpu },
+    { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
+  ];
+
+  const items =
+    papel === "veterinario" ? itemsVeterinario : papel === "unidade_movel" ? itemsUnidadeMovel : itemsRecepcao;
+  const podeNovoAtendimento = papel === "veterinario" || papel === "unidade_movel";
 
 
   return (
