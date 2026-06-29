@@ -184,7 +184,7 @@ export function EquipeShell() {
             />
           </div>
           <div className="flex items-center gap-2">
-            {papel === "unidade_movel" && <div className="hidden md:block"><SyncIndicator /></div>}
+            </div>
             <div className="hidden lg:block"><RoleSwitcher /></div>
             <button
               type="button"
