@@ -103,17 +103,22 @@ export function EquipeShell() {
           <ul className="flex flex-col gap-0.5">
             {items.map((it) => {
               const basePath = it.params ? it.to.replace(/\$(\w+)/g, (_, k) => it.params![k] ?? "") : it.to;
-              const active =
-                it.to === "/painel"
-                  ? location.pathname === "/painel"
-                  : location.pathname.startsWith(basePath.split("/$")[0]);
-              const linkProps = it.params
-                ? { to: it.to as never, params: it.params as never }
-                : { to: it.to as never };
+              const currentTab = (location.search as { tab?: string } | undefined)?.tab;
+              let active: boolean;
+              if (it.tab !== undefined) {
+                active = location.pathname === "/painel" && (currentTab ?? "dashboard") === it.tab;
+              } else if (it.to === "/painel") {
+                active = location.pathname === "/painel" && !currentTab;
+              } else {
+                active = location.pathname.startsWith(basePath.split("/$")[0]);
+              }
+              const linkProps: Record<string, unknown> = { to: it.to };
+              if (it.params) linkProps.params = it.params;
+              if (it.search) linkProps.search = it.search;
               return (
                 <li key={`${it.to}-${it.label}`}>
                   <Link
-                    {...linkProps}
+                    {...(linkProps as never)}
                     className={cn(
                       "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       active
