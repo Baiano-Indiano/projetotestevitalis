@@ -227,7 +227,7 @@ function PainelUnidadeMovel() {
   const kpis = [
     { label: "Atendimentos Hoje", valor: 24, Icon: Users, bg: "bg-primary-50", fg: "text-primary" },
     { label: "Triagens", valor: 12, Icon: ClipboardList, bg: "bg-success-50", fg: "text-success-700" },
-    { label: "Vacinas", valor: 45, Icon: Syringe, bg: "bg-violet-50", fg: "text-violet-600" },
+    { label: "Vacinas", valor: 45, Icon: Syringe, bg: "bg-primary-50", fg: "text-primary-700" },
     { label: "Coletas", valor: 8, Icon: TestTube2, bg: "bg-muted", fg: "text-text-strong" },
     { label: "Microchips", valor: 15, Icon: Cpu, bg: "bg-success-50", fg: "text-success-700" },
     { label: "Encaminhamentos", valor: 3, Icon: GitBranchPlus, bg: "bg-destructive/10", fg: "text-destructive" },
