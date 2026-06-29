@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
-import { calcularMotor, gerarProtocolo } from "@/lib/triagem";
-import type { Triagem, ValidacaoDecisao, EtapasTriagem } from "@/data/types";
+import { calcularMotor, gerarProtocolo, gerarProtocoloAgendamento } from "@/lib/triagem";
+import type { Triagem, ValidacaoDecisao, EtapasTriagem, Agendamento } from "@/data/types";
 
 // Seed inicial: 6 triagens variadas, sendo a primeira com red-flag ativo.
 const minutosAtras = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
@@ -172,6 +172,12 @@ interface StoreCtx {
   resetRascunho: () => void;
   ultimaTriagemId?: string;
   setUltimaTriagemId: (id?: string) => void;
+  agendamentos: Agendamento[];
+  criarAgendamento: (
+    parcial: Omit<Agendamento, "id" | "protocolo" | "criadoEm">,
+  ) => Agendamento;
+  ultimoAgendamentoId?: string;
+  setUltimoAgendamentoId: (id?: string) => void;
 }
 
 const Ctx = createContext<StoreCtx | null>(null);
@@ -184,6 +190,8 @@ export function VitalisStoreProvider({ children }: { children: ReactNode }) {
   const [papel, setPapel] = useState<Papel>("tutor");
   const [rascunho, setRascunho] = useState<StoreCtx["rascunho"]>({ sintomas: [] });
   const [ultimaTriagemId, setUltimaTriagemId] = useState<string | undefined>();
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [ultimoAgendamentoId, setUltimoAgendamentoId] = useState<string | undefined>();
 
   const value = useMemo<StoreCtx>(
     () => ({
@@ -225,8 +233,21 @@ export function VitalisStoreProvider({ children }: { children: ReactNode }) {
       resetRascunho: () => setRascunho({ sintomas: [] }),
       ultimaTriagemId,
       setUltimaTriagemId,
+      agendamentos,
+      criarAgendamento: (parcial) => {
+        const a: Agendamento = {
+          ...parcial,
+          id: `ag-${Date.now().toString(36)}`,
+          protocolo: gerarProtocoloAgendamento(),
+          criadoEm: new Date().toISOString(),
+        };
+        setAgendamentos((arr) => [a, ...arr]);
+        return a;
+      },
+      ultimoAgendamentoId,
+      setUltimoAgendamentoId,
     }),
-    [triagens, decisoes, papel, rascunho, ultimaTriagemId],
+    [triagens, decisoes, papel, rascunho, ultimaTriagemId, agendamentos, ultimoAgendamentoId],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

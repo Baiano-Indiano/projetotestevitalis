@@ -20,6 +20,7 @@ import { Route as TutorEmergenciaRouteImport } from './routes/_tutor.emergencia'
 import { Route as TutorAgendarRouteImport } from './routes/_tutor.agendar'
 import { Route as EquipePainelIndexRouteImport } from './routes/_equipe.painel.index'
 import { Route as TutorTriagemResultadoRouteImport } from './routes/_tutor.triagem.resultado'
+import { Route as TutorAgendarConfirmacaoRouteImport } from './routes/_tutor.agendar.confirmacao'
 import { Route as EquipePainelVeterinariosRouteImport } from './routes/_equipe.painel.veterinarios'
 import { Route as EquipePainelValidacaoRouteImport } from './routes/_equipe.painel.validacao'
 import { Route as EquipePainelTriagensRouteImport } from './routes/_equipe.painel.triagens'
@@ -87,6 +88,11 @@ const TutorTriagemResultadoRoute = TutorTriagemResultadoRouteImport.update({
   id: '/resultado',
   path: '/resultado',
   getParentRoute: () => TutorTriagemRoute,
+} as any)
+const TutorAgendarConfirmacaoRoute = TutorAgendarConfirmacaoRouteImport.update({
+  id: '/confirmacao',
+  path: '/confirmacao',
+  getParentRoute: () => TutorAgendarRoute,
 } as any)
 const EquipePainelVeterinariosRoute =
   EquipePainelVeterinariosRouteImport.update({
@@ -165,7 +171,7 @@ const EquipePainelFichaIdRoute = EquipePainelFichaIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof TutorIndexRoute
-  '/agendar': typeof TutorAgendarRoute
+  '/agendar': typeof TutorAgendarRouteWithChildren
   '/emergencia': typeof TutorEmergenciaRoute
   '/identificacao': typeof TutorIdentificacaoRoute
   '/informacoes': typeof TutorInformacoesRoute
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/painel/triagens': typeof EquipePainelTriagensRoute
   '/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
   '/painel/veterinarios': typeof EquipePainelVeterinariosRoute
+  '/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
   '/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/painel/': typeof EquipePainelIndexRoute
   '/painel/ficha/$id': typeof EquipePainelFichaIdRoute
@@ -190,7 +197,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof TutorIndexRoute
-  '/agendar': typeof TutorAgendarRoute
+  '/agendar': typeof TutorAgendarRouteWithChildren
   '/emergencia': typeof TutorEmergenciaRoute
   '/identificacao': typeof TutorIdentificacaoRoute
   '/informacoes': typeof TutorInformacoesRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/painel/recepcao': typeof EquipePainelRecepcaoRoute
   '/painel/triagens': typeof EquipePainelTriagensRoute
   '/painel/veterinarios': typeof EquipePainelVeterinariosRoute
+  '/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
   '/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/painel': typeof EquipePainelIndexRoute
   '/painel/ficha/$id': typeof EquipePainelFichaIdRoute
@@ -216,7 +224,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_equipe': typeof EquipeRouteWithChildren
   '/_tutor': typeof TutorRouteWithChildren
-  '/_tutor/agendar': typeof TutorAgendarRoute
+  '/_tutor/agendar': typeof TutorAgendarRouteWithChildren
   '/_tutor/emergencia': typeof TutorEmergenciaRoute
   '/_tutor/identificacao': typeof TutorIdentificacaoRoute
   '/_tutor/informacoes': typeof TutorInformacoesRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/_equipe/painel/triagens': typeof EquipePainelTriagensRoute
   '/_equipe/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
   '/_equipe/painel/veterinarios': typeof EquipePainelVeterinariosRoute
+  '/_tutor/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
   '/_tutor/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/_equipe/painel/': typeof EquipePainelIndexRoute
   '/_equipe/painel/ficha/$id': typeof EquipePainelFichaIdRoute
@@ -261,6 +270,7 @@ export interface FileRouteTypes {
     | '/painel/triagens'
     | '/painel/validacao'
     | '/painel/veterinarios'
+    | '/agendar/confirmacao'
     | '/triagem/resultado'
     | '/painel/'
     | '/painel/ficha/$id'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/painel/recepcao'
     | '/painel/triagens'
     | '/painel/veterinarios'
+    | '/agendar/confirmacao'
     | '/triagem/resultado'
     | '/painel'
     | '/painel/ficha/$id'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/_equipe/painel/triagens'
     | '/_equipe/painel/validacao'
     | '/_equipe/painel/veterinarios'
+    | '/_tutor/agendar/confirmacao'
     | '/_tutor/triagem/resultado'
     | '/_equipe/painel/'
     | '/_equipe/painel/ficha/$id'
@@ -402,6 +414,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/triagem/resultado'
       preLoaderRoute: typeof TutorTriagemResultadoRouteImport
       parentRoute: typeof TutorTriagemRoute
+    }
+    '/_tutor/agendar/confirmacao': {
+      id: '/_tutor/agendar/confirmacao'
+      path: '/confirmacao'
+      fullPath: '/agendar/confirmacao'
+      preLoaderRoute: typeof TutorAgendarConfirmacaoRouteImport
+      parentRoute: typeof TutorAgendarRoute
     }
     '/_equipe/painel/veterinarios': {
       id: '/_equipe/painel/veterinarios'
@@ -554,6 +573,18 @@ const EquipeRouteChildren: EquipeRouteChildren = {
 const EquipeRouteWithChildren =
   EquipeRoute._addFileChildren(EquipeRouteChildren)
 
+interface TutorAgendarRouteChildren {
+  TutorAgendarConfirmacaoRoute: typeof TutorAgendarConfirmacaoRoute
+}
+
+const TutorAgendarRouteChildren: TutorAgendarRouteChildren = {
+  TutorAgendarConfirmacaoRoute: TutorAgendarConfirmacaoRoute,
+}
+
+const TutorAgendarRouteWithChildren = TutorAgendarRoute._addFileChildren(
+  TutorAgendarRouteChildren,
+)
+
 interface TutorTriagemRouteChildren {
   TutorTriagemResultadoRoute: typeof TutorTriagemResultadoRoute
 }
@@ -567,7 +598,7 @@ const TutorTriagemRouteWithChildren = TutorTriagemRoute._addFileChildren(
 )
 
 interface TutorRouteChildren {
-  TutorAgendarRoute: typeof TutorAgendarRoute
+  TutorAgendarRoute: typeof TutorAgendarRouteWithChildren
   TutorEmergenciaRoute: typeof TutorEmergenciaRoute
   TutorIdentificacaoRoute: typeof TutorIdentificacaoRoute
   TutorInformacoesRoute: typeof TutorInformacoesRoute
@@ -577,7 +608,7 @@ interface TutorRouteChildren {
 }
 
 const TutorRouteChildren: TutorRouteChildren = {
-  TutorAgendarRoute: TutorAgendarRoute,
+  TutorAgendarRoute: TutorAgendarRouteWithChildren,
   TutorEmergenciaRoute: TutorEmergenciaRoute,
   TutorIdentificacaoRoute: TutorIdentificacaoRoute,
   TutorInformacoesRoute: TutorInformacoesRoute,
@@ -595,13 +626,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
