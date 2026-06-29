@@ -372,11 +372,18 @@ function Triagem() {
                             key={`${a.nome}-${i}`}
                             className="group relative aspect-square overflow-hidden rounded-md border border-border bg-muted"
                           >
-                            <img
-                              src={a.url}
-                              alt={a.nome}
-                              className="h-full w-full object-cover"
-                            />
+                            <button
+                              type="button"
+                              onClick={() => setLightboxIdx(i)}
+                              className="absolute inset-0 h-full w-full cursor-zoom-in"
+                              aria-label={`Ampliar ${a.nome}`}
+                            >
+                              <img
+                                src={a.url}
+                                alt={a.nome}
+                                className="h-full w-full object-cover"
+                              />
+                            </button>
                             <button
                               type="button"
                               onClick={() => removerAnexo(i)}
