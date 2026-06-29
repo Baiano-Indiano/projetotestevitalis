@@ -30,7 +30,9 @@ interface Item {
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
   badge?: () => ReactNode;
+  params?: Record<string, string>;
 }
+
 
 export function EquipeShell() {
   const { triagens, papel } = useVitalisStore();
