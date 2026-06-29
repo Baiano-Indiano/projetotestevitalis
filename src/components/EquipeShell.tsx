@@ -38,19 +38,29 @@ export function EquipeShell() {
   const urgencias = triagens.filter((t) => t.status === "urgencia").length;
   const location = useLocation();
 
-  const items: Item[] = [
+  const itemsRecepcao: Item[] = [
     { to: "/painel", label: "Painel da Recepção", Icon: LayoutGrid },
     { to: "/painel/aguardando", label: "Pacientes Aguardando", Icon: Users, badge: () => pendentes > 0 ? <Badge count={pendentes} /> : null },
     { to: "/painel/triagens", label: "Triagens Online", Icon: Wifi, badge: () => urgencias > 0 ? <Badge count={urgencias} tone="danger" /> : null },
-    { to: "/painel/veterinarios", label: "Veterinários", Icon: Stethoscope },
     { to: "/painel/em-atendimento", label: "Em Atendimento", Icon: UserSquare2 },
     { to: "/painel/agenda", label: "Agendamentos", Icon: CalendarDays },
     { to: "/painel/internacoes", label: "Internações", Icon: Bed },
+    { to: "/painel/veterinarios", label: "Veterinários", Icon: Stethoscope },
+  ];
+
+  const itemsVeterinario: Item[] = [
+    { to: "/painel", label: "Painel do Veterinário", Icon: LayoutGrid },
+    { to: "/painel/em-atendimento", label: "Pacientes em Atendimento", Icon: UserSquare2 },
+    { to: "/painel/ficha/$id", label: "Prontuários", Icon: FileText },
     { to: "/painel/exames", label: "Solicitações de Exames", Icon: FlaskConical },
     { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
     { to: "/painel/validacao", label: "Validação Clínica", Icon: ShieldCheck },
-    { to: "/painel/admin", label: "Visão Administrativa", Icon: FileText },
+    { to: "/painel/agenda", label: "Agenda do Veterinário", Icon: CalendarDays },
   ];
+
+  const items = papel === "veterinario" ? itemsVeterinario : itemsRecepcao;
+  const podeNovoAtendimento = papel === "veterinario";
+
 
   return (
     <div className="flex min-h-screen bg-background">
