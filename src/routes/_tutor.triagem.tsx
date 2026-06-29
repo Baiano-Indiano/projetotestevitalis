@@ -1,5 +1,6 @@
-import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState, useSearch } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Lightbox } from "@/components/Lightbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useVitalisStore } from "@/data/store";
