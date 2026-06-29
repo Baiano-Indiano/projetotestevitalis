@@ -2,7 +2,7 @@ import { Link, Outlet } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import { municipio } from "@/config/municipio";
 import { cn } from "@/lib/utils";
@@ -36,12 +36,6 @@ export function TutorShell() {
                 {n.label}
               </Link>
             ))}
-            <Link
-              to="/emergencia"
-              className="ml-2 inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive-50 px-3 py-1.5 text-sm font-medium text-destructive-700 transition-colors hover:bg-destructive-50/80"
-            >
-              <AlertTriangle className="h-4 w-4" /> Emergência
-            </Link>
           </nav>
           <div className="flex items-center gap-2">
             <div className="hidden lg:block"><RoleSwitcher /></div>
@@ -70,13 +64,6 @@ export function TutorShell() {
                 {n.label}
               </Link>
             ))}
-            <Link
-              to="/emergencia"
-              onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-2 text-sm font-medium text-destructive-700"
-            >
-              Emergência, veja onde ir
-            </Link>
             <div className="pt-2"><RoleSwitcher /></div>
           </div>
         </div>
