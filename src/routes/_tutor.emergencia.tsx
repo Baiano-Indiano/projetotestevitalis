@@ -26,7 +26,7 @@ function Emergencia() {
               <h1 className="font-display text-xl font-semibold">Emergência veterinária</h1>
               <p className="mt-1 text-sm">
                 Se há sinais graves (dificuldade respiratória, convulsão, sangramento ativo,
-                ingestão de tóxico, colapso), procure imediatamente uma unidade 24h.
+                ingestão de tóxico, colapso), procure imediatamente a unidade hospitalar.
               </p>
             </div>
           </div>
@@ -34,7 +34,7 @@ function Emergencia() {
 
         <Card className="border-border bg-surface p-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary-700">
-            Unidade 24h
+            Unidade hospitalar
           </p>
           <h2 className="mt-1 font-display text-2xl font-semibold text-text-strong">{u24.nome}</h2>
           <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
