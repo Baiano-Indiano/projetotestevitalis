@@ -27,6 +27,7 @@ import {
   X,
   AlertTriangle,
   Info,
+  ImagePlus,
 } from "lucide-react";
 import {
   categoriasParte1,
@@ -83,6 +84,40 @@ function Triagem() {
   // Fases 2 e 3 — sintomas
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
   const [obs, setObs] = useState("");
+  const [anexos, setAnexos] = useState<{ nome: string; url: string }[]>([]);
+
+  const onAnexar = (files: FileList | null) => {
+    if (!files) return;
+    const restante = 5 - anexos.length;
+    if (restante <= 0) {
+      toast.error("Máximo de 5 fotos por triagem.");
+      return;
+    }
+    const lista = Array.from(files).slice(0, restante);
+    Promise.all(
+      lista.map(
+        (f) =>
+          new Promise<{ nome: string; url: string } | null>((resolve) => {
+            if (!f.type.startsWith("image/")) return resolve(null);
+            if (f.size > 5 * 1024 * 1024) {
+              toast.error(`${f.name} excede 5MB e foi ignorada.`);
+              return resolve(null);
+            }
+            const reader = new FileReader();
+            reader.onload = () =>
+              resolve({ nome: f.name, url: String(reader.result) });
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(f);
+          }),
+      ),
+    ).then((res) => {
+      const novos = res.filter((x): x is { nome: string; url: string } => !!x);
+      if (novos.length) setAnexos((a) => [...a, ...novos]);
+    });
+  };
+
+  const removerAnexo = (idx: number) =>
+    setAnexos((a) => a.filter((_, i) => i !== idx));
 
   // Aceite
   const [aceite, setAceite] = useState(false);
@@ -139,6 +174,7 @@ function Triagem() {
           sintomas: ids,
           observacoes: obs,
           chipsIA: ids,
+          anexos: anexos.length ? anexos : undefined,
         },
         redFlags: motor.redFlags,
         scores: motor.scores,
@@ -256,17 +292,78 @@ function Triagem() {
               toggle={toggle}
               instrucao="Continue marcando os sintomas observados. Quanto mais detalhes, mais preciso o encaminhamento."
               extra={
-                <div className="mt-6">
-                  <Label className="text-sm font-semibold text-text-strong">
-                    Observações adicionais (opcional)
-                  </Label>
-                  <Textarea
-                    rows={4}
-                    className="mt-2"
-                    placeholder="Há quanto tempo começou? Algo mais que devemos saber?"
-                    value={obs}
-                    onChange={(e) => setObs(e.target.value)}
-                  />
+                <div className="mt-6 space-y-6">
+                  <div>
+                    <Label className="text-sm font-semibold text-text-strong">
+                      Observações adicionais (opcional)
+                    </Label>
+                    <Textarea
+                      rows={4}
+                      className="mt-2"
+                      placeholder="Há quanto tempo começou? Algo mais que devemos saber?"
+                      value={obs}
+                      onChange={(e) => setObs(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-semibold text-text-strong">
+                      Fotos do animal (opcional)
+                    </Label>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Anexe até 5 fotos (máx. 5MB cada) para ajudar a equipe a contextualizar.
+                    </p>
+
+                    <label
+                      htmlFor="anexos-triagem"
+                      className="mt-3 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/30 px-4 py-6 text-center transition hover:bg-muted/50"
+                    >
+                      <ImagePlus className="h-6 w-6 text-primary" />
+                      <span className="text-sm font-medium text-text-strong">
+                        Toque para adicionar fotos
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        JPG, PNG ou HEIC — câmera ou galeria
+                      </span>
+                      <input
+                        id="anexos-triagem"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        capture="environment"
+                        className="hidden"
+                        onChange={(e) => {
+                          onAnexar(e.target.files);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+
+                    {anexos.length > 0 && (
+                      <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                        {anexos.map((a, i) => (
+                          <li
+                            key={`${a.nome}-${i}`}
+                            className="group relative aspect-square overflow-hidden rounded-md border border-border bg-muted"
+                          >
+                            <img
+                              src={a.url}
+                              alt={a.nome}
+                              className="h-full w-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removerAnexo(i)}
+                              aria-label={`Remover ${a.nome}`}
+                              className="absolute right-1 top-1 rounded-full bg-background/90 p-1 text-foreground shadow-sm transition hover:bg-destructive hover:text-destructive-foreground"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </div>
               }
             />
