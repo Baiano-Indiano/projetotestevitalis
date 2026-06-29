@@ -187,6 +187,3 @@ function PainelVeterinario() {
     </div>
   );
 }
-
-// keep imported to avoid tree-shake removing reference in head meta context
-void LayoutGrid;
