@@ -24,14 +24,16 @@ export function Logo({
     <span className={cn("inline-flex items-center", s.gap, className)}>
       <span
         className={cn(
-          "grid shrink-0 place-items-center overflow-hidden rounded-2xl bg-surface ring-1 ring-border/60 shadow-sm",
+          "grid shrink-0 place-items-center overflow-hidden",
           s.img,
         )}
       >
         <img
           src={logoAsset.url}
           alt="Vitalis"
-          className="h-full w-full object-contain p-1"
+          className="h-full w-full object-contain"
+          loading="eager"
+          decoding="async"
         />
       </span>
       {!mark && (
