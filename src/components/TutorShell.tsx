@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 const nav = [
   { to: "/", label: "Início" },
   { to: "/informacoes", label: "Como funciona" },
-  { to: "/emergencia", label: "Unidades" },
+  { to: "/unidades", label: "Unidades" },
 ];
 
 export function TutorShell() {
