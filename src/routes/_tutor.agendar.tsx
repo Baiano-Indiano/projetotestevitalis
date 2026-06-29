@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Stethoscope,
@@ -12,8 +13,10 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useVitalisStore } from "@/data/store";
 
 export const Route = createFileRoute("/_tutor/agendar")({
   head: () => ({
@@ -22,8 +25,14 @@ export const Route = createFileRoute("/_tutor/agendar")({
       { name: "description", content: "Selecione especialidade, data e horário para a consulta do seu pet." },
     ],
   }),
-  component: Agendar,
+  component: AgendarRoute,
 });
+
+function AgendarRoute() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  if (pathname !== "/agendar") return <Outlet />;
+  return <Agendar />;
+}
 
 const especialidades = [
   { id: "clinica", nome: "Clínica Geral", desc: "Avaliação de rotina e sintomas gerais.", icone: Stethoscope },
@@ -35,14 +44,64 @@ const especialidades = [
 const horarios = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00"];
 const indisponiveis = new Set(["08:00", "15:00"]);
 
-function Agendar() {
-  const [esp, setEsp] = useState("clinica");
-  const [diaSel, setDiaSel] = useState<number | null>(7);
-  const [horaSel, setHoraSel] = useState<string | null>("10:00");
-  const [mesIndex, setMesIndex] = useState(0);
+const fmtMes = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" });
+const fmtMesCurto = new Intl.DateTimeFormat("pt-BR", { month: "long" });
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-  const meses = ["Outubro 2024", "Novembro 2024", "Dezembro 2024"];
+function Agendar() {
+  const navigate = useNavigate();
+  const { criarAgendamento, setUltimoAgendamentoId } = useVitalisStore();
+
+  const meses = useMemo(() => {
+    const hoje = new Date();
+    return Array.from({ length: 3 }).map((_, i) => {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
+      return {
+        ano: d.getFullYear(),
+        mes: d.getMonth(),
+        label: capitalize(fmtMes.format(d)),
+        labelCurto: capitalize(fmtMesCurto.format(d)),
+      };
+    });
+  }, []);
+
+  const [mesIndex, setMesIndex] = useState(0);
+  const [esp, setEsp] = useState("clinica");
+  const [diaSel, setDiaSel] = useState<number | null>(null);
+  const [horaSel, setHoraSel] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  const mesAtivo = meses[mesIndex];
   const especialidadeAtiva = especialidades.find((e) => e.id === esp)!;
+
+  const primeiroDia = new Date(mesAtivo.ano, mesAtivo.mes, 1).getDay();
+  const diasNoMes = new Date(mesAtivo.ano, mesAtivo.mes + 1, 0).getDate();
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  const podeEnviar = !!diaSel && !!horaSel && !enviando;
+
+  async function handleAgendar() {
+    if (!podeEnviar || !diaSel || !horaSel) return;
+    setEnviando(true);
+    const id = toast.loading("Confirmando seu agendamento...");
+    try {
+      await new Promise((r) => setTimeout(r, 700));
+      const dataISO = `${mesAtivo.ano}-${String(mesAtivo.mes + 1).padStart(2, "0")}-${String(diaSel).padStart(2, "0")}`;
+      const ag = criarAgendamento({
+        especialidadeId: especialidadeAtiva.id,
+        especialidadeNome: especialidadeAtiva.nome,
+        dataISO,
+        horario: horaSel,
+      });
+      setUltimoAgendamentoId(ag.id);
+      toast.success(`Agendamento confirmado! Protocolo ${ag.protocolo}.`, { id });
+      navigate({ to: "/agendar/confirmacao" });
+    } catch {
+      toast.error("Não foi possível confirmar. Tente novamente.", { id });
+      setEnviando(false);
+    }
+  }
 
   return (
     <div className="container-app py-6 md:py-10">
@@ -68,9 +127,10 @@ function Agendar() {
                 <button
                   key={e.id}
                   type="button"
+                  disabled={enviando}
                   onClick={() => setEsp(e.id)}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-xl border bg-background p-3 text-left transition-all",
+                    "flex w-full items-center gap-3 rounded-xl border bg-background p-3 text-left transition-all disabled:opacity-60",
                     ativo ? "border-primary bg-primary-50 ring-2 ring-primary/15" : "border-border hover:border-primary/40",
                   )}
                 >
@@ -101,7 +161,7 @@ function Agendar() {
             </p>
             <p className="inline-flex items-center gap-2 text-muted-foreground">
               <CalendarDays className="h-4 w-4 text-primary" />
-              {diaSel ? `${diaSel} de ${meses[mesIndex].split(" ")[0]}` : "Selecione uma data..."}
+              {diaSel ? `${diaSel} de ${mesAtivo.labelCurto}` : "Selecione uma data..."}
             </p>
             <p className="inline-flex items-center gap-2 text-muted-foreground">
               <Clock className="h-4 w-4 text-primary" />
@@ -114,19 +174,27 @@ function Agendar() {
         <div className="mt-4 rounded-2xl border border-border bg-surface p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-base font-semibold text-text-strong">
-              {meses[mesIndex]}
+              {mesAtivo.label}
             </h2>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setMesIndex(Math.max(0, mesIndex - 1))}
-                className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background text-text-strong hover:bg-muted"
+                disabled={enviando || mesIndex === 0}
+                onClick={() => {
+                  setMesIndex(Math.max(0, mesIndex - 1));
+                  setDiaSel(null);
+                }}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background text-text-strong hover:bg-muted disabled:opacity-40"
                 aria-label="Mês anterior"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <button
-                onClick={() => setMesIndex(Math.min(meses.length - 1, mesIndex + 1))}
-                className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background text-text-strong hover:bg-muted"
+                disabled={enviando || mesIndex === meses.length - 1}
+                onClick={() => {
+                  setMesIndex(Math.min(meses.length - 1, mesIndex + 1));
+                  setDiaSel(null);
+                }}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background text-text-strong hover:bg-muted disabled:opacity-40"
                 aria-label="Próximo mês"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -140,19 +208,23 @@ function Agendar() {
             ))}
           </div>
           <div className="mt-1 grid grid-cols-7 gap-1 text-center text-sm">
-            {/* Out 2024 começa numa Terça → 2 espaços vazios */}
-            {Array.from({ length: 2 }).map((_, i) => <div key={`b-${i}`} />)}
-            {Array.from({ length: 31 }).map((_, i) => {
+            {Array.from({ length: primeiroDia }).map((_, i) => <div key={`b-${i}`} />)}
+            {Array.from({ length: diasNoMes }).map((_, i) => {
               const dia = i + 1;
+              const dataDia = new Date(mesAtivo.ano, mesAtivo.mes, dia);
+              const passado = dataDia < hoje;
               const ativo = diaSel === dia;
-              const temBolinha = dia === 4 || dia === 9;
+              const temBolinha = !passado && (dia % 5 === 4 || dia % 7 === 2);
               return (
                 <button
                   key={dia}
+                  disabled={passado || enviando}
                   onClick={() => setDiaSel(dia)}
                   className={cn(
                     "relative aspect-square rounded-full text-sm transition-colors",
-                    ativo ? "bg-primary font-semibold text-primary-foreground" : "text-text-strong hover:bg-muted",
+                    passado && "cursor-not-allowed text-text-soft/40",
+                    !passado && ativo && "bg-primary font-semibold text-primary-foreground",
+                    !passado && !ativo && "text-text-strong hover:bg-muted",
                   )}
                 >
                   {dia}
@@ -166,7 +238,7 @@ function Agendar() {
 
           <div className="mt-5 border-t border-border pt-4">
             <p className="text-sm font-semibold text-text-strong">
-              Horários Disponíveis {diaSel ? `(${String(diaSel).padStart(2, "0")} Out)` : ""}
+              Horários Disponíveis {diaSel ? `(${String(diaSel).padStart(2, "0")} ${mesAtivo.labelCurto.slice(0, 3)})` : ""}
             </p>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {horarios.map((h) => {
@@ -176,7 +248,7 @@ function Agendar() {
                   <button
                     key={h}
                     type="button"
-                    disabled={indisp}
+                    disabled={indisp || enviando}
                     onClick={() => setHoraSel(h)}
                     className={cn(
                       "rounded-lg border px-3 py-2.5 text-sm font-medium transition-all",
@@ -193,10 +265,33 @@ function Agendar() {
           </div>
         </div>
 
-        <Button size="lg" className="mt-5 w-full" disabled={!diaSel || !horaSel}>
-          Agendar Atendimento <ArrowRight className="ml-1.5 h-4 w-4" />
+        <Button
+          size="lg"
+          className="mt-5 w-full"
+          disabled={!podeEnviar}
+          onClick={handleAgendar}
+        >
+          {enviando ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Confirmando...
+            </>
+          ) : (
+            <>
+              Agendar Atendimento <ArrowRight className="ml-1.5 h-4 w-4" />
+            </>
+          )}
         </Button>
       </div>
+
+      {enviando && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-background/70 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-6 py-5 shadow-lg">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <p className="text-sm font-medium text-text-strong">Confirmando seu agendamento...</p>
+            <p className="text-xs text-muted-foreground">Não feche esta janela</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
