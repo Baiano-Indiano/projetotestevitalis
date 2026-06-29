@@ -84,6 +84,40 @@ function Triagem() {
   // Fases 2 e 3 — sintomas
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
   const [obs, setObs] = useState("");
+  const [anexos, setAnexos] = useState<{ nome: string; url: string }[]>([]);
+
+  const onAnexar = (files: FileList | null) => {
+    if (!files) return;
+    const restante = 5 - anexos.length;
+    if (restante <= 0) {
+      toast.error("Máximo de 5 fotos por triagem.");
+      return;
+    }
+    const lista = Array.from(files).slice(0, restante);
+    Promise.all(
+      lista.map(
+        (f) =>
+          new Promise<{ nome: string; url: string } | null>((resolve) => {
+            if (!f.type.startsWith("image/")) return resolve(null);
+            if (f.size > 5 * 1024 * 1024) {
+              toast.error(`${f.name} excede 5MB e foi ignorada.`);
+              return resolve(null);
+            }
+            const reader = new FileReader();
+            reader.onload = () =>
+              resolve({ nome: f.name, url: String(reader.result) });
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(f);
+          }),
+      ),
+    ).then((res) => {
+      const novos = res.filter((x): x is { nome: string; url: string } => !!x);
+      if (novos.length) setAnexos((a) => [...a, ...novos]);
+    });
+  };
+
+  const removerAnexo = (idx: number) =>
+    setAnexos((a) => a.filter((_, i) => i !== idx));
 
   // Aceite
   const [aceite, setAceite] = useState(false);
