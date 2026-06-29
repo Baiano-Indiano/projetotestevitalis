@@ -160,6 +160,48 @@ const seedTriagens: Triagem[] = [
   })(),
 ];
 
+// Seed de agendamentos para hoje e amanhã, distribuídos entre os veterinários.
+const hojeISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+const amanhaISO = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
+const seedAgs: Agendamento[] = [
+  { vet: "vet-rs", h: "08:00", tutor: "Marina Albuquerque", animal: "Thor", st: "confirmado", obs: "Retorno cardiológico" },
+  { vet: "vet-rs", h: "09:00", tutor: "Carla Dias", animal: "Bidu", st: "check-in" },
+  { vet: "vet-am", h: "08:30", tutor: "Roberto Pinto", animal: "Luna", st: "em-atendimento" },
+  { vet: "vet-am", h: "10:00", tutor: "Eduardo Lima", animal: "Theo", st: "pendente" },
+  { vet: "vet-ms", h: "09:30", tutor: "Rafael Lopes Maia", animal: "Mel", st: "confirmado", obs: "Pós-cirúrgico" },
+  { vet: "vet-cl", h: "11:00", tutor: "Henrique Sales", animal: "Bento", st: "confirmado" },
+  { vet: "vet-jp", h: "14:00", tutor: "Cláudia Bezerra", animal: "Pituca", st: "pendente" },
+  { vet: "vet-jp", h: "15:30", tutor: "Sandra Mota", animal: "Nina", st: "confirmado" },
+  { vet: "vet-rs", h: "16:00", tutor: "Paulo Reis", animal: "Rex", st: "concluido" },
+].map((s, i) => {
+  const v = veterinarios.find((x) => x.id === s.vet)!;
+  return {
+    id: `ag-seed-${i}`,
+    protocolo: gerarProtocoloAgendamento(),
+    especialidadeId: v.especialidadeId,
+    especialidadeNome: nomeEspecialidade(v.especialidadeId),
+    dataISO: i % 4 === 3 ? amanhaISO() : hojeISO(),
+    horario: s.h,
+    criadoEm: new Date().toISOString(),
+    status: s.st as StatusAgendamento,
+    profissionalId: v.id,
+    profissionalNome: v.nome,
+    unidadeId: v.unidadeId,
+    tutorNome: s.tutor,
+    animalNome: s.animal,
+    duracaoMin: 30,
+    observacoes: s.obs,
+  } satisfies Agendamento;
+});
+
 export type Papel = "tutor" | "recepcao" | "veterinario" | "gestor";
 
 interface StoreCtx {
