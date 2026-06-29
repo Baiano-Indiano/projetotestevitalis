@@ -174,6 +174,7 @@ function Triagem() {
           sintomas: ids,
           observacoes: obs,
           chipsIA: ids,
+          anexos: anexos.length ? anexos : undefined,
         },
         redFlags: motor.redFlags,
         scores: motor.scores,
