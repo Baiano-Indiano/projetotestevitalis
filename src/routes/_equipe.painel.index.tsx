@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   Users,
   Wifi,
@@ -11,7 +12,17 @@ import {
   FlaskConical,
   GitBranchPlus,
   ShieldCheck,
+  Syringe,
+  TestTube2,
+  Cpu,
+  ClipboardList,
+  Search,
+  Plus,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { useVitalisStore } from "@/data/store";
 
 export const Route = createFileRoute("/_equipe/painel/")({
