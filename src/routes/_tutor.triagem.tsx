@@ -152,20 +152,42 @@ function Triagem() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-background">
+      {/* Overlay bloqueador durante o envio */}
+      {enviando && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm"
+          aria-live="assertive"
+          role="alert"
+        >
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-8 py-6 shadow-lg">
+            <Loader2 className="h-7 w-7 animate-spin text-primary" />
+            <p className="text-sm font-semibold text-text-strong">Enviando sua triagem...</p>
+            <p className="text-xs text-muted-foreground">Não feche esta janela.</p>
+          </div>
+        </div>
+      )}
+
       {/* Top bar */}
       <div className="border-b border-border bg-surface">
         <div className="container-app flex h-14 items-center justify-between">
           <span className="font-display text-sm font-semibold text-text-strong">
             Triagem
           </span>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-text-strong"
-          >
-            Cancelar triagem <X className="h-4 w-4" />
-          </Link>
+          {enviando ? (
+            <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground opacity-50">
+              Cancelar triagem <X className="h-4 w-4" />
+            </span>
+          ) : (
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-text-strong"
+            >
+              Cancelar triagem <X className="h-4 w-4" />
+            </Link>
+          )}
         </div>
       </div>
+
 
       <div className="container-app py-6 md:py-10">
         <div className="mx-auto max-w-2xl">
@@ -267,6 +289,7 @@ function Triagem() {
               <Button
                 variant="outline"
                 size="lg"
+                disabled={enviando}
                 onClick={() => setFase((fase - 1) as Fase)}
               >
                 <ArrowLeft className="mr-1.5 h-4 w-4" /> Anterior

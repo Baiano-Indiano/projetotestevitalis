@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useVitalisStore } from "@/data/store";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Copy, Eye, Download, Info, FileCheck, Clock, Send, PawPrint, Stethoscope, Flag } from "lucide-react";
+import { CheckCircle2, Copy, Eye, Download, Info, FileCheck, Clock, Send, PawPrint, Stethoscope, Flag, User2, Phone, Calendar, ListChecks } from "lucide-react";
+import { getItemById } from "@/data/sintomas-categorias";
 import { nomeEspecialidade } from "@/config/municipio";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,11 @@ function Resultado() {
   const { triagens, ultimaTriagemId } = useVitalisStore();
   const t = triagens.find((x) => x.id === ultimaTriagemId);
   const [copiado, setCopiado] = useState(false);
+  const [confirmVisivel, setConfirmVisivel] = useState(true);
+  useEffect(() => {
+    const id = setTimeout(() => setConfirmVisivel(false), 4000);
+    return () => clearTimeout(id);
+  }, []);
 
   if (!t) {
     return (
@@ -46,6 +52,14 @@ function Resultado() {
     <div className="bg-[radial-gradient(ellipse_at_top,var(--color-primary-50)_0%,var(--color-background)_60%)] py-8 md:py-14">
       <div className="container-app">
         <div className="mx-auto max-w-xl">
+          {confirmVisivel && (
+            <div className="mb-4 flex items-center gap-3 rounded-xl border border-success/30 bg-success-50 px-4 py-3 text-sm shadow-sm animate-in fade-in slide-in-from-top-2">
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
+              <p className="font-medium text-success-700">
+                Triagem confirmada. Protocolo <span className="font-mono font-bold">{t.protocolo}</span> gerado.
+              </p>
+            </div>
+          )}
           <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm md:p-8">
             {/* Ícone de sucesso */}
             <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-success-50">
@@ -94,6 +108,31 @@ function Resultado() {
               />
             </div>
 
+            {/* Resumo rápido dos dados enviados */}
+            <div className="mt-5 rounded-xl border border-border bg-background p-4">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-soft">
+                <ListChecks className="h-3.5 w-3.5" /> Resumo do envio
+              </p>
+              <dl className="mt-3 grid gap-2 text-sm">
+                <ResumoLinha icone={User2} rotulo="Tutor" valor={t.tutor.nome} />
+                <ResumoLinha icone={Phone} rotulo="Contato" valor={t.tutor.telefone} />
+                <ResumoLinha icone={PawPrint} rotulo="Animal" valor={`${t.animal.nome} • ${t.animal.raca} • ${t.animal.idade}`} />
+                <ResumoLinha
+                  icone={ListChecks}
+                  rotulo={`Sintomas (${t.etapas.sintomas.length})`}
+                  valor={
+                    t.etapas.sintomas.length > 0
+                      ? t.etapas.sintomas.map((id) => getItemById(id)?.label ?? id).join(" • ")
+                      : "Nenhum sintoma marcado"
+                  }
+                />
+                {t.etapas.observacoes && (
+                  <ResumoLinha icone={Info} rotulo="Observações" valor={t.etapas.observacoes} />
+                )}
+                <ResumoLinha icone={Calendar} rotulo="Enviado em" valor={new Date(t.criadoEm).toLocaleString("pt-BR")} />
+              </dl>
+            </div>
+
             {/* Próximos passos */}
             <div className="mt-7">
               <p className="text-sm font-semibold text-text-strong">Próximos Passos</p>
@@ -103,6 +142,7 @@ function Resultado() {
                 <Passo label="Retorno ao Tutor" icone={Send} />
               </div>
             </div>
+
 
             {/* Aviso */}
             <div className="mt-6 flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive-50/60 p-4 text-sm">
@@ -164,6 +204,18 @@ function Passo({ label, icone: Icone, concluido, atual }: { label: string; icone
       <p className={cn("mt-2 text-xs font-medium leading-tight", concluido ? "text-success-700" : atual ? "text-primary" : "text-text-soft")}>
         {label}
       </p>
+    </div>
+  );
+}
+
+function ResumoLinha({ icone: Icone, rotulo, valor }: { icone: typeof PawPrint; rotulo: string; valor: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-2">
+      <Icone className="mt-0.5 h-3.5 w-3.5 shrink-0 text-text-soft" />
+      <div className="min-w-0 flex-1">
+        <dt className="text-xs text-text-soft">{rotulo}</dt>
+        <dd className="text-sm text-text-strong break-words">{valor}</dd>
+      </div>
     </div>
   );
 }
