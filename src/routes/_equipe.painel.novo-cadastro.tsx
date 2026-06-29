@@ -151,111 +151,113 @@ function NovoCadastroPage() {
                 2. Dados do Animal
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_180px]">
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <Field label="Nome do animal" className="md:col-span-2"><Input placeholder="Ex: Rex" /></Field>
-                  <Field label="Espécie">
-                    <Select>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cao">Cão</SelectItem>
-                        <SelectItem value="gato">Gato</SelectItem>
-                        <SelectItem value="outro">Outro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Raça">
-                    <Select>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="srd">SRD</SelectItem>
-                        <SelectItem value="labrador">Labrador</SelectItem>
-                        <SelectItem value="poodle">Poodle</SelectItem>
-                        <SelectItem value="siames">Siamês</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Sexo">
-                    <Select>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="macho">Macho</SelectItem>
-                        <SelectItem value="femea">Fêmea</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Idade"><Input placeholder="Ex: 3 anos" /></Field>
-                  <Field label="Data de nascimento"><Input type="date" /></Field>
-                  <Field label="Peso (kg)"><Input type="number" step="0.1" placeholder="0,0" /></Field>
-                  <Field label="Cor" className="md:col-span-2"><Input placeholder="Ex: Caramelo" /></Field>
-                  <Field label="Castrado?" className="md:col-span-2">
-                    <div className="inline-flex rounded-md border border-border p-0.5">
-                      {(["sim","nao"] as const).map((v) => (
-                        <button
-                          key={v}
-                          type="button"
-                          onClick={() => setCastrado(v)}
-                          className={cn(
-                            "rounded-sm px-4 py-1.5 text-sm font-medium transition-colors",
-                            castrado === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-text-strong",
-                          )}
-                        >
-                          {v === "sim" ? "Sim" : "Não"}
-                        </button>
-                      ))}
-                    </div>
-                  </Field>
-                  <Field label="Microchip" className="md:col-span-2">
-                    <div className="relative">
-                      <Input placeholder="Número do microchip" className="pr-9" />
-                      <Barcode className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    </div>
-                  </Field>
-                  <Field label="Tutor responsável" className="md:col-span-2">
-                    <Select>
-                      <SelectTrigger><SelectValue placeholder="Selecione o tutor" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="atual">Tutor cadastrado acima</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                </div>
-
-                {/* Upload foto */}
-                <div>
-                  <Label className="mb-2 block">Foto</Label>
-                  <label
-                    htmlFor="foto-animal"
-                    className="flex aspect-square w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/40 text-muted-foreground transition-colors hover:bg-muted"
-                  >
-                    {foto ? (
-                      <img src={foto} alt="" className="h-full w-full rounded-lg object-cover" />
-                    ) : (
-                      <>
-                        <Camera className="h-7 w-7" />
-                        <span className="text-xs font-medium">Adicionar foto</span>
-                      </>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <Field label="Nome do animal"><Input placeholder="Ex: Rex" /></Field>
+                <Field label="Espécie">
+                  <Select>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cao">Cão</SelectItem>
+                      <SelectItem value="gato">Gato</SelectItem>
+                      <SelectItem value="outro">Outro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Raça">
+                  <Select>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="srd">SRD</SelectItem>
+                      <SelectItem value="labrador">Labrador</SelectItem>
+                      <SelectItem value="poodle">Poodle</SelectItem>
+                      <SelectItem value="siames">Siamês</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <Field label="Sexo">
+                  <Select>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="macho">Macho</SelectItem>
+                      <SelectItem value="femea">Fêmea</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Idade"><Input placeholder="Ex: 3 anos" /></Field>
+                <Field label="Data de nascimento"><Input type="date" /></Field>
+                <Field label="Peso (kg)"><Input type="number" step="0.1" placeholder="0,0" /></Field>
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <Field label="Cor"><Input placeholder="Ex: Caramelo" /></Field>
+                <Field label="Castrado?">
+                  <div className="inline-flex rounded-md border border-border p-0.5">
+                    {(["sim","nao"] as const).map((v) => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => setCastrado(v)}
+                        className={cn(
+                          "rounded-sm px-5 py-1.5 text-sm font-medium transition-colors",
+                          castrado === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-text-strong",
+                        )}
+                      >
+                        {v === "sim" ? "Sim" : "Não"}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+                <Field label="Microchip">
+                  <div className="relative">
+                    <Input placeholder="Número do microchip" className="pr-9" />
+                    <Barcode className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  </div>
+                </Field>
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto]">
+                <Field label="Tutor responsável">
+                  <Select>
+                    <SelectTrigger><SelectValue placeholder="Selecione o tutor" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="atual">Tutor cadastrado acima</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Foto do animal (opcional)">
+                  <div className="flex items-center gap-2">
+                    {foto && (
+                      <img src={foto} alt="" className="h-10 w-14 rounded-md object-cover" />
                     )}
-                    <input
-                      id="foto-animal"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        if (!f) return;
-                        const r = new FileReader();
-                        r.onload = () => setFoto(r.result as string);
-                        r.readAsDataURL(f);
-                      }}
-                    />
-                  </label>
-                </div>
+                    <label
+                      htmlFor="foto-animal"
+                      className="flex h-10 cursor-pointer items-center gap-2 rounded-md border-2 border-dashed border-border bg-muted/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
+                    >
+                      <Camera className="h-4 w-4" />
+                      Adicionar foto
+                      <input
+                        id="foto-animal"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (!f) return;
+                          const r = new FileReader();
+                          r.onload = () => setFoto(r.result as string);
+                          r.readAsDataURL(f);
+                        }}
+                      />
+                    </label>
+                  </div>
+                </Field>
               </div>
             </CardContent>
           </Card>
         </div>
+
+
 
         {/* Coluna direita */}
         <div className="flex flex-col gap-5 lg:col-span-2">
