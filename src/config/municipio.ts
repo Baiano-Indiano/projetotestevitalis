@@ -3,6 +3,7 @@
 // o Vitalis para outra prefeitura sem alterar layout.
 
 export type EspecialidadeId =
+  | "clinico-geral"
   | "traumatologia"
   | "cardiologia"
   | "nefrologia"
@@ -48,6 +49,7 @@ export const municipio: MunicipioConfig = {
   uf: "PA",
   prefeitura: "Prefeitura Municipal de Belém",
   especialidades: [
+    { id: "clinico-geral", nome: "Clínico Geral", ativa: true },
     { id: "traumatologia", nome: "Traumatologia", ativa: true },
     { id: "cardiologia", nome: "Cardiologia", ativa: true },
     { id: "nefrologia", nome: "Nefrologia", ativa: true },

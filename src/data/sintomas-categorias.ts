@@ -153,7 +153,7 @@ export function calcularDeSelecionados(ids: string[]): MotorResultadoCategorias 
     .map(([especialidade, score]) => ({ especialidade, score }))
     .sort((a, b) => b.score - a.score);
   const sugestao: EspecialidadeId | "urgencia" =
-    redFlags.length > 0 ? "urgencia" : ranking[0]?.especialidade ?? "traumatologia";
+    redFlags.length > 0 ? "urgencia" : ranking[0]?.especialidade ?? "clinico-geral";
   const prioridade: "alta" | "media" | "baixa" =
     redFlags.length > 0 ? "alta" : (ranking[0]?.score ?? 0) >= 5 ? "media" : "baixa";
   return { scores, ranking, redFlags, sugestao, prioridade };
