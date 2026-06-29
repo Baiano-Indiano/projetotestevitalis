@@ -184,7 +184,6 @@ export function EquipeShell() {
             />
           </div>
           <div className="flex items-center gap-2">
-            </div>
             <div className="hidden lg:block"><RoleSwitcher /></div>
             <button
               type="button"
