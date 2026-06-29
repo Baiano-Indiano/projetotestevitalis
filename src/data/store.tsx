@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
-import { calcularMotor, gerarProtocolo } from "@/lib/triagem";
-import type { Triagem, ValidacaoDecisao, EtapasTriagem } from "@/data/types";
+import { calcularMotor, gerarProtocolo, gerarProtocoloAgendamento } from "@/lib/triagem";
+import type { Triagem, ValidacaoDecisao, EtapasTriagem, Agendamento } from "@/data/types";
 
 // Seed inicial: 6 triagens variadas, sendo a primeira com red-flag ativo.
 const minutosAtras = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
