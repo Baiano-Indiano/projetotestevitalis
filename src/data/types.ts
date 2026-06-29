@@ -74,6 +74,15 @@ export interface ValidacaoDecisao {
   decididoEm: string;
 }
 
+export type StatusAgendamento =
+  | "pendente"
+  | "confirmado"
+  | "check-in"
+  | "em-atendimento"
+  | "concluido"
+  | "cancelado"
+  | "falta";
+
 export interface Agendamento {
   id: string;
   protocolo: string; // ex. "AG-2026-000001"
@@ -82,4 +91,12 @@ export interface Agendamento {
   dataISO: string; // YYYY-MM-DD
   horario: string; // HH:mm
   criadoEm: string; // ISO
+  status?: StatusAgendamento;
+  profissionalId?: string;
+  profissionalNome?: string;
+  unidadeId?: string;
+  tutorNome?: string;
+  animalNome?: string;
+  duracaoMin?: number;
+  observacoes?: string;
 }
