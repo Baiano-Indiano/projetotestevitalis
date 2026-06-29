@@ -112,13 +112,16 @@ export function EquipeShell() {
               } else {
                 active = location.pathname.startsWith(basePath.split("/$")[0]);
               }
-              const linkProps: Record<string, unknown> = { to: it.to };
-              if (it.params) linkProps.params = it.params;
-              if (it.search) linkProps.search = it.search;
+              const linkProps = {
+                to: it.to,
+                ...(it.params ? { params: it.params } : {}),
+                ...(it.search ? { search: it.search } : {}),
+              } as Record<string, unknown>;
               return (
                 <li key={`${it.to}-${it.label}`}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   <Link
-                    {...(linkProps as never)}
+                    {...(linkProps as any)}
                     className={cn(
                       "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       active
