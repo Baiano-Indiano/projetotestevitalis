@@ -73,3 +73,13 @@ export interface ValidacaoDecisao {
   concordanciaIA: boolean;
   decididoEm: string;
 }
+
+export interface Agendamento {
+  id: string;
+  protocolo: string; // ex. "AG-2026-000001"
+  especialidadeId: string;
+  especialidadeNome: string;
+  dataISO: string; // YYYY-MM-DD
+  horario: string; // HH:mm
+  criadoEm: string; // ISO
+}
