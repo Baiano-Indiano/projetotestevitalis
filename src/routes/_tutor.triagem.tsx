@@ -257,6 +257,13 @@ function Triagem() {
         />
       )}
 
+      {redFlagAtivo && (
+        <RedFlagModal
+          sintoma={redFlagAtivo.label}
+          onClose={() => setRedFlagAtivo(null)}
+        />
+      )}
+
       {/* Top bar */}
       <div className="border-b border-border bg-surface">
         <div className="container-app flex h-14 items-center justify-between">
