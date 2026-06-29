@@ -7,6 +7,8 @@ const labels: Record<Papel, string> = {
   recepcao: "Recepção / Triagem",
   veterinario: "Veterinário",
   unidade_movel: "Equipe de Unidade Móvel",
+  laboratorio: "Laboratório Clínico",
+  imagem: "Diagnóstico por Imagem",
 };
 
 export function RoleSwitcher() {

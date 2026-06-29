@@ -202,7 +202,26 @@ const seedAgs: Agendamento[] = [
   } satisfies Agendamento;
 });
 
-export type Papel = "tutor" | "recepcao" | "veterinario" | "unidade_movel";
+export type Papel = "tutor" | "recepcao" | "veterinario" | "unidade_movel" | "laboratorio" | "imagem";
+
+export type RegistroCampoTipo = "atendimento" | "vacina" | "exame";
+export interface RegistroCampo {
+  id: string;
+  tipo: RegistroCampoTipo;
+  paciente: string;
+  detalhe: string;
+  criadoEm: string;
+  sincronizado: boolean;
+}
+const STORAGE_FILA = "vitalis:um:fila";
+function lerFila(): RegistroCampo[] {
+  if (typeof window === "undefined") return [];
+  try { return JSON.parse(window.localStorage.getItem(STORAGE_FILA) ?? "[]"); } catch { return []; }
+}
+function salvarFila(arr: RegistroCampo[]) {
+  if (typeof window === "undefined") return;
+  try { window.localStorage.setItem(STORAGE_FILA, JSON.stringify(arr)); } catch { /* ignore */ }
+}
 
 interface StoreCtx {
   triagens: Triagem[];
