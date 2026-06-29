@@ -36,12 +36,6 @@ export function TutorShell() {
                 {n.label}
               </Link>
             ))}
-            <Link
-              to="/emergencia"
-              className="ml-2 inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive-50 px-3 py-1.5 text-sm font-medium text-destructive-700 transition-colors hover:bg-destructive-50/80"
-            >
-              <AlertTriangle className="h-4 w-4" /> Emergência
-            </Link>
           </nav>
           <div className="flex items-center gap-2">
             <div className="hidden lg:block"><RoleSwitcher /></div>
