@@ -1,5 +1,6 @@
-import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState, useSearch } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Lightbox } from "@/components/Lightbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useVitalisStore } from "@/data/store";
@@ -40,6 +41,9 @@ import { nomeEspecialidade, type EspecialidadeId } from "@/config/municipio";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_tutor/triagem")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    edit: typeof s.edit === "string" ? s.edit : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Triagem online. Vitalis Belém" },
@@ -64,8 +68,10 @@ const TOTAL_FASES = 4;
 
 function Triagem() {
   const navigate = useNavigate();
-  const { adicionarTriagem, setUltimaTriagemId } = useVitalisStore();
+  const { adicionarTriagem, setUltimaTriagemId, triagens } = useVitalisStore();
+  const { edit } = useSearch({ from: "/_tutor/triagem" });
   const [fase, setFase] = useState<Fase>(1);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   // Fase 1
   const [especie, setEspecie] = useState<"cao" | "gato" | "">("");
@@ -118,6 +124,26 @@ function Triagem() {
 
   const removerAnexo = (idx: number) =>
     setAnexos((a) => a.filter((_, i) => i !== idx));
+
+  // Pré-preenchimento ao editar uma triagem existente (?edit=<id>)
+  useEffect(() => {
+    if (!edit) return;
+    const t = triagens.find((x) => x.id === edit || x.protocolo === edit);
+    if (!t) return;
+    setEspecie(t.animal.especie === "cao" || t.animal.especie === "gato" ? t.animal.especie : "");
+    setAnimalNome(t.animal.nome);
+    setRaca(t.animal.raca);
+    setSexo(t.animal.sexo);
+    const [vNum, vUni] = String(t.animal.idade).split(" ");
+    setIdadeValor(vNum ?? "");
+    setIdadeUnidade(vUni === "meses" ? "meses" : "anos");
+    setTutorNome(t.tutor.nome);
+    setTutorTel(t.tutor.telefone);
+    setSelecionados(new Set(t.etapas.sintomas ?? []));
+    setObs(t.etapas.observacoes ?? "");
+    if (t.etapas.anexos?.length) setAnexos(t.etapas.anexos);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [edit]);
 
   // Aceite
   const [aceite, setAceite] = useState(false);
@@ -211,6 +237,15 @@ function Triagem() {
             <p className="text-xs text-muted-foreground">Não feche esta janela.</p>
           </div>
         </div>
+      )}
+
+      {lightboxIdx !== null && anexos[lightboxIdx] && (
+        <Lightbox
+          fotos={anexos}
+          index={lightboxIdx}
+          onClose={() => setLightboxIdx(null)}
+          onIndexChange={setLightboxIdx}
+        />
       )}
 
       {/* Top bar */}
@@ -346,11 +381,18 @@ function Triagem() {
                             key={`${a.nome}-${i}`}
                             className="group relative aspect-square overflow-hidden rounded-md border border-border bg-muted"
                           >
-                            <img
-                              src={a.url}
-                              alt={a.nome}
-                              className="h-full w-full object-cover"
-                            />
+                            <button
+                              type="button"
+                              onClick={() => setLightboxIdx(i)}
+                              className="absolute inset-0 h-full w-full cursor-zoom-in"
+                              aria-label={`Ampliar ${a.nome}`}
+                            >
+                              <img
+                                src={a.url}
+                                alt={a.nome}
+                                className="h-full w-full object-cover"
+                              />
+                            </button>
                             <button
                               type="button"
                               onClick={() => removerAnexo(i)}
