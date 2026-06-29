@@ -63,7 +63,7 @@ export const municipio: MunicipioConfig = {
       id: "clinica-centro",
       nome: "Clínica Veterinária Municipal Centro",
       tipo: "clinica",
-      endereco: "Av. Governador José Malcher, 1200, Nazaré, Belém, PA",
+      endereco: "Av. Marques de Herval, Belém, PA",
       lat: -1.4498,
       lng: -48.4751,
       servicos: ["Consulta", "Vacinação", "Castração", "Triagem"],
@@ -72,7 +72,7 @@ export const municipio: MunicipioConfig = {
     },
     {
       id: "hospital-veterinario",
-      nome: "Hospital Veterinário Aysú - Unidade Belém",
+      nome: "Hospital Municipal Veterinário",
       tipo: "hospital",
       endereco: "Av. José Bonifácio, 578 - Fátima, Belém - PA, Brasil",
       lat: -1.4486,
