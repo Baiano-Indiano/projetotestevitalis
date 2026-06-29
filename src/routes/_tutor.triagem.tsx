@@ -27,6 +27,7 @@ import {
   X,
   AlertTriangle,
   Info,
+  ImagePlus,
 } from "lucide-react";
 import {
   categoriasParte1,
