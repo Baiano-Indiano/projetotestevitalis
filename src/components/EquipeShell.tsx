@@ -158,11 +158,13 @@ export function EquipeShell() {
                 ...(it.params ? { params: it.params } : {}),
                 ...(it.search ? { search: it.search } : {}),
               } as Record<string, unknown>;
+              const isLab = it.label === "Laboratório" && it.children;
               return (
                 <li key={`${it.to}-${it.label}`}>
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   <Link
                     {...(linkProps as any)}
+                    onClick={isLab ? (e) => { e.preventDefault(); setLabOpen((v) => !v); } : undefined}
                     className={cn(
                       "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       active
@@ -174,8 +176,26 @@ export function EquipeShell() {
                       <it.Icon className="h-4 w-4" />
                       {it.label}
                     </span>
-                    {it.badge?.()}
+                    {it.children
+                      ? <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", labOpen ? "" : "-rotate-90")} />
+                      : it.badge?.()}
                   </Link>
+                  {it.children && labOpen && (
+                    <ul className="ml-7 mt-0.5 flex flex-col gap-0.5 border-l border-border pl-3">
+                      {it.children.map((c) => (
+                        <li key={c.label}>
+                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          <Link
+                            to={c.to as any}
+                            search={c.search as any}
+                            className="block rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-text-strong"
+                          >
+                            {c.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               );
             })}
@@ -203,6 +223,7 @@ export function EquipeShell() {
             />
           </div>
           <div className="flex items-center gap-2">
+            {papel === "unidade_movel" && <div className="hidden md:block"><SyncIndicator /></div>}
             <div className="hidden lg:block"><RoleSwitcher /></div>
             <button
               type="button"
