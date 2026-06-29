@@ -101,6 +101,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Vitalis" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "twitter:title", content: "Vitalis. Saúde pública veterinária de Belém" },
+      { name: "description", content: "Pixel Perfect replicates UI designs from screenshots with high fidelity." },
+      { property: "og:description", content: "Pixel Perfect replicates UI designs from screenshots with high fidelity." },
+      { name: "twitter:description", content: "Pixel Perfect replicates UI designs from screenshots with high fidelity." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
