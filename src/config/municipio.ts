@@ -63,7 +63,7 @@ export const municipio: MunicipioConfig = {
       id: "clinica-centro",
       nome: "Clínica Veterinária Municipal Centro",
       tipo: "clinica",
-      endereco: "Av. Marques de Herval, Belém, PA",
+      endereco: "Av. Marques de Herval, 276 - Pedreira, Belém, PA",
       lat: -1.4498,
       lng: -48.4751,
       servicos: ["Consulta", "Vacinação", "Castração", "Triagem"],
