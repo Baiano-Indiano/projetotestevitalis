@@ -220,6 +220,8 @@ interface StoreCtx {
   criarAgendamento: (
     parcial: Omit<Agendamento, "id" | "protocolo" | "criadoEm">,
   ) => Agendamento;
+  atualizarStatusAgendamento: (id: string, status: StatusAgendamento) => void;
+  removerAgendamento: (id: string) => void;
   ultimoAgendamentoId?: string;
   setUltimoAgendamentoId: (id?: string) => void;
 }
