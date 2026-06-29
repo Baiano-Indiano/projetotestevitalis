@@ -365,7 +365,7 @@ function NovoCadastroPage() {
       </div>
 
       {/* Barra inferior fixa */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 px-4 py-3 shadow-[0_-4px_16px_-8px_rgba(0,0,0,0.1)] backdrop-blur md:px-8 lg:left-72">
+      <div className="sticky bottom-0 z-30 mt-6 -mx-4 border-t border-border bg-surface/95 px-4 py-3 shadow-[0_-4px_16px_-8px_rgba(0,0,0,0.1)] backdrop-blur md:-mx-8 md:px-8">
         <div className="flex flex-col items-stretch gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             <div className="flex items-center gap-2">
