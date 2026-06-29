@@ -100,6 +100,31 @@ function Resultado() {
               />
             </div>
 
+            {/* Resumo rápido dos dados enviados */}
+            <div className="mt-5 rounded-xl border border-border bg-background p-4">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-soft">
+                <ListChecks className="h-3.5 w-3.5" /> Resumo do envio
+              </p>
+              <dl className="mt-3 grid gap-2 text-sm">
+                <ResumoLinha icone={User2} rotulo="Tutor" valor={t.tutor.nome} />
+                <ResumoLinha icone={Phone} rotulo="Contato" valor={t.tutor.telefone} />
+                <ResumoLinha icone={PawPrint} rotulo="Animal" valor={`${t.animal.nome} • ${t.animal.raca} • ${t.animal.idade}`} />
+                <ResumoLinha
+                  icone={ListChecks}
+                  rotulo={`Sintomas (${t.etapas.sintomas.length})`}
+                  valor={
+                    t.etapas.sintomas.length > 0
+                      ? t.etapas.sintomas.map((id) => getItemById(id)?.label ?? id).join(" • ")
+                      : "Nenhum sintoma marcado"
+                  }
+                />
+                {t.etapas.observacoes && (
+                  <ResumoLinha icone={Info} rotulo="Observações" valor={t.etapas.observacoes} />
+                )}
+                <ResumoLinha icone={Calendar} rotulo="Enviado em" valor={new Date(t.criadoEm).toLocaleString("pt-BR")} />
+              </dl>
+            </div>
+
             {/* Próximos passos */}
             <div className="mt-7">
               <p className="text-sm font-semibold text-text-strong">Próximos Passos</p>
@@ -109,6 +134,7 @@ function Resultado() {
                 <Passo label="Retorno ao Tutor" icone={Send} />
               </div>
             </div>
+
 
             {/* Aviso */}
             <div className="mt-6 flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive-50/60 p-4 text-sm">
