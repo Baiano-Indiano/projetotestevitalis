@@ -28,7 +28,7 @@ export interface BlocoEspecialidade {
 const tempoOpcoes = ["Menos de 24h", "1 a 3 dias", "Mais de uma semana", "Meses"];
 const tempoOpcoesSelect = ["Selecione uma opção", ...tempoOpcoes];
 
-export const blocosEspecialidade: Record<EspecialidadeId | "geral", BlocoEspecialidade> = {
+export const blocosEspecialidade: Partial<Record<EspecialidadeId | "geral", BlocoEspecialidade>> = {
   cardiologia: {
     id: "cardiologia",
     nome: "Cardiologia",
