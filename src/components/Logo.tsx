@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/vitalis-logo.jpg.asset.json";
+import logoAsset from "@/assets/vitalis-logo.png.asset.json";
 
 type Size = "sm" | "md" | "lg" | "xl";
 
