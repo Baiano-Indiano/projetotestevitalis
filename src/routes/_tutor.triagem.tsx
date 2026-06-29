@@ -2,12 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useVitalisStore } from "@/data/store";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -15,145 +14,129 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
-import { sintomas, sistemasLabel, inferirSintomas, sintomaPorId } from "@/data/sintomas";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  PawPrint,
+  Cat,
+  Calendar as CalendarIcon,
+  UserCircle2,
+  ClipboardList,
+  Stethoscope,
+  X,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
 import { calcularMotor } from "@/lib/triagem";
-import { unidade24h } from "@/config/municipio";
-import { AlertTriangle, ArrowLeft, ArrowRight, MapPin, Sparkles, X } from "lucide-react";
-import { RedFlagBanner } from "@/components/RedFlagBanner";
+import { blocosEspecialidade, motivosConsulta, type BlocoEspecialidade } from "@/data/especialidades-perguntas";
+import { nomeEspecialidade, type EspecialidadeId } from "@/config/municipio";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_tutor/triagem")({
   head: () => ({
     meta: [
       { title: "Triagem online. Vitalis Belém" },
-      {
-        name: "description",
-        content:
-          "Responda 6 etapas guiadas para receber orientação clínica do seu animal. Detecção de sinais de emergência incluída.",
-      },
-      { property: "og:title", content: "Triagem online. Vitalis Belém" },
-      { property: "og:description", content: "Triagem gratuita em 6 etapas, com validação por veterinário." },
+      { name: "description", content: "Triagem online em três etapas, gratuita, validada por veterinário." },
     ],
   }),
   component: Triagem,
 });
 
-const etapas = [
-  { id: 1, titulo: "Sobre o animal e o tutor", subtitulo: "Para identificar o atendimento." },
-  { id: 2, titulo: "Estado atual", subtitulo: "Como o animal está agora." },
-  { id: 3, titulo: "Sintomas", subtitulo: "Selecione tudo que perceber." },
-  { id: 4, titulo: "Aprofundando os sintomas", subtitulo: "Detalhe a intensidade." },
-  { id: 5, titulo: "Tempo e ambiente", subtitulo: "Quando começou e onde vive." },
-  { id: 6, titulo: "Observações", subtitulo: "Conte com suas palavras." },
-];
+type Fase = 1 | 2 | 3;
+type Respostas = Record<string, string | string[] | number>;
 
 function Triagem() {
   const navigate = useNavigate();
   const { adicionarTriagem, setUltimaTriagemId } = useVitalisStore();
-  const [step, setStep] = useState(1);
-  const [erro, setErro] = useState<string | null>(null);
+  const [fase, setFase] = useState<Fase>(1);
 
-  // estado local da triagem
-  const [animal, setAnimal] = useState({
-    nome: "",
-    especie: "cao" as "cao" | "gato" | "outro",
-    raca: "",
-    sexo: "macho" as "macho" | "femea",
-    idade: "",
-  });
-  const [tutor, setTutor] = useState({ nome: "", telefone: "", anonimo: false });
-  const [estado, setEstado] = useState({
-    consciencia: "alerta" as "alerta" | "apatico" | "deprimido" | "inconsciente",
-    apetite: "normal" as "normal" | "reduzido" | "ausente",
-    hidratacao: "normal" as "normal" | "leve" | "moderada" | "grave",
-    comportamento: "normal" as "normal" | "agitado" | "isolado" | "agressivo",
-  });
-  const [sintomaSel, setSintomaSel] = useState<string[]>([]);
-  const [busca, setBusca] = useState("");
-  const [intensidade, setIntensidade] = useState<Record<string, "leve" | "moderada" | "intensa">>({});
-  const [tempo, setTempo] = useState({ inicio: "há 1 dia", duracao: "agudo" });
-  const [ambiente, setAmbiente] = useState({
-    ambiente: "domestico" as "domestico" | "rua" | "misto",
-    contatoOutros: false,
-    vacinado: true,
-  });
-  const [observacoes, setObservacoes] = useState("");
-  const [chipsIA, setChipsIA] = useState<string[]>([]);
+  // Fase 1
+  const [especie, setEspecie] = useState<"cao" | "gato" | "">("");
+  const [idadeValor, setIdadeValor] = useState("");
+  const [idadeUnidade, setIdadeUnidade] = useState<"meses" | "anos">("anos");
+  const [tutorNome, setTutorNome] = useState("");
+  const [tutorCpf, setTutorCpf] = useState("");
+  const [tutorTel, setTutorTel] = useState("");
+  const [tutorEnd, setTutorEnd] = useState("");
+  const [animalNome, setAnimalNome] = useState("");
+  const [raca, setRaca] = useState("");
+  const [motivo, setMotivo] = useState<EspecialidadeId | "geral" | "">("");
 
-  const motor = useMemo(() => calcularMotor(sintomaSel), [sintomaSel]);
-  const temRedFlag = motor.redFlags.length > 0;
+  // Fase 2 – respostas por especialidade
+  const [respostas, setRespostas] = useState<Respostas>({});
 
-  const grupos = useMemo(() => {
-    const filtrados = busca
-      ? sintomas.filter((s) => s.nome.toLowerCase().includes(busca.toLowerCase()))
-      : sintomas;
-    const out: Record<string, typeof sintomas> = {};
-    for (const s of filtrados) {
-      (out[s.sistema] ??= []).push(s);
+  // Aceite
+  const [aceite, setAceite] = useState(false);
+
+  const bloco: BlocoEspecialidade | null = motivo ? blocosEspecialidade[motivo] : null;
+  const Icone = bloco?.icone ?? Stethoscope;
+
+  const valida1 = () =>
+    Boolean(especie && idadeValor && tutorNome && tutorTel && tutorEnd && animalNome && motivo);
+
+  // mapeia respostas em sintoma ids genéricos para o motor
+  const sintomasInferidos = useMemo(() => {
+    const ids: string[] = [];
+    if (!bloco) return ids;
+    const map: Record<string, string> = {
+      coceira: "prurido",
+      cansaco: "cansaco",
+      respirar: "dispneia",
+      desmaio: "colapso",
+      manqueira: "claudicacao",
+      trauma: "trauma",
+      sangramento: "sangramento",
+      nodulo: "nodulo",
+      sede: "sede",
+      peso: "perda-peso",
+    };
+    for (const p of bloco.perguntas) {
+      const r = respostas[p.id];
+      if (p.tipo === "simnao" && r === "Sim" && map[p.id]) ids.push(map[p.id]);
     }
-    return out;
-  }, [busca]);
-
-  const toggleSintoma = (id: string) => {
-    setSintomaSel((arr) => (arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]));
-  };
-
-  const validar = (): string | null => {
-    if (step === 1) {
-      if (!animal.nome) return "Informe o nome do animal.";
-      if (!animal.raca) return "Informe a raça.";
-      if (!animal.idade) return "Informe a idade aproximada.";
-      if (!tutor.anonimo && (!tutor.nome || !tutor.telefone)) {
-        return "Informe nome e telefone do tutor, ou marque continuar sem cadastro.";
-      }
+    if (motivo && motivo !== "geral") {
+      // garante peso mínimo para a especialidade escolhida
+      const stubBySpec: Record<EspecialidadeId, string> = {
+        cardiologia: "tosse",
+        dermatologia: "prurido",
+        ortopedia: "claudicacao",
+        traumatologia: "trauma",
+        nefrologia: "poliuria",
+        oncologia: "nodulo",
+        endocrinologia: "sede",
+      };
+      const stub = stubBySpec[motivo as EspecialidadeId];
+      if (stub && !ids.includes(stub)) ids.push(stub);
     }
-    if (step === 3 && sintomaSel.length === 0) return "Selecione ao menos um sintoma.";
-    return null;
-  };
+    return ids;
+  }, [bloco, respostas, motivo]);
 
-  const avancar = () => {
-    const e = validar();
-    if (e) {
-      setErro(e);
-      return;
-    }
-    setErro(null);
-    if (step < 6) setStep(step + 1);
-    else finalizar();
-  };
-  const voltar = () => {
-    setErro(null);
-    if (step > 1) setStep(step - 1);
-  };
-
-  const interpretar = () => {
-    const ids = inferirSintomas(observacoes);
-    setChipsIA(ids);
-  };
-  const aceitarChip = (id: string) => {
-    toggleSintoma(id);
-    setChipsIA((arr) => arr.filter((x) => x !== id));
-  };
+  const motor = useMemo(() => calcularMotor(sintomasInferidos), [sintomasInferidos]);
+  const especialidadeFinal: EspecialidadeId | "urgencia" | "geral" =
+    motor.redFlags.length > 0
+      ? "urgencia"
+      : motor.sugestao ?? (motivo === "geral" ? "geral" : (motivo as EspecialidadeId));
 
   const finalizar = () => {
     const t = adicionarTriagem({
-      animal,
-      tutor: tutor.anonimo
-        ? { nome: "Tutor anônimo", telefone: "—" }
-        : { nome: tutor.nome, telefone: tutor.telefone },
+      animal: {
+        nome: animalNome,
+        especie: especie || "outro",
+        raca: raca || "Não informada",
+        sexo: "macho",
+        idade: `${idadeValor} ${idadeUnidade}`,
+      },
+      tutor: { nome: tutorNome, telefone: tutorTel },
       canal: "online",
       etapas: {
-        estadoAtual: estado,
-        sintomas: sintomaSel,
-        tempo,
-        ambiente,
-        observacoes,
-        chipsIA,
+        sintomas: sintomasInferidos,
+        observacoes: typeof respostas.obs === "string" ? respostas.obs : "",
+        chipsIA: sintomasInferidos,
       },
       redFlags: motor.redFlags,
       scores: motor.scores,
-      sugestao: motor.sugestao,
+      sugestao: especialidadeFinal === "geral" ? motor.sugestao : (especialidadeFinal as EspecialidadeId | "urgencia"),
       prioridade: motor.prioridade,
     });
     setUltimaTriagemId(t.id);
@@ -161,379 +144,565 @@ function Triagem() {
   };
 
   return (
-    <div className="container-app py-6 md:py-10">
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-6 flex items-center justify-between">
-          <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-text-strong">
-            <ArrowLeft className="h-4 w-4" /> Voltar
-          </Link>
-          <span className="text-xs font-medium uppercase tracking-wide text-text-soft">
-            Etapa {step} de 6
+    <div className="min-h-[calc(100vh-4rem)] bg-background">
+      {/* Top bar com cancelar */}
+      <div className="border-b border-border bg-surface">
+        <div className="container-app flex h-14 items-center justify-between">
+          <span className="font-display text-sm font-semibold text-text-strong">
+            {fase === 1 ? "Triagem Online" : fase === 2 ? bloco?.nome : "Revisão"}
           </span>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-text-strong"
+          >
+            Cancelar triagem <X className="h-4 w-4" />
+          </Link>
         </div>
-        <Progress value={(step / 6) * 100} className="h-1.5" />
-        <div className="mt-6">
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
-            {etapas[step - 1].titulo}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{etapas[step - 1].subtitulo}</p>
-        </div>
+      </div>
 
-        {temRedFlag && step >= 3 && (
-          <div className="mt-6">
-            <RedFlagBanner
-              ids={motor.redFlags}
-              acao={
-                <>
-                  <Button asChild variant="destructive">
-                    <Link to="/emergencia">
-                      <AlertTriangle className="mr-1 h-4 w-4" /> Buscar urgência agora
-                    </Link>
-                  </Button>
-                  <p className="text-xs text-destructive-700">
-                    Você pode continuar a triagem para registrar o caso. A unidade 24h mais próxima é{" "}
-                    <strong>{unidade24h().nome}</strong>.
-                  </p>
-                </>
-              }
+      <div className="container-app py-6 md:py-10">
+        <div className="mx-auto max-w-2xl">
+          {/* Tabs de progresso */}
+          <Tabs fase={fase} bloco={bloco} />
+
+          {fase === 1 && (
+            <FaseInicial
+              especie={especie}
+              setEspecie={setEspecie}
+              idadeValor={idadeValor}
+              setIdadeValor={setIdadeValor}
+              idadeUnidade={idadeUnidade}
+              setIdadeUnidade={setIdadeUnidade}
+              tutorNome={tutorNome} setTutorNome={setTutorNome}
+              tutorCpf={tutorCpf} setTutorCpf={setTutorCpf}
+              tutorTel={tutorTel} setTutorTel={setTutorTel}
+              tutorEnd={tutorEnd} setTutorEnd={setTutorEnd}
+              animalNome={animalNome} setAnimalNome={setAnimalNome}
+              raca={raca} setRaca={setRaca}
+              motivo={motivo} setMotivo={setMotivo}
             />
-          </div>
-        )}
-
-        <Card className="mt-6 border-border bg-surface p-6">
-          {step === 1 && (
-            <div className="grid gap-5 md:grid-cols-2">
-              <Field label="Nome do animal" required>
-                <Input value={animal.nome} onChange={(e) => setAnimal({ ...animal, nome: e.target.value })} placeholder="Ex. Thor" />
-              </Field>
-              <Field label="Espécie" required>
-                <Select value={animal.especie} onValueChange={(v) => setAnimal({ ...animal, especie: v as typeof animal.especie })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cao">Cão</SelectItem>
-                    <SelectItem value="gato">Gato</SelectItem>
-                    <SelectItem value="outro">Outro</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field label="Raça" required>
-                <Input value={animal.raca} onChange={(e) => setAnimal({ ...animal, raca: e.target.value })} placeholder="Ex. SRD" />
-              </Field>
-              <Field label="Idade aproximada" required>
-                <Input value={animal.idade} onChange={(e) => setAnimal({ ...animal, idade: e.target.value })} placeholder="Ex. 5 anos" />
-              </Field>
-              <Field label="Sexo">
-                <RadioGroup value={animal.sexo} onValueChange={(v) => setAnimal({ ...animal, sexo: v as typeof animal.sexo })} className="flex gap-4 pt-2">
-                  <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="macho" /> Macho</label>
-                  <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="femea" /> Fêmea</label>
-                </RadioGroup>
-              </Field>
-              <div className="md:col-span-2 mt-2 rounded-lg border border-border bg-background p-4">
-                <p className="text-sm font-medium text-text-strong">Tutor</p>
-                <div className="mt-3 grid gap-4 md:grid-cols-2">
-                  <Field label="Seu nome">
-                    <Input disabled={tutor.anonimo} value={tutor.nome} onChange={(e) => setTutor({ ...tutor, nome: e.target.value })} placeholder="Nome completo" />
-                  </Field>
-                  <Field label="Telefone">
-                    <Input disabled={tutor.anonimo} value={tutor.telefone} onChange={(e) => setTutor({ ...tutor, telefone: e.target.value })} placeholder="(91) 9 0000 0000" />
-                  </Field>
-                </div>
-                <label className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Checkbox checked={tutor.anonimo} onCheckedChange={(v) => setTutor({ ...tutor, anonimo: Boolean(v) })} />
-                  Continuar sem cadastro (gera protocolo anônimo)
-                </label>
-              </div>
-            </div>
           )}
 
-          {step === 2 && (
-            <div className="grid gap-5 md:grid-cols-2">
-              <Field label="Nível de consciência">
-                <Select value={estado.consciencia} onValueChange={(v) => setEstado({ ...estado, consciencia: v as typeof estado.consciencia })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="alerta">Alerta</SelectItem>
-                    <SelectItem value="apatico">Apático</SelectItem>
-                    <SelectItem value="deprimido">Deprimido</SelectItem>
-                    <SelectItem value="inconsciente">Inconsciente</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field label="Apetite">
-                <Select value={estado.apetite} onValueChange={(v) => setEstado({ ...estado, apetite: v as typeof estado.apetite })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="normal">Normal</SelectItem>
-                    <SelectItem value="reduzido">Reduzido</SelectItem>
-                    <SelectItem value="ausente">Ausente</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field label="Hidratação">
-                <Select value={estado.hidratacao} onValueChange={(v) => setEstado({ ...estado, hidratacao: v as typeof estado.hidratacao })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="normal">Normal</SelectItem>
-                    <SelectItem value="leve">Leve desidratação</SelectItem>
-                    <SelectItem value="moderada">Moderada</SelectItem>
-                    <SelectItem value="grave">Grave</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field label="Comportamento">
-                <Select value={estado.comportamento} onValueChange={(v) => setEstado({ ...estado, comportamento: v as typeof estado.comportamento })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="normal">Normal</SelectItem>
-                    <SelectItem value="agitado">Agitado</SelectItem>
-                    <SelectItem value="isolado">Isolado</SelectItem>
-                    <SelectItem value="agressivo">Agressivo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-            </div>
+          {fase === 2 && bloco && (
+            <FaseEspecialidade
+              bloco={bloco}
+              Icone={Icone}
+              respostas={respostas}
+              setRespostas={setRespostas}
+            />
           )}
 
-          {step === 3 && (
-            <div>
-              <Input
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-                placeholder="Buscar sintoma (ex. tosse, coceira, mancando)"
-                className="mb-4"
-              />
-              <div className="space-y-5">
-                {(Object.keys(grupos) as (keyof typeof sistemasLabel)[]).map((sis) => (
-                  <div key={sis}>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-soft">
-                      {sistemasLabel[sis]}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {grupos[sis].map((s) => {
-                        const ativo = sintomaSel.includes(s.id);
-                        return (
-                          <button
-                            key={s.id}
-                            type="button"
-                            onClick={() => toggleSintoma(s.id)}
-                            className={cn(
-                              "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-                              ativo
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : s.redFlag
-                                  ? "border-destructive/40 bg-destructive-50 text-destructive-700 hover:bg-destructive-50/80"
-                                  : "border-border bg-background text-text-strong hover:bg-muted",
-                            )}
-                            aria-pressed={ativo}
-                          >
-                            {s.redFlag && <AlertTriangle className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />}
-                            {s.nome}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-4 text-xs text-text-soft">
-                Sintomas marcados em vermelho indicam possível emergência.
-              </p>
-            </div>
+          {fase === 3 && (
+            <FaseRevisao
+              tutorNome={tutorNome}
+              tutorTel={tutorTel}
+              tutorEnd={tutorEnd}
+              animalNome={animalNome}
+              especie={especie}
+              raca={raca}
+              idade={`${idadeValor} ${idadeUnidade}`}
+              especialidade={especialidadeFinal}
+              respostas={respostas}
+              bloco={bloco}
+              aceite={aceite}
+              setAceite={setAceite}
+            />
           )}
 
-          {step === 4 && (
-            <div>
-              {sintomaSel.length === 0 ? (
-                <EmptyState
-                  titulo="Sem sintomas selecionados"
-                  desc="Volte para a etapa 3 e selecione ao menos um."
-                />
-              ) : (
-                <div className="space-y-3">
-                  {sintomaSel.map((id) => {
-                    const s = sintomaPorId(id);
-                    return (
-                      <div key={id} className="flex items-center justify-between gap-4 rounded-lg border border-border bg-background p-3">
-                        <div>
-                          <p className="text-sm font-medium text-text-strong">{s?.nome}</p>
-                          <p className="text-xs text-text-soft">{sistemasLabel[s!.sistema]}</p>
-                        </div>
-                        <Select
-                          value={intensidade[id] ?? "moderada"}
-                          onValueChange={(v) => setIntensidade({ ...intensidade, [id]: v as "leve" | "moderada" | "intensa" })}
-                        >
-                          <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="leve">Leve</SelectItem>
-                            <SelectItem value="moderada">Moderada</SelectItem>
-                            <SelectItem value="intensa">Intensa</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="grid gap-5 md:grid-cols-2">
-              <Field label="Quando começou?">
-                <Select value={tempo.inicio} onValueChange={(v) => setTempo({ ...tempo, inicio: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {["há poucas horas", "há 1 dia", "há 3 dias", "há 1 semana", "há 2 semanas", "há mais de 1 mês"].map((v) => (
-                      <SelectItem key={v} value={v}>{v}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field label="Duração">
-                <Select value={tempo.duracao} onValueChange={(v) => setTempo({ ...tempo, duracao: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="agudo">Agudo (de início súbito)</SelectItem>
-                    <SelectItem value="subagudo">Subagudo</SelectItem>
-                    <SelectItem value="crônico">Crônico (recorrente)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field label="Ambiente">
-                <Select value={ambiente.ambiente} onValueChange={(v) => setAmbiente({ ...ambiente, ambiente: v as typeof ambiente.ambiente })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="domestico">Doméstico</SelectItem>
-                    <SelectItem value="rua">Rua</SelectItem>
-                    <SelectItem value="misto">Misto</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              <div className="grid gap-3 pt-2">
-                <label className="flex items-center gap-2 text-sm text-text-strong">
-                  <Checkbox checked={ambiente.contatoOutros} onCheckedChange={(v) => setAmbiente({ ...ambiente, contatoOutros: Boolean(v) })} />
-                  Tem contato com outros animais
-                </label>
-                <label className="flex items-center gap-2 text-sm text-text-strong">
-                  <Checkbox checked={ambiente.vacinado} onCheckedChange={(v) => setAmbiente({ ...ambiente, vacinado: Boolean(v) })} />
-                  Vacinação em dia
-                </label>
-              </div>
-            </div>
-          )}
-
-          {step === 6 && (
-            <div className="space-y-5">
-              <Field label="Conte com suas palavras o que está acontecendo">
-                <Textarea
-                  value={observacoes}
-                  onChange={(e) => setObservacoes(e.target.value)}
-                  rows={5}
-                  placeholder="Ex. está respirando rápido desde a manhã, não come desde ontem e a gengiva está pálida."
-                />
-              </Field>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={interpretar}>
-                  <Sparkles className="mr-1.5 h-4 w-4" /> Interpretar texto
+          {/* Ações */}
+          <div className={cn(
+            "mt-6 grid gap-3",
+            fase === 1 ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2",
+          )}>
+            {fase === 3 ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setFase(2)}
+                  className="bg-primary-50 text-primary-800 border-transparent hover:bg-primary-100"
+                >
+                  Voltar e Editar
                 </Button>
-                <span className="text-xs text-text-soft">
-                  A IA sugere sintomas com base no que você escreveu. Você confirma cada um.
-                </span>
-              </div>
-              {chipsIA.length > 0 && (
-                <div className="rounded-lg border border-primary-100 bg-primary-50 p-3">
-                  <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary-800">
-                    <Sparkles className="h-3.5 w-3.5" /> Interpretado por IA, confirme
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {chipsIA.map((id) => {
-                      const s = sintomaPorId(id);
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => aceitarChip(id)}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-primary-100 bg-surface px-3 py-1 text-sm text-primary-800 hover:bg-primary-100"
-                        >
-                          {s?.nome ?? id}
-                          <span className="text-xs text-primary-700">adicionar</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              {sintomaSel.length > 0 && (
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-soft">
-                    Sintomas selecionados
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {sintomaSel.map((id) => {
-                      const s = sintomaPorId(id);
-                      return (
-                        <span key={id} className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm text-text-strong">
-                          {s?.nome}
-                          <button type="button" onClick={() => toggleSintoma(id)} aria-label="Remover">
-                            <X className="h-3.5 w-3.5 text-text-soft" />
-                          </button>
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              <p className="rounded-lg bg-muted p-3 text-xs text-muted-foreground">
-                Anexo de foto estará disponível no próximo passo do produto.
-                Hoje você pode descrever em texto. <MapPin className="ml-1 inline h-3 w-3" />
-              </p>
-            </div>
-          )}
-
-          {erro && (
-            <div role="alert" className="mt-5 rounded-md border border-destructive/30 bg-destructive-50 px-3 py-2 text-sm text-destructive-700">
-              {erro}
-            </div>
-          )}
-
-          <div className="mt-7 flex items-center justify-between border-t border-border pt-5">
-            <Button type="button" variant="ghost" onClick={voltar} disabled={step === 1}>
-              <ArrowLeft className="mr-1 h-4 w-4" /> Voltar
-            </Button>
-            <Button type="button" onClick={avancar}>
-              {step < 6 ? (
-                <>Avançar <ArrowRight className="ml-1 h-4 w-4" /></>
-              ) : (
-                "Concluir triagem"
-              )}
-            </Button>
+                <Button
+                  size="lg"
+                  disabled={!aceite}
+                  onClick={finalizar}
+                >
+                  Finalizar e Enviar
+                </Button>
+              </>
+            ) : fase === 2 ? (
+              <>
+                <Button variant="outline" size="lg" onClick={() => setFase(1)}>
+                  <ArrowLeft className="mr-1.5 h-4 w-4" /> Anterior
+                </Button>
+                <Button size="lg" onClick={() => setFase(3)}>
+                  Próximo <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                size="lg"
+                disabled={!valida1()}
+                onClick={() => setFase(2)}
+              >
+                Próximo <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
+            )}
           </div>
-        </Card>
-
-        <p className="mt-4 text-center text-xs text-text-soft">
-          Esta triagem é orientação. Um veterinário confirma no atendimento.
-        </p>
+        </div>
       </div>
     </div>
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Tabs({ fase, bloco }: { fase: Fase; bloco: BlocoEspecialidade | null }) {
+  const items = [
+    { id: 1, label: "Triagem Inicial" },
+    { id: 2, label: bloco?.nome ?? "Especialidade" },
+    { id: 3, label: "Revisão" },
+  ];
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label className="text-sm font-medium text-text-strong">
-        {label} {required && <span className="text-destructive">*</span>}
-      </Label>
+    <div>
+      <div className="grid grid-cols-3 text-center text-xs font-medium md:text-sm">
+        {items.map((it) => {
+          const ativo = fase === it.id;
+          const passou = fase > it.id;
+          return (
+            <div
+              key={it.id}
+              className={cn(
+                "pb-2 transition-colors",
+                ativo ? "text-primary" : passou ? "text-success-700" : "text-text-soft",
+              )}
+            >
+              {it.label}
+            </div>
+          );
+        })}
+      </div>
+      <div className="grid h-1 grid-cols-3 overflow-hidden rounded-full bg-muted">
+        <div className={cn("transition-colors", fase >= 1 ? "bg-success" : "bg-muted")} />
+        <div className={cn("transition-colors", fase >= 2 ? (fase > 2 ? "bg-success" : "bg-primary") : "bg-muted")} />
+        <div className={cn("transition-colors", fase >= 3 ? "bg-primary" : "bg-muted")} />
+      </div>
+    </div>
+  );
+}
+
+function SectionCard({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn("mt-6 rounded-2xl border border-border bg-surface p-5 shadow-sm md:p-6", className)}>
       {children}
     </div>
   );
 }
 
-function EmptyState({ titulo, desc }: { titulo: string; desc: string }) {
+function SectionHeader({ icon: Icon, titulo }: { icon: typeof PawPrint; titulo: string }) {
   return (
-    <div className="rounded-lg border border-dashed border-border bg-background p-6 text-center">
-      <p className="font-display text-sm font-semibold text-text-strong">{titulo}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
+    <div className="mb-4 flex items-center gap-2">
+      <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary-50 text-primary">
+        <Icon className="h-5 w-5" />
+      </span>
+      <h2 className="font-display text-lg font-semibold text-text-strong">{titulo}</h2>
+    </div>
+  );
+}
+
+function FaseInicial(props: {
+  especie: "cao" | "gato" | "";
+  setEspecie: (v: "cao" | "gato") => void;
+  idadeValor: string; setIdadeValor: (v: string) => void;
+  idadeUnidade: "meses" | "anos"; setIdadeUnidade: (v: "meses" | "anos") => void;
+  tutorNome: string; setTutorNome: (v: string) => void;
+  tutorCpf: string; setTutorCpf: (v: string) => void;
+  tutorTel: string; setTutorTel: (v: string) => void;
+  tutorEnd: string; setTutorEnd: (v: string) => void;
+  animalNome: string; setAnimalNome: (v: string) => void;
+  raca: string; setRaca: (v: string) => void;
+  motivo: EspecialidadeId | "geral" | "";
+  setMotivo: (v: EspecialidadeId | "geral") => void;
+}) {
+  return (
+    <div className="mt-6">
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
+        Triagem Online
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Ajude-nos a entender a situação do seu animal para um atendimento mais ágil.
+      </p>
+
+      <SectionCard>
+        <SectionHeader icon={PawPrint} titulo="Qual a espécie do seu animal?" />
+        <div className="grid grid-cols-2 gap-3">
+          <EspecieCard
+            ativo={props.especie === "cao"}
+            onClick={() => props.setEspecie("cao")}
+            icone={<PawPrint className="h-6 w-6" />}
+            label="Cão"
+          />
+          <EspecieCard
+            ativo={props.especie === "gato"}
+            onClick={() => props.setEspecie("gato")}
+            icone={<Cat className="h-6 w-6" />}
+            label="Gato"
+          />
+        </div>
+      </SectionCard>
+
+      <SectionCard>
+        <SectionHeader icon={CalendarIcon} titulo="Qual a idade aproximada?" />
+        <div className="grid gap-3">
+          <div>
+            <Label className="text-sm">Valor</Label>
+            <Input
+              className="mt-1.5"
+              placeholder="Ex: 2"
+              inputMode="numeric"
+              value={props.idadeValor}
+              onChange={(e) => props.setIdadeValor(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label className="text-sm">Unidade de tempo</Label>
+            <Select value={props.idadeUnidade} onValueChange={(v) => props.setIdadeUnidade(v as "anos" | "meses")}>
+              <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="anos">Anos</SelectItem>
+                <SelectItem value="meses">Meses</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <p className="flex items-start gap-2 text-xs text-text-soft">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            Se não souber a idade exata, uma estimativa ajuda nossa equipe.
+          </p>
+        </div>
+      </SectionCard>
+
+      <SectionCard>
+        <SectionHeader icon={UserCircle2} titulo="Dados do Tutor" />
+        <div className="grid gap-3">
+          <Campo label="Nome completo">
+            <Input value={props.tutorNome} onChange={(e) => props.setTutorNome(e.target.value)} placeholder="Seu nome completo" />
+          </Campo>
+          <Campo label="CPF">
+            <Input value={props.tutorCpf} onChange={(e) => props.setTutorCpf(e.target.value)} placeholder="000.000.000-00" />
+          </Campo>
+          <Campo label="Telefone">
+            <Input value={props.tutorTel} onChange={(e) => props.setTutorTel(e.target.value)} placeholder="(00) 00000-0000" />
+          </Campo>
+          <Campo label="Endereço">
+            <Input value={props.tutorEnd} onChange={(e) => props.setTutorEnd(e.target.value)} placeholder="Rua, número, bairro" />
+          </Campo>
+        </div>
+      </SectionCard>
+
+      <SectionCard>
+        <SectionHeader icon={ClipboardList} titulo="Dados do Animal e Motivo" />
+        <div className="grid gap-3">
+          <Campo label="Nome do animal">
+            <Input value={props.animalNome} onChange={(e) => props.setAnimalNome(e.target.value)} placeholder="Ex: Rex" />
+          </Campo>
+          <Campo label="Raça (opcional)">
+            <Input value={props.raca} onChange={(e) => props.setRaca(e.target.value)} placeholder="Ex: Labrador, SRD" />
+          </Campo>
+          <Campo label="Motivo principal da consulta">
+            <Select value={props.motivo || undefined} onValueChange={(v) => props.setMotivo(v as EspecialidadeId | "geral")}>
+              <SelectTrigger><SelectValue placeholder="Selecione o motivo" /></SelectTrigger>
+              <SelectContent>
+                {motivosConsulta.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">{m.label}</span>
+                      <span className="text-xs text-text-soft">{m.desc}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Campo>
+        </div>
+      </SectionCard>
+    </div>
+  );
+}
+
+function EspecieCard({ ativo, onClick, icone, label }: { ativo: boolean; onClick: () => void; icone: React.ReactNode; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center gap-2 rounded-xl border bg-background p-5 transition-all",
+        ativo ? "border-primary bg-primary-50 ring-2 ring-primary/20" : "border-border hover:border-primary/40",
+      )}
+      aria-pressed={ativo}
+    >
+      <span className={cn("grid h-12 w-12 place-items-center rounded-full", ativo ? "bg-primary text-primary-foreground" : "bg-primary-50 text-primary")}>
+        {icone}
+      </span>
+      <span className="text-sm font-semibold text-text-strong">{label}</span>
+    </button>
+  );
+}
+
+function Campo({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <Label className="text-sm font-medium">{label}</Label>
+      <div className="mt-1.5">{children}</div>
+    </div>
+  );
+}
+
+function FaseEspecialidade({
+  bloco,
+  Icone,
+  respostas,
+  setRespostas,
+}: {
+  bloco: BlocoEspecialidade;
+  Icone: typeof PawPrint;
+  respostas: Respostas;
+  setRespostas: (r: Respostas) => void;
+}) {
+  const setR = (id: string, v: string | string[] | number) =>
+    setRespostas({ ...respostas, [id]: v });
+
+  return (
+    <SectionCard>
+      <div className="mb-4 flex items-start gap-3 rounded-xl bg-destructive-50/40 p-4">
+        <span className="grid h-10 w-10 place-items-center rounded-full bg-destructive-50 text-destructive">
+          <Icone className="h-5 w-5" />
+        </span>
+        <div>
+          <h2 className="font-display text-lg font-semibold text-text-strong">{bloco.titulo}</h2>
+          <p className="text-sm text-muted-foreground">{bloco.subtitulo}</p>
+        </div>
+      </div>
+
+      <div className="space-y-5">
+        {bloco.perguntas.map((p, i) => {
+          const num = i + 1;
+          const valor = respostas[p.id];
+          return (
+            <div key={p.id} className="space-y-2">
+              <Label className="block text-sm font-semibold text-text-strong">
+                {num}. {p.label}
+              </Label>
+
+              {p.tipo === "simnao" && (
+                <div className="grid grid-cols-2 gap-3">
+                  {["Sim", "Não"].map((opt) => {
+                    const ativo = valor === opt;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setR(p.id, opt)}
+                        className={cn(
+                          "flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-all",
+                          ativo ? "border-primary bg-primary-50 text-primary-800 font-medium" : "border-border bg-background hover:border-primary/40",
+                        )}
+                      >
+                        <span className={cn("grid h-4 w-4 place-items-center rounded-full border-2", ativo ? "border-primary" : "border-border")}>
+                          {ativo && <span className="h-2 w-2 rounded-full bg-primary" />}
+                        </span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {p.tipo === "checkbox" && p.opcoes && (
+                <div className="space-y-2">
+                  {p.opcoes.map((opt) => {
+                    const arr = Array.isArray(valor) ? valor : [];
+                    const ativo = arr.includes(opt);
+                    return (
+                      <label
+                        key={opt}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 transition-colors",
+                          ativo ? "border-primary bg-primary-50" : "border-border bg-background hover:bg-muted",
+                        )}
+                      >
+                        <Checkbox
+                          checked={ativo}
+                          onCheckedChange={() => setR(p.id, ativo ? arr.filter((x) => x !== opt) : [...arr, opt])}
+                        />
+                        <span className="text-sm text-text-strong">{opt}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+
+              {p.tipo === "select" && p.opcoes && (
+                <Select value={(valor as string) || undefined} onValueChange={(v) => setR(p.id, v)}>
+                  <SelectTrigger><SelectValue placeholder={p.opcoes[0]} /></SelectTrigger>
+                  <SelectContent>
+                    {p.opcoes.slice(1).map((o) => (
+                      <SelectItem key={o} value={o}>{o}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              {p.tipo === "slider" && (
+                <div className="rounded-lg border border-border bg-background p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-xs text-text-soft">{p.minLabel}</span>
+                    <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                      {(valor as number) ?? 3}
+                    </span>
+                    <span className="text-xs text-text-soft">{p.maxLabel}</span>
+                  </div>
+                  <Slider
+                    min={p.min ?? 1}
+                    max={p.max ?? 5}
+                    step={1}
+                    value={[(valor as number) ?? 3]}
+                    onValueChange={(v) => setR(p.id, v[0])}
+                  />
+                </div>
+              )}
+
+              {p.tipo === "textarea" && (
+                <Textarea
+                  rows={4}
+                  placeholder={p.placeholder}
+                  value={(valor as string) || ""}
+                  onChange={(e) => setR(p.id, e.target.value)}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </SectionCard>
+  );
+}
+
+function FaseRevisao({
+  tutorNome, tutorTel, tutorEnd,
+  animalNome, especie, raca, idade,
+  especialidade,
+  respostas,
+  bloco,
+  aceite, setAceite,
+}: {
+  tutorNome: string; tutorTel: string; tutorEnd: string;
+  animalNome: string; especie: string; raca: string; idade: string;
+  especialidade: EspecialidadeId | "urgencia" | "geral";
+  respostas: Respostas;
+  bloco: BlocoEspecialidade | null;
+  aceite: boolean; setAceite: (v: boolean) => void;
+}) {
+  const especieLabel = especie === "cao" ? "Canina" : especie === "gato" ? "Felina" : "Outro";
+  const especialidadeLabel = especialidade === "urgencia" ? "Urgência" : especialidade === "geral" ? "Clínica Geral" : nomeEspecialidade(especialidade as EspecialidadeId);
+
+  const resumoSintomas: string[] = [];
+  if (bloco) {
+    for (const p of bloco.perguntas) {
+      const r = respostas[p.id];
+      if (p.tipo === "simnao" && r) resumoSintomas.push(`${r === "Sim" ? "" : "Sem "}${p.label.replace(/\?$/, "").toLowerCase()}`);
+      if (p.tipo === "checkbox" && Array.isArray(r) && r.length) resumoSintomas.push(`${p.label.replace(/:$/, "")}: ${r.join(", ")}`);
+      if (p.tipo === "select" && typeof r === "string" && r) resumoSintomas.push(`${p.label.replace(/:$/, "")}: ${r}`);
+      if (p.tipo === "slider" && r) resumoSintomas.push(`Intensidade: ${r}/5`);
+    }
+  }
+  const obs = typeof respostas.obs === "string" ? respostas.obs : "";
+
+  return (
+    <SectionCard>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
+        Revisão das Informações
+      </h1>
+
+      <Bloco titulo="Dados do Tutor" icone={UserCircle2}>
+        <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+          <Item rotulo="Nome" valor={tutorNome} />
+          <Item rotulo="Telefone" valor={tutorTel} />
+          <Item rotulo="Endereço" valor={tutorEnd} className="sm:col-span-2" />
+        </div>
+      </Bloco>
+
+      <Bloco titulo="Dados do Animal" icone={PawPrint}>
+        <div className="grid gap-x-6 gap-y-3 sm:grid-cols-3">
+          <Item rotulo="Nome" valor={animalNome} />
+          <Item rotulo="Espécie" valor={especieLabel} />
+          <Item rotulo="Raça" valor={raca || "Não informada"} />
+          <Item rotulo="Idade" valor={idade} />
+        </div>
+      </Bloco>
+
+      <Bloco titulo="Motivo da Consulta" icone={ClipboardList}>
+        <div className="rounded-lg bg-primary-50 px-4 py-3">
+          <p className="text-sm font-medium text-primary-800">
+            <span className="mr-1 text-success">●</span>
+            Especialidade Identificada: {especialidadeLabel}
+          </p>
+        </div>
+      </Bloco>
+
+      {resumoSintomas.length > 0 && (
+        <Bloco titulo="Resumo da Triagem" icone={Stethoscope}>
+          <ul className="space-y-1.5 text-sm text-text-strong">
+            {resumoSintomas.map((s, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-primary">•</span> {s}
+              </li>
+            ))}
+          </ul>
+        </Bloco>
+      )}
+
+      {obs && (
+        <Bloco titulo="Observações Adicionais" icone={Info}>
+          <div className="rounded-lg border border-border bg-background p-3 text-sm text-text-strong">
+            {obs}
+          </div>
+        </Bloco>
+      )}
+
+      <div className="mt-6 flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive-50 p-4 text-sm text-destructive-700">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+        <p>
+          A triagem não substitui uma avaliação veterinária presencial. Em caso de emergência grave, dirija-se imediatamente à unidade.
+        </p>
+      </div>
+
+      <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-sm text-text-strong">
+        <Checkbox checked={aceite} onCheckedChange={(v) => setAceite(Boolean(v))} className="mt-0.5" />
+        <span>
+          Declaro que as informações fornecidas são verdadeiras e estou ciente de que a prioridade de atendimento é baseada na gravidade do quadro clínico.
+        </span>
+      </label>
+    </SectionCard>
+  );
+}
+
+function Bloco({ titulo, icone: Icone, children }: { titulo: string; icone: typeof PawPrint; children: React.ReactNode }) {
+  return (
+    <div className="mt-5 border-t border-border pt-5 first:border-t-0 first:pt-0">
+      <div className="mb-3 flex items-center gap-2 text-primary">
+        <Icone className="h-4 w-4" />
+        <h3 className="font-display text-base font-semibold">{titulo}</h3>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Item({ rotulo, valor, className }: { rotulo: string; valor: string; className?: string }) {
+  return (
+    <div className={className}>
+      <p className="text-xs text-text-soft">{rotulo}</p>
+      <p className="text-sm font-medium text-text-strong">{valor || "—"}</p>
     </div>
   );
 }
