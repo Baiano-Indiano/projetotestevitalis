@@ -21,6 +21,11 @@ function Resultado() {
   const { triagens, ultimaTriagemId } = useVitalisStore();
   const t = triagens.find((x) => x.id === ultimaTriagemId);
   const [copiado, setCopiado] = useState(false);
+  const [confirmVisivel, setConfirmVisivel] = useState(true);
+  useEffect(() => {
+    const id = setTimeout(() => setConfirmVisivel(false), 4000);
+    return () => clearTimeout(id);
+  }, []);
 
   if (!t) {
     return (
