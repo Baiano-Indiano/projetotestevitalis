@@ -73,69 +73,74 @@ aside:has(a[href*="lovable.dev"]) {
   --color-sidebar-ring: var(--sidebar-ring);
 
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Sora", "Inter", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 1rem;
 
-  --background: #F5F8FC;
-  --foreground: #0F1B2D;
-  --surface: #FFFFFF;
-  --text-strong: #0F1B2D;
-  --text-soft: #8A99AD;
+  /* Vitalis Belém — base */
+  --background: #f8f9ff;
+  --foreground: #0b1c30;
+  --surface: #ffffff;
+  --text-strong: #0b1c30;
+  --text-soft: #424656;
 
-  --card: #FFFFFF;
-  --card-foreground: #0F1B2D;
-  --popover: #FFFFFF;
-  --popover-foreground: #0F1B2D;
+  --card: #ffffff;
+  --card-foreground: #0b1c30;
+  --popover: #ffffff;
+  --popover-foreground: #0b1c30;
 
-  --primary: #1B6FC4;
-  --primary-foreground: #FFFFFF;
-  --primary-50: #E8F1FB;
-  --primary-100: #CFE2F6;
-  --primary-700: #155396;
-  --primary-800: #0F3E72;
+  /* Primary: Electric Blue */
+  --primary: #0050cb;
+  --primary-foreground: #ffffff;
+  --primary-50: #eff4ff;
+  --primary-100: #dae1ff;
+  --primary-700: #003fa4;
+  --primary-800: #001849;
 
-  --secondary: #E8F1FB;
-  --secondary-foreground: #0F3E72;
+  /* Secondary: usado como surface azul-claro nos componentes shadcn */
+  --secondary: #e5eeff;
+  --secondary-foreground: #003fa4;
 
-  --muted: #F1F5F9;
-  --muted-foreground: #475569;
+  --muted: #eff4ff;
+  --muted-foreground: #424656;
 
-  --accent: #E4F6EE;
-  --accent-foreground: #0C7E54;
+  /* Accent: Emerald (vitalidade) */
+  --accent: #e6fff3;
+  --accent-foreground: #00714d;
 
-  --success: #10A06A;
-  --success-foreground: #FFFFFF;
-  --success-50: #E4F6EE;
-  --success-700: #0C7E54;
+  --success: #006c49;
+  --success-foreground: #ffffff;
+  --success-50: #e6fff3;
+  --success-700: #00714d;
 
-  --warning: #F59E0B;
-  --warning-foreground: #0F1B2D;
-  --warning-50: #FEF3DA;
-  --warning-700: #B4710A;
+  --warning: #b4710a;
+  --warning-foreground: #ffffff;
+  --warning-50: #fef3da;
+  --warning-700: #8a5500;
 
-  --destructive: #DC2626;
-  --destructive-foreground: #FFFFFF;
-  --destructive-50: #FDECEC;
-  --destructive-700: #B91C1C;
+  --destructive: #ba1a1a;
+  --destructive-foreground: #ffffff;
+  --destructive-50: #ffdad6;
+  --destructive-700: #93000a;
 
-  --border: #E2E8F0;
-  --border-strong: #CBD5E1;
-  --input: #E2E8F0;
-  --ring: #1B6FC4;
+  --border: #c2c6d8;
+  --border-strong: #727687;
+  --input: #c2c6d8;
+  --ring: #0054d6;
 
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #0F1B2D;
-  --sidebar-primary: #1B6FC4;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E8F1FB;
-  --sidebar-accent-foreground: #0F3E72;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #1B6FC4;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0b1c30;
+  --sidebar-primary: #0050cb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eff4ff;
+  --sidebar-accent-foreground: #003fa4;
+  --sidebar-border: #c2c6d8;
+  --sidebar-ring: #0054d6;
 }
+
 
 .dark {
   --background: #0C131F;
