@@ -572,8 +572,8 @@ function NovoDialog({
   const [especie, setEspecie] = useState<"cao" | "gato">("cao");
   const [origemId, setOrigemId] = useState(municipio.unidades[0]?.id ?? "");
   const [destinoId, setDestinoId] = useState(municipio.unidades[1]?.id ?? municipio.unidades[0]?.id ?? "");
-  const [especialidade, setEspecialidade] = useState(
-    municipio.especialidades[0] ?? "Clínico Geral",
+  const [especialidade, setEspecialidade] = useState<string>(
+    municipio.especialidades[0]?.nome ?? "Clínico Geral",
   );
   const [prioridade, setPrioridade] = useState<"normal" | "alta" | "urgente">(
     "normal",
