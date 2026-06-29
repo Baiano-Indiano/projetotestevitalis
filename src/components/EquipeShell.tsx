@@ -1,7 +1,6 @@
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
-import { SyncIndicator } from "@/components/SyncIndicator";
 import {
   Bell,
   CalendarDays,
@@ -21,14 +20,8 @@ import {
   Users,
   Wifi,
   Bed,
-  Syringe,
-  TestTube2,
-  Cpu,
   ClipboardList,
   ScanLine,
-  Boxes,
-  BarChart3,
-  Wrench,
   Beaker,
   ChevronDown,
 } from "lucide-react";
