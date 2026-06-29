@@ -50,6 +50,7 @@ export function EquipeShell() {
 
   const itemsRecepcao: Item[] = [
     { to: "/painel", label: "Painel da Recepção", Icon: LayoutGrid },
+    { to: "/painel/novo-cadastro", label: "Novo Cadastro", Icon: Plus },
     { to: "/painel/aguardando", label: "Pacientes Aguardando", Icon: Users, badge: () => pendentes > 0 ? <Badge count={pendentes} /> : null },
     { to: "/painel/triagens", label: "Triagens Online", Icon: Wifi, badge: () => urgencias > 0 ? <Badge count={urgencias} tone="danger" /> : null },
     { to: "/painel/em-atendimento", label: "Em Atendimento", Icon: UserSquare2 },
