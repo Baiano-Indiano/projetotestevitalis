@@ -16,8 +16,7 @@ export function RoleSwitcher() {
     setPapel(v);
     if (v === "tutor") navigate({ to: "/" });
     else if (v === "recepcao") navigate({ to: "/painel/recepcao" });
-    else if (v === "veterinario") navigate({ to: "/painel/validacao" });
-    else navigate({ to: "/painel" });
+    else navigate({ to: "/painel/validacao" });
   };
 
   return (
