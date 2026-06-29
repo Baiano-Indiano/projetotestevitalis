@@ -7,63 +7,72 @@ import {
   FileText,
   FlaskConical,
   GitBranchPlus,
-  Inbox,
+  HelpCircle,
+  LayoutGrid,
+  LifeBuoy,
+  LogOut,
+  Plus,
+  Search,
+  Settings,
   ShieldCheck,
   Stethoscope,
-  Building2,
+  UserSquare2,
+  Users,
+  Wifi,
+  Bed,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useVitalisStore } from "@/data/store";
-import { municipio } from "@/config/municipio";
 import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface Item {
   to: string;
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
   badge?: () => ReactNode;
-  roles: Array<"recepcao" | "veterinario" | "gestor">;
 }
 
 export function EquipeShell() {
   const { triagens, papel } = useVitalisStore();
-  const [unidadeId, setUnidadeId] = useState(municipio.unidades[1]?.id ?? municipio.unidades[0].id);
   const pendentes = triagens.filter((t) => t.status === "pendente" || t.status === "urgencia").length;
   const urgencias = triagens.filter((t) => t.status === "urgencia").length;
   const location = useLocation();
 
   const items: Item[] = [
-    { to: "/painel/recepcao", label: "Recepção", Icon: Inbox, roles: ["recepcao", "veterinario", "gestor"], badge: () => pendentes > 0 ? <Badge count={pendentes} /> : null },
-    { to: "/painel/validacao", label: "Validação", Icon: ShieldCheck, roles: ["recepcao", "veterinario", "gestor"], badge: () => urgencias > 0 ? <Badge count={urgencias} tone="danger" /> : null },
-    { to: "/painel/agenda", label: "Agenda", Icon: CalendarDays, roles: ["recepcao", "veterinario", "gestor"] },
-    { to: "/painel/ficha/_demo", label: "Ficha clínica", Icon: FileText, roles: ["veterinario", "gestor"] },
-    { to: "/painel/exames", label: "Exames", Icon: FlaskConical, roles: ["veterinario", "gestor"] },
-    { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus, roles: ["veterinario", "gestor"] },
+    { to: "/painel", label: "Painel da Recepção", Icon: LayoutGrid },
+    { to: "/painel/aguardando", label: "Pacientes Aguardando", Icon: Users, badge: () => pendentes > 0 ? <Badge count={pendentes} /> : null },
+    { to: "/painel/triagens", label: "Triagens Online", Icon: Wifi, badge: () => urgencias > 0 ? <Badge count={urgencias} tone="danger" /> : null },
+    { to: "/painel/veterinarios", label: "Veterinários", Icon: Stethoscope },
+    { to: "/painel/em-atendimento", label: "Em Atendimento", Icon: UserSquare2 },
+    { to: "/painel/agenda", label: "Agendamentos", Icon: CalendarDays },
+    { to: "/painel/internacoes", label: "Internações", Icon: Bed },
+    { to: "/painel/exames", label: "Solicitações de Exames", Icon: FlaskConical },
+    { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
+    { to: "/painel/validacao", label: "Validação Clínica", Icon: ShieldCheck },
+    { to: "/painel/admin", label: "Visão Administrativa", Icon: FileText },
   ];
-
-  const role = papel === "tutor" ? "recepcao" : papel;
-  const visible = items.filter((i) => i.roles.includes(role));
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-border bg-sidebar lg:block">
-        <div className="flex h-16 items-center gap-2 border-b border-border px-5">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-sidebar lg:flex">
+        <div className="flex h-16 items-center px-5">
           <Logo />
         </div>
-        <nav className="px-3 py-4">
-          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-            Operação
-          </p>
+        <div className="px-3 pb-3">
+          <Link
+            to="/painel/triagens"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary-700"
+          >
+            <Plus className="h-4 w-4" /> Novo Atendimento
+          </Link>
+        </div>
+        <nav className="flex-1 overflow-y-auto px-3 pb-3">
           <ul className="flex flex-col gap-0.5">
-            {visible.map((it) => {
-              const active = location.pathname.startsWith(it.to.replace("/_demo", ""));
+            {items.map((it) => {
+              const active =
+                it.to === "/painel"
+                  ? location.pathname === "/painel"
+                  : location.pathname.startsWith(it.to);
               return (
                 <li key={it.to}>
                   <Link
@@ -75,7 +84,7 @@ export function EquipeShell() {
                         : "text-muted-foreground hover:bg-muted hover:text-text-strong",
                     )}
                   >
-                    <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex items-center gap-2.5">
                       <it.Icon className="h-4 w-4" />
                       {it.label}
                     </span>
@@ -86,55 +95,49 @@ export function EquipeShell() {
             })}
           </ul>
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
-          <div className="flex items-center gap-2 text-xs text-text-soft">
-            <Stethoscope className="h-4 w-4" />
-            <span>O Vitalis orienta, o veterinário decide.</span>
-          </div>
+        <div className="border-t border-border p-3">
+          <Link to="/painel" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted">
+            <LifeBuoy className="h-4 w-4" /> Suporte
+          </Link>
+          <button type="button" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted">
+            <LogOut className="h-4 w-4" /> Sair
+          </button>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-border bg-surface/90 px-4 backdrop-blur md:px-6">
-          <div className="flex items-center gap-3">
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-            <Select value={unidadeId} onValueChange={setUnidadeId}>
-              <SelectTrigger className="h-9 w-[260px] border-border bg-surface">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {municipio.unidades.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>
-                    {u.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex max-w-md flex-1 items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm text-muted-foreground">
+            <Search className="h-4 w-4" />
+            <input
+              type="text"
+              placeholder="Pesquisar pacientes, tutores, exames..."
+              className="w-full border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
           </div>
-          <div className="flex items-center gap-3">
-            <RoleSwitcher />
+          <div className="flex items-center gap-2">
+            <div className="hidden lg:block"><RoleSwitcher /></div>
             <button
               type="button"
-              className="relative rounded-md border border-border bg-surface p-2 text-muted-foreground hover:bg-muted"
+              className="relative grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted"
               aria-label="Notificações"
             >
               <Bell className="h-4 w-4" />
-              {urgencias > 0 && (
-                <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
-              )}
+              {urgencias > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" />}
             </button>
-            <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-2 py-1">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-primary-50 text-xs font-semibold text-primary-800">
-                MV
-              </span>
-              <span className="hidden text-sm font-medium text-text-strong sm:inline">
-                Dra. Marina Vieira
-              </span>
-            </div>
+            <button type="button" className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted" aria-label="Ajuda">
+              <HelpCircle className="h-4 w-4" />
+            </button>
+            <button type="button" className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted" aria-label="Configurações">
+              <Settings className="h-4 w-4" />
+            </button>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+              AS
+            </span>
           </div>
         </header>
 
-        <main className="flex-1 px-4 py-6 md:px-6 md:py-8">
+        <main className="flex-1 px-4 py-6 md:px-8 md:py-8">
           <Outlet />
         </main>
       </div>

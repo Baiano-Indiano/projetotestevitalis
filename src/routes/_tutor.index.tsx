@@ -1,32 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { municipio } from "@/config/municipio";
 import {
-  AlertTriangle,
   ArrowRight,
   CalendarCheck,
   ShieldCheck,
   Stethoscope,
-  Hospital,
-  HeartPulse,
-  Truck,
+  AlertTriangle,
+  Filter,
+  Zap,
+  Clock,
+  Plus,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_tutor/")({
   head: () => ({
     meta: [
-      { title: "Vitalis Belém. Triagem online gratuita e atendimento veterinário" },
-      {
-        name: "description",
-        content:
-          "Cuide da saúde do seu animal pela rede pública municipal. Triagem online em minutos, orientação por especialidade e atendimento na rede Vitalis.",
-      },
+      { title: "Atendimento veterinário público mais organizado e acessível. Vitalis Belém" },
+      { name: "description", content: "Triagem online gratuita e atendimento veterinário na rede municipal de Belém. Reduza filas e priorize quem precisa de cuidado urgente." },
       { property: "og:title", content: "Vitalis Belém. Saúde veterinária pública" },
-      {
-        property: "og:description",
-        content: "Triagem online gratuita e atendimento na rede veterinária de Belém.",
-      },
+      { property: "og:description", content: "Triagem online gratuita e atendimento na rede veterinária de Belém." },
     ],
   }),
   component: Landing,
@@ -35,208 +29,179 @@ export const Route = createFileRoute("/_tutor/")({
 function Landing() {
   return (
     <>
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary-50 via-background to-background">
-        <div className="container-app grid gap-10 py-14 md:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-surface px-3 py-1 text-xs font-medium text-primary-800">
-              <ShieldCheck className="h-3.5 w-3.5" /> Serviço oficial da {municipio.prefeitura}
-            </span>
-            <h1 className="mt-5 font-display text-4xl font-semibold leading-tight tracking-tight text-text-strong md:text-5xl">
-              Cuide da saúde do seu animal pela rede pública.
-            </h1>
-            <p className="mt-4 max-w-xl text-base text-muted-foreground md:text-lg">
-              Triagem online gratuita, orientação clínica por especialidade e atendimento
-              em toda a rede veterinária municipal de {municipio.cidade}.
+      {/* Hero */}
+      <section className="bg-[radial-gradient(ellipse_at_top,var(--color-primary-50)_0%,var(--color-background)_60%)] pb-10 pt-8 md:pb-16 md:pt-14">
+        <div className="container-app">
+          <div className="mx-auto max-w-2xl text-center md:text-left">
+            <p className="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" /> Serviço Público Municipal
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+            <h1 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight text-text-strong md:text-5xl">
+              Atendimento Veterinário Público Mais <span className="text-primary">Organizado</span> e <span className="text-success-700">Acessível</span>
+            </h1>
+            <p className="mt-4 text-sm text-muted-foreground md:text-base">
+              Reduzimos filas e facilitamos o acesso à saúde do seu pet. Um sistema inteligente para garantir que quem precisa de cuidado urgente seja atendido com prioridade.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:max-w-md sm:mx-auto md:mx-0">
               <Button asChild size="lg">
                 <Link to="/triagem">
-                  Iniciar triagem <ArrowRight className="ml-1 h-4 w-4" />
+                  <Filter className="mr-2 h-4 w-4" /> Fazer Triagem
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link to="/agendar">Agendar atendimento</Link>
+              <Button asChild size="lg" className="bg-success text-success-foreground hover:bg-success/90">
+                <Link to="/agendar">
+                  <CalendarCheck className="mr-2 h-4 w-4" /> Agendar Atendimento
+                </Link>
               </Button>
-              <Link
-                to="/emergencia"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-destructive-700 underline-offset-4 hover:underline"
-              >
-                <AlertTriangle className="h-4 w-4" /> Emergência, veja onde ir
-              </Link>
             </div>
-            <dl className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-6 text-sm">
-              <div>
-                <dt className="text-xs uppercase tracking-wide text-text-soft">Triagens/dia</dt>
-                <dd className="mt-1 font-display text-xl font-semibold text-text-strong">
-                  {municipio.capacidade.triagensPorDia}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-wide text-text-soft">Unidades</dt>
-                <dd className="mt-1 font-display text-xl font-semibold text-text-strong">
-                  {municipio.unidades.length}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-wide text-text-soft">Especialidades</dt>
-                <dd className="mt-1 font-display text-xl font-semibold text-text-strong">
-                  {municipio.especialidades.filter((e) => e.ativa).length}
-                </dd>
-              </div>
-            </dl>
           </div>
-
-          <Card className="relative border-border bg-surface p-6 shadow-sm">
-            <div className="flex items-start gap-3 border-b border-border pb-4">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary-50 text-primary-800">
-                <HeartPulse className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-soft">
-                  Triagem inteligente
-                </p>
-                <p className="font-display text-base font-semibold text-text-strong">
-                  Orientada por veterinário
-                </p>
-              </div>
-            </div>
-            <ul className="mt-4 space-y-3 text-sm">
-              {[
-                "6 etapas curtas, em linguagem simples.",
-                "Detecção automática de sinais de emergência.",
-                "Ranking de especialidades com explicação.",
-                "Validação final por um veterinário da rede.",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-2 text-text-strong">
-                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 rounded-lg bg-primary-50 px-3 py-2 text-xs text-primary-800">
-              O Vitalis orienta. O veterinário decide. A triagem nunca diagnostica.
-            </p>
-          </Card>
         </div>
       </section>
 
-      <section className="container-app py-14 md:py-20">
-        <div className="mb-10 max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary-700">
-            Como funciona
-          </p>
-          <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-text-strong">
-            Três passos. Sem fila desnecessária.
+      {/* Entenda nossas unidades */}
+      <section className="container-app py-10 md:py-14">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
+            Entenda Nossas Unidades
           </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Saiba para onde levar seu pet dependendo da necessidade.
+          </p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+
+        <div className="mx-auto mt-6 grid max-w-3xl gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary">
+              <Plus className="h-5 w-5" />
+            </span>
+            <h3 className="mt-4 font-display text-base font-semibold text-primary">Clínica Municipal</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Focada em atendimentos de baixa e média complexidade, consultas de rotina e prevenção.
+            </p>
+            <ul className="mt-3 space-y-1.5 text-sm text-text-strong">
+              <Item ok>Consultas de rotina</Item>
+              <Item ok>Vacinação básica</Item>
+              <Item ok>Casos não urgentes</Item>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border-l-4 border-l-destructive border-y border-r border-y-border border-r-border bg-surface p-5 shadow-sm">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-destructive-50 text-destructive">
+              <ShieldCheck className="h-5 w-5" />
+            </span>
+            <h3 className="mt-4 font-display text-base font-semibold text-destructive">Hospital Veterinário</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Estrutura completa para urgências, emergências, cirurgias e casos de alta complexidade.
+            </p>
+            <ul className="mt-3 space-y-1.5 text-sm text-text-strong">
+              <Item alerta>Urgências e Emergências</Item>
+              <Item alerta>Cirurgias complexas</Item>
+              <Item alerta>Internação</Item>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefícios */}
+      <section className="container-app pb-10">
+        <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-3">
           {[
-            {
-              n: "01",
-              t: "Triagem",
-              d: "Responda 6 etapas guiadas sobre o seu animal. Leva poucos minutos.",
-              Icon: Stethoscope,
-            },
-            {
-              n: "02",
-              t: "Orientação",
-              d: "Você recebe a especialidade indicada e a prioridade do caso.",
-              Icon: ShieldCheck,
-            },
-            {
-              n: "03",
-              t: "Atendimento",
-              d: "Agende ou seja atendido na rede municipal, com a triagem anexada.",
-              Icon: CalendarCheck,
-            },
-          ].map((s) => (
-            <Card key={s.n} className="border-border bg-surface p-6">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-text-soft">{s.n}</span>
-                <s.Icon className="h-5 w-5 text-primary" />
+            { Icon: Filter, t: "Menos Filas", d: "Sistema inteligente que organiza o fluxo e reduz o tempo de espera nas unidades." },
+            { Icon: AlertTriangle, t: "Priorização de Urgências", d: "Casos graves são identificados rapidamente e encaminhados para atendimento imediato." },
+            { Icon: Zap, t: "Informação Rápida", d: "Saiba exatamente o que fazer e para onde ir antes mesmo de sair de casa." },
+          ].map((b) => {
+            const Icone = b.Icon;
+            return (
+              <div key={b.t} className="text-center">
+                <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary-50 text-primary">
+                  <Icone className="h-5 w-5" />
+                </span>
+                <h3 className="mt-3 font-display text-base font-semibold text-text-strong">{b.t}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{b.d}</p>
               </div>
-              <h3 className="mt-3 font-display text-lg font-semibold text-text-strong">
-                {s.t}
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">{s.d}</p>
-            </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Como funciona */}
+      <section className="border-t border-border bg-surface/60 py-12 md:py-16">
+        <div className="container-app">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
+              Como Funciona
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Um processo simples em três etapas para garantir o melhor cuidado.
+            </p>
+          </div>
+          <div className="mx-auto mt-7 grid max-w-3xl gap-4 md:grid-cols-3">
+            {[
+              { n: 1, t: "Triagem Online", d: "Responda a um breve questionário sobre os sintomas do seu animal." },
+              { n: 2, t: "Orientação", d: "Receba a indicação imediata se é um caso de clínica ou emergência hospitalar." },
+              { n: 3, t: "Agendamento", d: "Para casos não urgentes, agende o melhor horário na unidade indicada." },
+            ].map((s) => (
+              <div key={s.n} className="rounded-2xl border border-border bg-background p-5 text-center shadow-sm">
+                <span className={cn(
+                  "mx-auto grid h-10 w-10 place-items-center rounded-full font-bold text-white",
+                  s.n === 1 ? "bg-primary" : s.n === 2 ? "bg-success" : "bg-primary-700",
+                )}>
+                  {s.n}
+                </span>
+                <h3 className="mt-3 font-display text-base font-semibold text-text-strong">{s.t}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{s.d}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mx-auto mt-7 max-w-md">
+            <Button asChild size="lg" className="w-full">
+              <Link to="/triagem">
+                Iniciar Triagem Agora <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Unidades */}
+      <section className="container-app py-12 md:py-16">
+        <div className="mb-6 text-center">
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
+            Rede {municipio.nomeRede}
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">{municipio.unidades.length} unidades em {municipio.cidade}</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {municipio.unidades.map((u) => (
+            <div key={u.id} className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-text-soft">
+                  {u.tipo === "movel" ? "Móvel" : u.tipo === "hospital" ? "Hospital" : "Clínica"}
+                </span>
+                {u.atendimento24h && <span className="rounded-full bg-success-50 px-2 py-0.5 text-[10px] font-semibold text-success-700">24h</span>}
+              </div>
+              <h3 className="mt-2 font-display text-sm font-semibold text-text-strong">{u.nome}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{u.endereco}</p>
+            </div>
           ))}
         </div>
       </section>
-
-      <section className="border-t border-border bg-surface py-14 md:py-20">
-        <div className="container-app">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary-700">
-                Rede {municipio.nomeRede}
-              </p>
-              <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-text-strong">
-                Nossas unidades em {municipio.cidade}
-              </h2>
-            </div>
-            <Link
-              to="/emergencia"
-              className="text-sm font-medium text-primary-700 hover:underline"
-            >
-              Ver mapa e horários
-            </Link>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {municipio.unidades.map((u) => (
-              <Card key={u.id} className="border-border bg-background p-5">
-                <div className="flex items-center gap-2">
-                  {u.tipo === "hospital" ? (
-                    <Hospital className="h-4 w-4 text-primary" />
-                  ) : u.tipo === "movel" ? (
-                    <Truck className="h-4 w-4 text-primary" />
-                  ) : (
-                    <Stethoscope className="h-4 w-4 text-primary" />
-                  )}
-                  <span className="text-xs font-medium uppercase tracking-wide text-text-soft">
-                    {u.tipo === "movel" ? "Unidade móvel" : u.tipo === "hospital" ? "Hospital" : "Clínica"}
-                  </span>
-                  {u.atendimento24h && (
-                    <span className="ml-auto rounded-full bg-success-50 px-2 py-0.5 text-[11px] font-medium text-success-700">
-                      24h
-                    </span>
-                  )}
-                </div>
-                <h3 className="mt-2 font-display text-base font-semibold text-text-strong">
-                  {u.nome}
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">{u.endereco}</p>
-                <ul className="mt-3 flex flex-wrap gap-1.5">
-                  {u.servicos.slice(0, 4).map((s) => (
-                    <li
-                      key={s}
-                      className="rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] text-muted-foreground"
-                    >
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="container-app py-14 md:py-16">
-        <Card className="flex flex-col items-start justify-between gap-4 border-border bg-primary p-6 text-primary-foreground md:flex-row md:items-center md:p-8">
-          <div>
-            <h2 className="font-display text-2xl font-semibold tracking-tight">
-              Pronto para começar?
-            </h2>
-            <p className="mt-1 max-w-xl text-sm text-primary-foreground/85">
-              A triagem é gratuita, leva poucos minutos e fica registrada na sua conta.
-            </p>
-          </div>
-          <Button asChild size="lg" variant="secondary">
-            <Link to="/triagem">Iniciar triagem agora</Link>
-          </Button>
-        </Card>
-      </section>
     </>
+  );
+}
+
+function Item({ children, ok, alerta }: { children: React.ReactNode; ok?: boolean; alerta?: boolean }) {
+  return (
+    <li className="flex items-start gap-2">
+      <span className={cn(
+        "mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold",
+        ok && "bg-success/10 text-success-700",
+        alerta && "bg-destructive/10 text-destructive",
+      )}>
+        {ok ? "✓" : "▲"}
+      </span>
+      <span className="text-sm">{children}</span>
+    </li>
   );
 }
