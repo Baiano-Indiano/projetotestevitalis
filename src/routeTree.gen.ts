@@ -17,7 +17,6 @@ import { Route as TutorTriagemRouteImport } from './routes/_tutor.triagem'
 import { Route as TutorMeusAtendimentosRouteImport } from './routes/_tutor.meus-atendimentos'
 import { Route as TutorInformacoesRouteImport } from './routes/_tutor.informacoes'
 import { Route as TutorIdentificacaoRouteImport } from './routes/_tutor.identificacao'
-import { Route as TutorEmergenciaRouteImport } from './routes/_tutor.emergencia'
 import { Route as TutorAgendarRouteImport } from './routes/_tutor.agendar'
 import { Route as EquipePainelIndexRouteImport } from './routes/_equipe.painel.index'
 import { Route as TutorTriagemResultadoRouteImport } from './routes/_tutor.triagem.resultado'
@@ -73,11 +72,6 @@ const TutorInformacoesRoute = TutorInformacoesRouteImport.update({
 const TutorIdentificacaoRoute = TutorIdentificacaoRouteImport.update({
   id: '/identificacao',
   path: '/identificacao',
-  getParentRoute: () => TutorRoute,
-} as any)
-const TutorEmergenciaRoute = TutorEmergenciaRouteImport.update({
-  id: '/emergencia',
-  path: '/emergencia',
   getParentRoute: () => TutorRoute,
 } as any)
 const TutorAgendarRoute = TutorAgendarRouteImport.update({
@@ -178,7 +172,6 @@ const EquipePainelFichaIdRoute = EquipePainelFichaIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof TutorIndexRoute
   '/agendar': typeof TutorAgendarRouteWithChildren
-  '/emergencia': typeof TutorEmergenciaRoute
   '/identificacao': typeof TutorIdentificacaoRoute
   '/informacoes': typeof TutorInformacoesRoute
   '/meus-atendimentos': typeof TutorMeusAtendimentosRoute
@@ -205,7 +198,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof TutorIndexRoute
   '/agendar': typeof TutorAgendarRouteWithChildren
-  '/emergencia': typeof TutorEmergenciaRoute
   '/identificacao': typeof TutorIdentificacaoRoute
   '/informacoes': typeof TutorInformacoesRoute
   '/meus-atendimentos': typeof TutorMeusAtendimentosRoute
@@ -233,7 +225,6 @@ export interface FileRoutesById {
   '/_equipe': typeof EquipeRouteWithChildren
   '/_tutor': typeof TutorRouteWithChildren
   '/_tutor/agendar': typeof TutorAgendarRouteWithChildren
-  '/_tutor/emergencia': typeof TutorEmergenciaRoute
   '/_tutor/identificacao': typeof TutorIdentificacaoRoute
   '/_tutor/informacoes': typeof TutorInformacoesRoute
   '/_tutor/meus-atendimentos': typeof TutorMeusAtendimentosRoute
@@ -263,7 +254,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/agendar'
-    | '/emergencia'
     | '/identificacao'
     | '/informacoes'
     | '/meus-atendimentos'
@@ -290,7 +280,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/agendar'
-    | '/emergencia'
     | '/identificacao'
     | '/informacoes'
     | '/meus-atendimentos'
@@ -317,7 +306,6 @@ export interface FileRouteTypes {
     | '/_equipe'
     | '/_tutor'
     | '/_tutor/agendar'
-    | '/_tutor/emergencia'
     | '/_tutor/identificacao'
     | '/_tutor/informacoes'
     | '/_tutor/meus-atendimentos'
@@ -404,13 +392,6 @@ declare module '@tanstack/react-router' {
       path: '/identificacao'
       fullPath: '/identificacao'
       preLoaderRoute: typeof TutorIdentificacaoRouteImport
-      parentRoute: typeof TutorRoute
-    }
-    '/_tutor/emergencia': {
-      id: '/_tutor/emergencia'
-      path: '/emergencia'
-      fullPath: '/emergencia'
-      preLoaderRoute: typeof TutorEmergenciaRouteImport
       parentRoute: typeof TutorRoute
     }
     '/_tutor/agendar': {
@@ -618,7 +599,6 @@ const TutorTriagemRouteWithChildren = TutorTriagemRoute._addFileChildren(
 
 interface TutorRouteChildren {
   TutorAgendarRoute: typeof TutorAgendarRouteWithChildren
-  TutorEmergenciaRoute: typeof TutorEmergenciaRoute
   TutorIdentificacaoRoute: typeof TutorIdentificacaoRoute
   TutorInformacoesRoute: typeof TutorInformacoesRoute
   TutorMeusAtendimentosRoute: typeof TutorMeusAtendimentosRoute
@@ -629,7 +609,6 @@ interface TutorRouteChildren {
 
 const TutorRouteChildren: TutorRouteChildren = {
   TutorAgendarRoute: TutorAgendarRouteWithChildren,
-  TutorEmergenciaRoute: TutorEmergenciaRoute,
   TutorIdentificacaoRoute: TutorIdentificacaoRoute,
   TutorInformacoesRoute: TutorInformacoesRoute,
   TutorMeusAtendimentosRoute: TutorMeusAtendimentosRoute,
