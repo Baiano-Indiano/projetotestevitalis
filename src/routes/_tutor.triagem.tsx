@@ -68,8 +68,10 @@ const TOTAL_FASES = 4;
 
 function Triagem() {
   const navigate = useNavigate();
-  const { adicionarTriagem, setUltimaTriagemId } = useVitalisStore();
+  const { adicionarTriagem, setUltimaTriagemId, triagens } = useVitalisStore();
+  const { edit } = useSearch({ from: "/_tutor/triagem" });
   const [fase, setFase] = useState<Fase>(1);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   // Fase 1
   const [especie, setEspecie] = useState<"cao" | "gato" | "">("");
