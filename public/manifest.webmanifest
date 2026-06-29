@@ -10,15 +10,15 @@
   "lang": "pt-BR",
   "icons": [
     {
-      "src": "/__l5e/assets-v1/09c0e45c-a266-49e1-8dfb-4fdb08dd4b45/vitalis-logo.jpg",
+      "src": "/__l5e/assets-v1/db731c28-5e09-4c99-8304-6c3cffb9d799/vitalis-logo.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/__l5e/assets-v1/09c0e45c-a266-49e1-8dfb-4fdb08dd4b45/vitalis-logo.jpg",
+      "src": "/__l5e/assets-v1/db731c28-5e09-4c99-8304-6c3cffb9d799/vitalis-logo.png",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any"
     }
   ]
