@@ -2,7 +2,7 @@ import { Link, Outlet } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import { municipio } from "@/config/municipio";
 import { cn } from "@/lib/utils";
