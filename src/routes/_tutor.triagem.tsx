@@ -151,11 +151,20 @@ function Triagem() {
   const valida1 = () =>
     Boolean(especie && idadeValor && tutorNome && tutorTel && tutorEnd && animalNome);
 
+  const [redFlagAtivo, setRedFlagAtivo] = useState<{ id: string; label: string } | null>(null);
+
   const toggle = (id: string) => {
     setSelecionados((s) => {
       const n = new Set(s);
-      if (n.has(id)) n.delete(id);
-      else n.add(id);
+      if (n.has(id)) {
+        n.delete(id);
+      } else {
+        n.add(id);
+        const item = getItemById(id);
+        if (item?.redFlag) {
+          setRedFlagAtivo({ id, label: item.label });
+        }
+      }
       return n;
     });
   };
