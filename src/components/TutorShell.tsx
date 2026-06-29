@@ -18,10 +18,10 @@ export function TutorShell() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-30 border-b border-border bg-surface/80 backdrop-blur">
-        <div className="container-app flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <Logo />
-            <span className="hidden text-xs text-text-soft sm:inline">
+        <div className="container-app flex h-20 items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-3">
+            <Logo size="lg" />
+            <span className="hidden text-xs font-medium text-text-soft sm:inline">
               {municipio.cidade}
             </span>
           </Link>
@@ -76,7 +76,7 @@ export function TutorShell() {
       <footer className="border-t border-border bg-surface">
         <div className="container-app flex flex-col items-start justify-between gap-4 py-8 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
-            <Logo mark />
+            <Logo mark size="md" />
             <div>
               <p className="text-sm font-medium text-text-strong">{municipio.nomeRede}</p>
               <p className="text-xs text-text-soft">{municipio.prefeitura}</p>

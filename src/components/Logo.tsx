@@ -1,16 +1,46 @@
 import { cn } from "@/lib/utils";
 import logoAsset from "@/assets/vitalis-logo.jpg.asset.json";
 
-export function Logo({ className, mark = false }: { className?: string; mark?: boolean }) {
+type Size = "sm" | "md" | "lg" | "xl";
+
+const sizeMap: Record<Size, { img: string; text: string; gap: string }> = {
+  sm: { img: "h-9 w-9", text: "text-base", gap: "gap-2" },
+  md: { img: "h-11 w-11", text: "text-lg", gap: "gap-2.5" },
+  lg: { img: "h-14 w-14", text: "text-2xl", gap: "gap-3" },
+  xl: { img: "h-20 w-20", text: "text-3xl", gap: "gap-3.5" },
+};
+
+export function Logo({
+  className,
+  mark = false,
+  size = "lg",
+}: {
+  className?: string;
+  mark?: boolean;
+  size?: Size;
+}) {
+  const s = sizeMap[size];
   return (
-    <span className={cn("inline-flex items-center gap-2", className)}>
-      <img
-        src={logoAsset.url}
-        alt="Vitalis"
-        className="h-9 w-9 object-contain"
-      />
+    <span className={cn("inline-flex items-center", s.gap, className)}>
+      <span
+        className={cn(
+          "grid shrink-0 place-items-center overflow-hidden rounded-2xl bg-surface ring-1 ring-border/60 shadow-sm",
+          s.img,
+        )}
+      >
+        <img
+          src={logoAsset.url}
+          alt="Vitalis"
+          className="h-full w-full object-contain p-1"
+        />
+      </span>
       {!mark && (
-        <span className="font-display text-lg font-semibold tracking-tight text-text-strong">
+        <span
+          className={cn(
+            "font-display font-bold tracking-tight text-text-strong leading-none",
+            s.text,
+          )}
+        >
           Vitalis
         </span>
       )}

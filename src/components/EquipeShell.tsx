@@ -54,11 +54,13 @@ export function EquipeShell() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-sidebar lg:flex">
-        <div className="flex h-16 items-center px-5">
-          <Logo />
+      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-border bg-sidebar lg:flex">
+        <div className="flex items-center px-5 pt-6 pb-5 border-b border-border/60">
+          <Link to="/painel" className="flex items-center">
+            <Logo size="lg" />
+          </Link>
         </div>
-        <div className="px-3 pb-3">
+        <div className="px-3 pt-4 pb-3">
           <Link
             to="/painel/ficha/$id"
             params={{ id: "novo" }}
