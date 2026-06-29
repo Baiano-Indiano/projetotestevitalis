@@ -98,6 +98,14 @@ function Triagem() {
   const [obs, setObs] = useState("");
   const [anexos, setAnexos] = useState<{ nome: string; url: string }[]>([]);
 
+  // Fases 4..9 — respostas por especialidade
+  const [respostas, setRespostas] = useState<RespostasEspecialidades>({});
+  const setRespostaBloco = (especialidadeId: string, perguntaId: string, valor: unknown) =>
+    setRespostas((r) => ({
+      ...r,
+      [especialidadeId]: { ...(r[especialidadeId] ?? {}), [perguntaId]: valor },
+    }));
+
   const onAnexar = (files: FileList | null) => {
     if (!files) return;
     const restante = 5 - anexos.length;
@@ -179,17 +187,19 @@ function Triagem() {
   const motor = useMemo(() => calcularDeSelecionados(ids), [ids]);
   const especialidadeFinal: EspecialidadeId | "urgencia" = motor.sugestao;
 
-  const tituloFase: Record<Fase, { titulo: string; subtitulo: string }> = {
-    1: { titulo: "Triagem", subtitulo: "Dados iniciais" },
-    2: { titulo: "Triagem", subtitulo: "Sintomas Detalhados" },
-    3: { titulo: "Triagem", subtitulo: "Sintomas Detalhados (Continuação)" },
-    4: { titulo: "Triagem", subtitulo: "Revisão e envio" },
+  const tituloFase = (f: Fase): { titulo: string; subtitulo: string } => {
+    if (f === 1) return { titulo: "Triagem", subtitulo: "Dados iniciais" };
+    if (f === 2) return { titulo: "Triagem", subtitulo: "Sintomas Detalhados" };
+    if (f === 3) return { titulo: "Triagem", subtitulo: "Sintomas Detalhados (Continuação)" };
+    if (f === FASE_REVISAO) return { titulo: "Triagem", subtitulo: "Revisão e envio" };
+    const b = faseParaBloco(f);
+    return { titulo: "Triagem", subtitulo: b ? b.titulo : "" };
   };
 
   const podeAvancar = (): boolean => {
     if (fase === 1) return valida1();
-    if (fase === 2 || fase === 3) return true;
-    return aceite;
+    if (fase === FASE_REVISAO) return aceite;
+    return true;
   };
 
   const [enviando, setEnviando] = useState(false);
