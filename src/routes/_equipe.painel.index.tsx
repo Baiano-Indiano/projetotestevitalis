@@ -27,14 +27,74 @@ import { useVitalisStore } from "@/data/store";
 
 export const Route = createFileRoute("/_equipe/painel/")({
   head: () => ({ meta: [{ title: "Painel. Vitalis Belém" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    tab: typeof s.tab === "string" ? s.tab : undefined,
+  }),
   component: PainelHome,
 });
 
 function PainelHome() {
   const { papel } = useVitalisStore();
+  const { tab } = Route.useSearch();
   if (papel === "veterinario") return <PainelVeterinario />;
-  if (papel === "unidade_movel") return <PainelUnidadeMovel />;
+  if (papel === "unidade_movel") {
+    if (tab && tab !== "dashboard") return <PainelUnidadeMovelTab tab={tab} />;
+    return <PainelUnidadeMovel />;
+  }
   return <PainelRecepcao />;
+}
+
+function PainelUnidadeMovelTab({ tab }: { tab: string }) {
+  const titulos: Record<string, { titulo: string; desc: string; Icon: typeof Syringe }> = {
+    triagem: { titulo: "Triagens da Unidade", desc: "Triagens realizadas em campo nesta unidade móvel.", Icon: ClipboardList },
+    vacinacao: { titulo: "Vacinas Aplicadas", desc: "Histórico de doses aplicadas durante as ações de campo.", Icon: Syringe },
+    coletas: { titulo: "Coletas Realizadas", desc: "Coletas de sangue e amostras realizadas em campo.", Icon: TestTube2 },
+    microchip: { titulo: "Microchipagem", desc: "Animais identificados com microchip nesta unidade.", Icon: Cpu },
+  };
+  const info = titulos[tab] ?? titulos.triagem;
+  const I = info.Icon;
+  const linhas = [
+    { hora: "08:30", paciente: "Bidu", tutor: "Maria Souza", detalhe: tab === "vacinacao" ? "V10 - Lote 4521" : tab === "coletas" ? "Sangue - Hemograma" : tab === "microchip" ? "Chip 9821..." : "Triagem inicial" },
+    { hora: "09:15", paciente: "Luna", tutor: "João Lima", detalhe: tab === "vacinacao" ? "Antirrábica - Lote 8812" : tab === "coletas" ? "Urina" : tab === "microchip" ? "Chip 9822..." : "Triagem rotina" },
+    { hora: "10:00", paciente: "Thor", tutor: "Ana Paula", detalhe: tab === "vacinacao" ? "V8 - Lote 7710" : tab === "coletas" ? "Fezes" : tab === "microchip" ? "Chip 9823..." : "Reavaliação" },
+  ];
+  return (
+    <div className="mx-auto max-w-7xl">
+      <div className="flex items-center gap-3">
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-50 text-primary-700"><I className="h-5 w-5" /></span>
+        <div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">{info.titulo}</h1>
+          <p className="text-sm text-muted-foreground">{info.desc}</p>
+        </div>
+      </div>
+      <div className="mt-6 rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h3 className="font-display text-base font-semibold text-text-strong">Registros do dia</h3>
+          <Button size="sm"><Plus className="mr-1 h-4 w-4" /> Novo registro</Button>
+        </div>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-muted/40 text-left text-[11px] font-semibold uppercase tracking-wider text-text-soft">
+              <th className="px-5 py-3">Horário</th>
+              <th className="px-5 py-3">Paciente</th>
+              <th className="px-5 py-3">Tutor</th>
+              <th className="px-5 py-3">Detalhe</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {linhas.map((l) => (
+              <tr key={l.hora} className="hover:bg-muted/40">
+                <td className="px-5 py-3 font-medium text-text-strong">{l.hora}</td>
+                <td className="px-5 py-3 text-text-strong">{l.paciente}</td>
+                <td className="px-5 py-3 text-muted-foreground">{l.tutor}</td>
+                <td className="px-5 py-3 text-text-strong">{l.detalhe}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
 function PainelRecepcao() {
@@ -227,7 +287,7 @@ function PainelUnidadeMovel() {
   const kpis = [
     { label: "Atendimentos Hoje", valor: 24, Icon: Users, bg: "bg-primary-50", fg: "text-primary" },
     { label: "Triagens", valor: 12, Icon: ClipboardList, bg: "bg-success-50", fg: "text-success-700" },
-    { label: "Vacinas", valor: 45, Icon: Syringe, bg: "bg-violet-50", fg: "text-violet-600" },
+    { label: "Vacinas", valor: 45, Icon: Syringe, bg: "bg-primary-50", fg: "text-primary-700" },
     { label: "Coletas", valor: 8, Icon: TestTube2, bg: "bg-muted", fg: "text-text-strong" },
     { label: "Microchips", valor: 15, Icon: Cpu, bg: "bg-success-50", fg: "text-success-700" },
     { label: "Encaminhamentos", valor: 3, Icon: GitBranchPlus, bg: "bg-destructive/10", fg: "text-destructive" },

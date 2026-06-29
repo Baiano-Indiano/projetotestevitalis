@@ -52,7 +52,7 @@ const STATUS_META: Record<StatusAgendamento, { label: string; cls: string; dot: 
   pendente: { label: "Pendente", cls: "bg-warning-50 text-warning-700 border-warning-200", dot: "bg-warning" },
   confirmado: { label: "Confirmado", cls: "bg-primary-50 text-primary-800 border-primary-200", dot: "bg-primary" },
   "check-in": { label: "Check-in", cls: "bg-cyan-50 text-cyan-700 border-cyan-200", dot: "bg-cyan-500" },
-  "em-atendimento": { label: "Em atendimento", cls: "bg-violet-50 text-violet-700 border-violet-200", dot: "bg-violet-500" },
+  "em-atendimento": { label: "Em atendimento", cls: "bg-primary-50 text-primary-800 border-primary-200", dot: "bg-primary" },
   concluido: { label: "Concluído", cls: "bg-success-50 text-success-700 border-success-200", dot: "bg-success" },
   cancelado: { label: "Cancelado", cls: "bg-muted text-muted-foreground border-border line-through", dot: "bg-muted-foreground" },
   falta: { label: "Faltou", cls: "bg-destructive/10 text-destructive border-destructive/30", dot: "bg-destructive" },
@@ -166,7 +166,7 @@ function AgendaPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <KPI icon={<CalendarDays className="h-4 w-4" />} label="Agendamentos do dia" valor={kpis.total} />
         <KPI icon={<CheckCircle2 className="h-4 w-4 text-success" />} label="Confirmados / check-in" valor={kpis.confirmados} />
-        <KPI icon={<Stethoscope className="h-4 w-4 text-violet-500" />} label="Concluídos" valor={kpis.concluidos} />
+        <KPI icon={<Stethoscope className="h-4 w-4 text-primary-600" />} label="Concluídos" valor={kpis.concluidos} />
         <KPI icon={<Users className="h-4 w-4 text-primary" />} label="Ocupação" valor={`${kpis.ocup}%`} />
       </div>
 

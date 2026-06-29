@@ -35,6 +35,8 @@ interface Item {
   Icon: React.ComponentType<{ className?: string }>;
   badge?: () => ReactNode;
   params?: Record<string, string>;
+  search?: Record<string, string>;
+  tab?: string;
 }
 
 
@@ -65,11 +67,11 @@ export function EquipeShell() {
   ];
 
   const itemsUnidadeMovel: Item[] = [
-    { to: "/painel", label: "Dashboard", Icon: LayoutGrid },
-    { to: "/painel", label: "Triagem", Icon: ClipboardList },
-    { to: "/painel", label: "Vacinação", Icon: Syringe },
-    { to: "/painel", label: "Coletas", Icon: TestTube2 },
-    { to: "/painel", label: "Microchipagem", Icon: Cpu },
+    { to: "/painel", label: "Dashboard", Icon: LayoutGrid, tab: "dashboard" },
+    { to: "/painel", label: "Triagem", Icon: ClipboardList, search: { tab: "triagem" }, tab: "triagem" },
+    { to: "/painel", label: "Vacinação", Icon: Syringe, search: { tab: "vacinacao" }, tab: "vacinacao" },
+    { to: "/painel", label: "Coletas", Icon: TestTube2, search: { tab: "coletas" }, tab: "coletas" },
+    { to: "/painel", label: "Microchipagem", Icon: Cpu, search: { tab: "microchip" }, tab: "microchip" },
     { to: "/painel/encaminhamentos", label: "Encaminhamentos", Icon: GitBranchPlus },
   ];
 
@@ -101,17 +103,25 @@ export function EquipeShell() {
           <ul className="flex flex-col gap-0.5">
             {items.map((it) => {
               const basePath = it.params ? it.to.replace(/\$(\w+)/g, (_, k) => it.params![k] ?? "") : it.to;
-              const active =
-                it.to === "/painel"
-                  ? location.pathname === "/painel"
-                  : location.pathname.startsWith(basePath.split("/$")[0]);
-              const linkProps = it.params
-                ? { to: it.to as never, params: it.params as never }
-                : { to: it.to as never };
+              const currentTab = (location.search as { tab?: string } | undefined)?.tab;
+              let active: boolean;
+              if (it.tab !== undefined) {
+                active = location.pathname === "/painel" && (currentTab ?? "dashboard") === it.tab;
+              } else if (it.to === "/painel") {
+                active = location.pathname === "/painel" && !currentTab;
+              } else {
+                active = location.pathname.startsWith(basePath.split("/$")[0]);
+              }
+              const linkProps = {
+                to: it.to,
+                ...(it.params ? { params: it.params } : {}),
+                ...(it.search ? { search: it.search } : {}),
+              } as Record<string, unknown>;
               return (
                 <li key={`${it.to}-${it.label}`}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   <Link
-                    {...linkProps}
+                    {...(linkProps as any)}
                     className={cn(
                       "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       active
