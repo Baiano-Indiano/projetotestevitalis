@@ -22,6 +22,7 @@ export const Route = createFileRoute("/_equipe/painel/")({
 function PainelHome() {
   const { papel } = useVitalisStore();
   if (papel === "veterinario") return <PainelVeterinario />;
+  if (papel === "unidade_movel") return <PainelUnidadeMovel />;
   return <PainelRecepcao />;
 }
 
