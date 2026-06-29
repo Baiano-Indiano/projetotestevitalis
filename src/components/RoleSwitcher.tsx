@@ -6,7 +6,6 @@ const labels: Record<Papel, string> = {
   tutor: "Tutor",
   recepcao: "Recepção / Triagem",
   veterinario: "Veterinário",
-  gestor: "Gestor",
 };
 
 export function RoleSwitcher() {
@@ -17,8 +16,7 @@ export function RoleSwitcher() {
     setPapel(v);
     if (v === "tutor") navigate({ to: "/" });
     else if (v === "recepcao") navigate({ to: "/painel/recepcao" });
-    else if (v === "veterinario") navigate({ to: "/painel/validacao" });
-    else navigate({ to: "/painel" });
+    else navigate({ to: "/painel/validacao" });
   };
 
   return (
