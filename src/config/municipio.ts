@@ -72,34 +72,14 @@ export const municipio: MunicipioConfig = {
     },
     {
       id: "hospital-veterinario",
-      nome: "Hospital Veterinário Municipal de Belém",
+      nome: "Hospital Veterinário Aysú - Unidade Belém",
       tipo: "hospital",
-      endereco: "Av. Almirante Barroso, 4500, Souza, Belém, PA",
-      lat: -1.4042,
-      lng: -48.4537,
+      endereco: "Av. José Bonifácio, 578 - Fátima, Belém - PA, Brasil",
+      lat: -1.4486,
+      lng: -48.4689,
       servicos: ["Urgência", "Internação", "Cirurgia", "Imagem", "Laboratório"],
-      atendimento24h: true,
+      atendimento24h: false,
       telefone: "(91) 3000 0002",
-    },
-    {
-      id: "movel-icoaraci",
-      nome: "Unidade Móvel Icoaraci",
-      tipo: "movel",
-      endereco: "Praça São Sebastião, Icoaraci, Belém, PA",
-      lat: -1.2884,
-      lng: -48.4783,
-      servicos: ["Triagem", "Vacinação", "Vermifugação"],
-      atendimento24h: false,
-    },
-    {
-      id: "movel-mosqueiro",
-      nome: "Unidade Móvel Mosqueiro",
-      tipo: "movel",
-      endereco: "Av. Beira-Mar, Mosqueiro, Belém, PA",
-      lat: -1.0856,
-      lng: -48.4128,
-      servicos: ["Triagem", "Vacinação"],
-      atendimento24h: false,
     },
   ],
   capacidade: {
@@ -116,3 +96,4 @@ export const unidade24h = () =>
 
 export const nomeEspecialidade = (id: EspecialidadeId): string =>
   municipio.especialidades.find((e) => e.id === id)?.nome ?? id;
+
