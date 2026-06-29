@@ -704,7 +704,7 @@ function NovoDialog({
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {municipio.especialidades.map((e) => (
-                  <SelectItem key={e} value={e}>{e}</SelectItem>
+                  <SelectItem key={e.id} value={e.nome}>{e.nome}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
