@@ -236,10 +236,8 @@ export function VitalisStoreProvider({ children }: { children: ReactNode }) {
   const [papel, setPapel] = useState<Papel>("tutor");
   const [rascunho, setRascunho] = useState<StoreCtx["rascunho"]>({ sintomas: [] });
   const [ultimaTriagemId, setUltimaTriagemId] = useState<string | undefined>();
-  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>(seedAgs);
   const [ultimoAgendamentoId, setUltimoAgendamentoId] = useState<string | undefined>();
-
-  const value = useMemo<StoreCtx>(
     () => ({
       triagens,
       decisoes,
