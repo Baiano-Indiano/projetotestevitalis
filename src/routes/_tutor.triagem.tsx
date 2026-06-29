@@ -281,8 +281,12 @@ function Triagem() {
                 Próximo <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             ) : (
-              <Button size="lg" disabled={!aceite} onClick={finalizar}>
-                Finalizar e Enviar
+              <Button size="lg" disabled={!aceite || enviando} onClick={finalizar}>
+                {enviando ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando...</>
+                ) : (
+                  "Finalizar e Enviar"
+                )}
               </Button>
             )}
           </div>
