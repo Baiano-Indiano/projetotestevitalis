@@ -618,7 +618,7 @@ function FaseInicial(props: {
         <SectionHeader icon={CalendarIcon} titulo="Qual a idade aproximada?" />
         <div className="grid gap-3">
           <div>
-            <Label className="text-sm">Valor</Label>
+            <Label className="text-sm">Idade</Label>
             <Input
               className="mt-1.5"
               placeholder="Ex: 2"
