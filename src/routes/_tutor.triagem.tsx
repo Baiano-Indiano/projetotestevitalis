@@ -125,6 +125,26 @@ function Triagem() {
   const removerAnexo = (idx: number) =>
     setAnexos((a) => a.filter((_, i) => i !== idx));
 
+  // Pré-preenchimento ao editar uma triagem existente (?edit=<id>)
+  useEffect(() => {
+    if (!edit) return;
+    const t = triagens.find((x) => x.id === edit || x.protocolo === edit);
+    if (!t) return;
+    setEspecie(t.animal.especie === "cao" || t.animal.especie === "gato" ? t.animal.especie : "");
+    setAnimalNome(t.animal.nome);
+    setRaca(t.animal.raca);
+    setSexo(t.animal.sexo);
+    const [vNum, vUni] = String(t.animal.idade).split(" ");
+    setIdadeValor(vNum ?? "");
+    setIdadeUnidade(vUni === "meses" ? "meses" : "anos");
+    setTutorNome(t.tutor.nome);
+    setTutorTel(t.tutor.telefone);
+    setSelecionados(new Set(t.etapas.sintomas ?? []));
+    setObs(t.etapas.observacoes ?? "");
+    if (t.etapas.anexos?.length) setAnexos(t.etapas.anexos);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [edit]);
+
   // Aceite
   const [aceite, setAceite] = useState(false);
 
