@@ -190,6 +190,8 @@ export function VitalisStoreProvider({ children }: { children: ReactNode }) {
   const [papel, setPapel] = useState<Papel>("tutor");
   const [rascunho, setRascunho] = useState<StoreCtx["rascunho"]>({ sintomas: [] });
   const [ultimaTriagemId, setUltimaTriagemId] = useState<string | undefined>();
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [ultimoAgendamentoId, setUltimoAgendamentoId] = useState<string | undefined>();
 
   const value = useMemo<StoreCtx>(
     () => ({
@@ -231,8 +233,21 @@ export function VitalisStoreProvider({ children }: { children: ReactNode }) {
       resetRascunho: () => setRascunho({ sintomas: [] }),
       ultimaTriagemId,
       setUltimaTriagemId,
+      agendamentos,
+      criarAgendamento: (parcial) => {
+        const a: Agendamento = {
+          ...parcial,
+          id: `ag-${Date.now().toString(36)}`,
+          protocolo: gerarProtocoloAgendamento(),
+          criadoEm: new Date().toISOString(),
+        };
+        setAgendamentos((arr) => [a, ...arr]);
+        return a;
+      },
+      ultimoAgendamentoId,
+      setUltimoAgendamentoId,
     }),
-    [triagens, decisoes, papel, rascunho, ultimaTriagemId],
+    [triagens, decisoes, papel, rascunho, ultimaTriagemId, agendamentos, ultimoAgendamentoId],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
