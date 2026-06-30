@@ -920,13 +920,128 @@ function FichaPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="evolucao" className="mt-6">
+        <TabsContent value="evolucao" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Evolução (SOAP)</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ClipboardList className="h-4 w-4 text-primary" />
+                Nova Evolução Clínica
+              </CardTitle>
             </CardHeader>
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
-              Módulo em construção — registros diários no padrão SOAP.
+            <CardContent className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="soap-s">
+                    <span className="font-semibold">S — Subjetivo</span>
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                      Relato de comportamento, queixas e estado percebido do paciente.
+                    </span>
+                  </Label>
+                  <Textarea
+                    id="soap-s"
+                    rows={5}
+                    value={novaEvolucao.subjetivo}
+                    onChange={(e) =>
+                      setNovaEvolucao((p) => ({ ...p, subjetivo: e.target.value }))
+                    }
+                    placeholder="Ex.: Tutor relata melhora do apetite e disposição..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="soap-o">
+                    <span className="font-semibold">O — Objetivo</span>
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                      Parâmetros clínicos aferidos e achados de exames.
+                    </span>
+                  </Label>
+                  <Textarea
+                    id="soap-o"
+                    rows={5}
+                    value={novaEvolucao.objetivo}
+                    onChange={(e) =>
+                      setNovaEvolucao((p) => ({ ...p, objetivo: e.target.value }))
+                    }
+                    placeholder="Ex.: FC 110bpm, T 38,7°C, mucosas rosadas, TPC 2s..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="soap-a">
+                    <span className="font-semibold">A — Avaliação</span>
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                      Análise clínica e conclusão médica sobre o quadro atual.
+                    </span>
+                  </Label>
+                  <Textarea
+                    id="soap-a"
+                    rows={5}
+                    value={novaEvolucao.avaliacao}
+                    onChange={(e) =>
+                      setNovaEvolucao((p) => ({ ...p, avaliacao: e.target.value }))
+                    }
+                    placeholder="Ex.: Evolução clínica favorável, resposta adequada ao tratamento..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="soap-p">
+                    <span className="font-semibold">P — Plano</span>
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                      Procedimentos, nova conduta terapêutica e recomendações.
+                    </span>
+                  </Label>
+                  <Textarea
+                    id="soap-p"
+                    rows={5}
+                    value={novaEvolucao.plano}
+                    onChange={(e) =>
+                      setNovaEvolucao((p) => ({ ...p, plano: e.target.value }))
+                    }
+                    placeholder="Ex.: Manter prescrição, reavaliar em 48h, liberar alimentação branda..."
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={salvarEvolucao} className="gap-2">
+                  <Check className="h-4 w-4" /> Salvar Evolução
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Histórico de Evoluções</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {historicoEvolucoes.length === 0 ? (
+                <p className="py-10 text-center text-sm text-muted-foreground">
+                  Nenhuma evolução registrada ainda.
+                </p>
+              ) : (
+                <div className="space-y-6">
+                  {historicoEvolucoes.map((ev, idx) => (
+                    <div key={ev.id} className="space-y-3">
+                      <div className="text-xs text-muted-foreground">
+                        {ev.medico} — {ev.dataHora}
+                      </div>
+                      <div className="space-y-2 text-sm leading-relaxed text-foreground">
+                        <p>
+                          <span className="font-semibold">S:</span> {ev.subjetivo || "—"}
+                        </p>
+                        <p>
+                          <span className="font-semibold">O:</span> {ev.objetivo || "—"}
+                        </p>
+                        <p>
+                          <span className="font-semibold">A:</span> {ev.avaliacao || "—"}
+                        </p>
+                        <p>
+                          <span className="font-semibold">P:</span> {ev.plano || "—"}
+                        </p>
+                      </div>
+                      {idx < historicoEvolucoes.length - 1 && <Separator />}
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
