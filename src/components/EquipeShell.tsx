@@ -26,7 +26,7 @@ import {
   ChevronDown,
   Package,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useVitalisStore } from "@/data/store";
 import { cn } from "@/lib/utils";
 
