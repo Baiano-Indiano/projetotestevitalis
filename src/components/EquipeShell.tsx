@@ -59,6 +59,7 @@ export function EquipeShell() {
     { to: "/painel/agenda", label: "Agendamentos", Icon: CalendarDays },
     { to: "/painel/internacoes", label: "Internações", Icon: Bed },
     { to: "/painel/veterinarios", label: "Veterinários", Icon: Stethoscope },
+    { to: "/painel/estoque", label: "Logística e Estoque", Icon: Package, sectionBefore: "Logística" },
   ];
 
   const itemsVeterinario: Item[] = [
