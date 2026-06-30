@@ -1,10 +1,28 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
+import { create, type StateCreator } from "zustand";
 import { calcularMotor, gerarProtocolo, gerarProtocoloAgendamento } from "@/lib/triagem";
-import type { Triagem, ValidacaoDecisao, EtapasTriagem, Agendamento, StatusAgendamento } from "@/data/types";
+import type {
+  Triagem,
+  ValidacaoDecisao,
+  Agendamento,
+  StatusAgendamento,
+  Papel,
+  RascunhoTriagem,
+  RegistroAnamnese,
+  RegistroExameFisico,
+  RegistroDiagnostico,
+  RegistroPrescricao,
+  RegistroEvolucaoSOAP,
+} from "@/data/types";
 import { veterinarios } from "@/data/veterinarios";
 import { nomeEspecialidade } from "@/config/municipio";
 
-// Seed inicial: 6 triagens variadas, sendo a primeira com red-flag ativo.
+// Re-export for backward compatibility
+export type { Papel } from "@/data/types";
+
+// =================================================================
+// SEEDS (mantidos exatamente como antes para não quebrar protótipos)
+// =================================================================
 const minutosAtras = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
 
 const seedTriagens: Triagem[] = [
@@ -160,7 +178,6 @@ const seedTriagens: Triagem[] = [
   })(),
 ];
 
-// Seed de agendamentos para hoje e amanhã, distribuídos entre os veterinários.
 const hojeISO = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -202,111 +219,167 @@ const seedAgs: Agendamento[] = [
   } satisfies Agendamento;
 });
 
-export type Papel = "tutor" | "recepcao" | "veterinario";
+// =================================================================
+// SLICES
+// =================================================================
+let seq = 100;
 
-interface StoreCtx {
-  triagens: Triagem[];
-  decisoes: ValidacaoDecisao[];
-  adicionarTriagem: (parcial: Omit<Triagem, "id" | "protocolo" | "criadoEm" | "status">) => Triagem;
-  decidir: (d: ValidacaoDecisao) => void;
+export interface TutorSlice {
   papel: Papel;
   setPapel: (p: Papel) => void;
-  rascunho: EtapasTriagem & { animal?: Triagem["animal"]; tutor?: Triagem["tutor"] };
-  setRascunho: (r: StoreCtx["rascunho"]) => void;
+  rascunho: RascunhoTriagem;
+  setRascunho: (r: RascunhoTriagem) => void;
   resetRascunho: () => void;
-  ultimaTriagemId?: string;
-  setUltimaTriagemId: (id?: string) => void;
   agendamentos: Agendamento[];
-  criarAgendamento: (
-    parcial: Omit<Agendamento, "id" | "protocolo" | "criadoEm">,
-  ) => Agendamento;
+  criarAgendamento: (parcial: Omit<Agendamento, "id" | "protocolo" | "criadoEm">) => Agendamento;
   atualizarStatusAgendamento: (id: string, status: StatusAgendamento) => void;
   removerAgendamento: (id: string) => void;
   ultimoAgendamentoId?: string;
   setUltimoAgendamentoId: (id?: string) => void;
 }
 
-const Ctx = createContext<StoreCtx | null>(null);
-
-let seq = 100;
-
-export function VitalisStoreProvider({ children }: { children: ReactNode }) {
-  const [triagens, setTriagens] = useState<Triagem[]>(seedTriagens);
-  const [decisoes, setDecisoes] = useState<ValidacaoDecisao[]>([]);
-  const [papel, setPapel] = useState<Papel>("tutor");
-  const [rascunho, setRascunho] = useState<StoreCtx["rascunho"]>({ sintomas: [] });
-  const [ultimaTriagemId, setUltimaTriagemId] = useState<string | undefined>();
-  const [agendamentos, setAgendamentos] = useState<Agendamento[]>(seedAgs);
-  const [ultimoAgendamentoId, setUltimoAgendamentoId] = useState<string | undefined>();
-
-  const value = useMemo<StoreCtx>(
-    () => ({
-      triagens,
-      decisoes,
-      adicionarTriagem: (parcial) => {
-        const t: Triagem = {
-          ...parcial,
-          id: `t-${(++seq).toString().padStart(3, "0")}`,
-          protocolo: gerarProtocolo(seq),
-          criadoEm: new Date().toISOString(),
-          status: parcial.redFlags.length > 0 ? "urgencia" : "pendente",
-        };
-        setTriagens((arr) => [t, ...arr]);
-        return t;
-      },
-      decidir: (d) => {
-        setDecisoes((arr) => [...arr, d]);
-        setTriagens((arr) =>
-          arr.map((t) =>
-            t.id === d.triagemId
-              ? {
-                  ...t,
-                  status:
-                    d.acao === "urgencia"
-                      ? "urgencia"
-                      : d.acao === "redirecionar"
-                        ? "redirecionada"
-                        : "validada",
-                }
-              : t,
-          ),
-        );
-      },
-      papel,
-      setPapel,
-      rascunho,
-      setRascunho,
-      resetRascunho: () => setRascunho({ sintomas: [] }),
-      ultimaTriagemId,
-      setUltimaTriagemId,
-      agendamentos,
-      criarAgendamento: (parcial) => {
-        const a: Agendamento = {
-          ...parcial,
-          id: `ag-${Date.now().toString(36)}`,
-          protocolo: gerarProtocoloAgendamento(),
-          criadoEm: new Date().toISOString(),
-        };
-        setAgendamentos((arr) => [a, ...arr]);
-        return a;
-      },
-      atualizarStatusAgendamento: (id, status) => {
-        setAgendamentos((arr) => arr.map((a) => (a.id === id ? { ...a, status } : a)));
-      },
-      removerAgendamento: (id) => {
-        setAgendamentos((arr) => arr.filter((a) => a.id !== id));
-      },
-      ultimoAgendamentoId,
-      setUltimoAgendamentoId,
-    }),
-    [triagens, decisoes, papel, rascunho, ultimaTriagemId, agendamentos, ultimoAgendamentoId],
-  );
-
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+export interface TriagemSlice {
+  triagens: Triagem[];
+  decisoes: ValidacaoDecisao[];
+  adicionarTriagem: (parcial: Omit<Triagem, "id" | "protocolo" | "criadoEm" | "status">) => Triagem;
+  decidir: (d: ValidacaoDecisao) => void;
+  ultimaTriagemId?: string;
+  setUltimaTriagemId: (id?: string) => void;
 }
 
-export function useVitalisStore(): StoreCtx {
-  const v = useContext(Ctx);
-  if (!v) throw new Error("useVitalisStore requer VitalisStoreProvider");
-  return v;
+export interface ProntuarioSlice {
+  anamneses: RegistroAnamnese[];
+  examesFisicos: RegistroExameFisico[];
+  diagnosticos: RegistroDiagnostico[];
+  prescricoes: RegistroPrescricao[];
+  evolucoesSOAP: RegistroEvolucaoSOAP[];
+  salvarAnamnese: (r: Omit<RegistroAnamnese, "id" | "criadoEm">) => RegistroAnamnese;
+  salvarExameFisico: (r: Omit<RegistroExameFisico, "id" | "criadoEm">) => RegistroExameFisico;
+  salvarDiagnostico: (r: Omit<RegistroDiagnostico, "id" | "criadoEm">) => RegistroDiagnostico;
+  salvarPrescricao: (r: Omit<RegistroPrescricao, "id" | "criadoEm">) => RegistroPrescricao;
+  salvarEvolucaoSOAP: (r: Omit<RegistroEvolucaoSOAP, "id" | "criadoEm">) => RegistroEvolucaoSOAP;
+}
+
+export type RootState = TutorSlice & TriagemSlice & ProntuarioSlice;
+
+const createTutorSlice: StateCreator<RootState, [], [], TutorSlice> = (set) => ({
+  papel: "tutor",
+  setPapel: (papel) => set({ papel }),
+  rascunho: { sintomas: [] },
+  setRascunho: (rascunho) => set({ rascunho }),
+  resetRascunho: () => set({ rascunho: { sintomas: [] } }),
+  agendamentos: seedAgs,
+  criarAgendamento: (parcial) => {
+    const a: Agendamento = {
+      ...parcial,
+      id: `ag-${Date.now().toString(36)}`,
+      protocolo: gerarProtocoloAgendamento(),
+      criadoEm: new Date().toISOString(),
+    };
+    set((s) => ({ agendamentos: [a, ...s.agendamentos] }));
+    return a;
+  },
+  atualizarStatusAgendamento: (id, status) =>
+    set((s) => ({
+      agendamentos: s.agendamentos.map((a) => (a.id === id ? { ...a, status } : a)),
+    })),
+  removerAgendamento: (id) =>
+    set((s) => ({ agendamentos: s.agendamentos.filter((a) => a.id !== id) })),
+  ultimoAgendamentoId: undefined,
+  setUltimoAgendamentoId: (ultimoAgendamentoId) => set({ ultimoAgendamentoId }),
+});
+
+const createTriagemSlice: StateCreator<RootState, [], [], TriagemSlice> = (set) => ({
+  triagens: seedTriagens,
+  decisoes: [],
+  adicionarTriagem: (parcial) => {
+    const t: Triagem = {
+      ...parcial,
+      id: `t-${(++seq).toString().padStart(3, "0")}`,
+      protocolo: gerarProtocolo(seq),
+      criadoEm: new Date().toISOString(),
+      status: parcial.redFlags.length > 0 ? "urgencia" : "pendente",
+    };
+    set((s) => ({ triagens: [t, ...s.triagens] }));
+    return t;
+  },
+  decidir: (d) =>
+    set((s) => ({
+      decisoes: [...s.decisoes, d],
+      triagens: s.triagens.map((t) =>
+        t.id === d.triagemId
+          ? {
+              ...t,
+              status:
+                d.acao === "urgencia"
+                  ? "urgencia"
+                  : d.acao === "redirecionar"
+                    ? "redirecionada"
+                    : "validada",
+            }
+          : t,
+      ),
+    })),
+  ultimaTriagemId: undefined,
+  setUltimaTriagemId: (ultimaTriagemId) => set({ ultimaTriagemId }),
+});
+
+const novoRegistro = <T,>(r: T): T & { id: string; criadoEm: string } => ({
+  ...r,
+  id: crypto.randomUUID(),
+  criadoEm: new Date().toISOString(),
+});
+
+const createProntuarioSlice: StateCreator<RootState, [], [], ProntuarioSlice> = (set) => ({
+  anamneses: [],
+  examesFisicos: [],
+  diagnosticos: [],
+  prescricoes: [],
+  evolucoesSOAP: [],
+  salvarAnamnese: (r) => {
+    const reg = novoRegistro(r);
+    set((s) => ({ anamneses: [reg, ...s.anamneses] }));
+    return reg;
+  },
+  salvarExameFisico: (r) => {
+    const reg = novoRegistro(r);
+    set((s) => ({ examesFisicos: [reg, ...s.examesFisicos] }));
+    return reg;
+  },
+  salvarDiagnostico: (r) => {
+    const reg = novoRegistro(r);
+    set((s) => ({ diagnosticos: [reg, ...s.diagnosticos] }));
+    return reg;
+  },
+  salvarPrescricao: (r) => {
+    const reg = novoRegistro(r);
+    set((s) => ({ prescricoes: [reg, ...s.prescricoes] }));
+    return reg;
+  },
+  salvarEvolucaoSOAP: (r) => {
+    const reg = novoRegistro(r);
+    set((s) => ({ evolucoesSOAP: [reg, ...s.evolucoesSOAP] }));
+    return reg;
+  },
+});
+
+// =================================================================
+// ROOT STORE
+// =================================================================
+export const useStore = create<RootState>()((...a) => ({
+  ...createTutorSlice(...a),
+  ...createTriagemSlice(...a),
+  ...createProntuarioSlice(...a),
+}));
+
+// =================================================================
+// COMPATIBILIDADE COM A API ANTIGA (Provider + hook agregador)
+// Mantém todos os componentes existentes funcionando sem alterações.
+// =================================================================
+export function VitalisStoreProvider({ children }: { children: ReactNode }) {
+  return <>{children}</>;
+}
+
+export function useVitalisStore(): RootState {
+  return useStore((s) => s);
 }
