@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -29,28 +27,25 @@ import {
   AlertTriangle,
   PawPrint,
   Cat,
-  Plus,
   Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { municipio } from "@/config/municipio";
+import { useStore } from "@/data/store";
+import type { Triagem } from "@/data/types";
 
 export const Route = createFileRoute("/_equipe/painel/encaminhamentos")({
   head: () => ({ meta: [{ title: "Encaminhamentos. Vitalis Belém" }] }),
   component: Encaminhamentos,
 });
 
-type StatusEnc =
-  | "pendente"
-  | "aceito"
-  | "recusado"
-  | "concluido";
+type StatusEnc = "pendente" | "aceito";
 
 interface Encaminhamento {
   id: string;
   protocolo: string;
   paciente: string;
-  especie: "cao" | "gato";
+  especie: "cao" | "gato" | "outro";
   tutor: string;
   origemId: string;
   destinoId: string;
@@ -58,79 +53,60 @@ interface Encaminhamento {
   motivo: string;
   prioridade: "normal" | "alta" | "urgente";
   status: StatusEnc;
-  criadoEm: string; // ISO
+  criadoEm: string;
   vetSolicitante: string;
 }
 
-const seed: Encaminhamento[] = [
-  {
-    id: "enc-1",
-    protocolo: "EN-2026-000118",
-    paciente: "Rex",
-    especie: "cao",
-    tutor: "Maria Silva",
-    origemId: municipio.unidades[1]?.id ?? "u1",
-    destinoId: municipio.unidades[0]?.id ?? "u0",
-    especialidade: "Ortopedia",
-    motivo: "Suspeita de fratura em membro posterior após queda.",
-    prioridade: "urgente",
-    status: "pendente",
-    criadoEm: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-    vetSolicitante: "Dra. Ana Mendes",
-  },
-  {
-    id: "enc-2",
-    protocolo: "EN-2026-000117",
-    paciente: "Luna",
-    especie: "gato",
-    tutor: "João Souza",
-    origemId: municipio.unidades[0]?.id ?? "u0",
-    destinoId: municipio.unidades[1]?.id ?? "u1",
-    especialidade: "Nefrologia",
-    motivo: "Acompanhamento de DRC estágio 2 para clínica geral.",
-    prioridade: "normal",
-    status: "aceito",
-    criadoEm: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-    vetSolicitante: "Dr. Marcos Souza",
-  },
-  {
-    id: "enc-3",
-    protocolo: "EN-2026-000116",
-    paciente: "Thor",
-    especie: "cao",
-    tutor: "Ana Oliveira",
-    origemId: municipio.unidades[1]?.id ?? "u1",
-    destinoId: municipio.unidades[0]?.id ?? "u0",
-    especialidade: "Cardiologia",
-    motivo: "Sopro grau IV identificado em consulta de rotina.",
-    prioridade: "alta",
-    status: "concluido",
-    criadoEm: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
-    vetSolicitante: "Dra. Juliana Pires",
-  },
-  {
-    id: "enc-4",
-    protocolo: "EN-2026-000115",
-    paciente: "Bidu",
-    especie: "cao",
-    tutor: "Carlos Mendes",
-    origemId: municipio.unidades[0]?.id ?? "u0",
-    destinoId: municipio.unidades[1]?.id ?? "u1",
-    especialidade: "Dermatologia",
-    motivo: "Lesão crônica refratária ao tratamento inicial.",
-    prioridade: "normal",
-    status: "recusado",
-    criadoEm: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    vetSolicitante: "Dr. Ricardo Silva",
-  },
-];
+function nomeEspecialidade(id: string) {
+  return municipio.especialidades.find((e) => e.id === id)?.nome ?? "Urgência";
+}
+
+function fromTriagem(t: Triagem): Encaminhamento {
+  const origemId = t.unidadeId ?? municipio.unidades[0]?.id ?? "";
+  const isUrg = t.status === "urgencia" || t.sugestao === "urgencia";
+  const destino =
+    municipio.unidades.find((u) => (isUrg ? u.tipo === "hospital" : u.id !== origemId)) ??
+    municipio.unidades.find((u) => u.id !== origemId) ??
+    municipio.unidades[0];
+  const prioridade: Encaminhamento["prioridade"] = isUrg
+    ? "urgente"
+    : t.prioridade === "alta"
+      ? "alta"
+      : "normal";
+  return {
+    id: t.id,
+    protocolo: t.protocolo,
+    paciente: t.animal.nome,
+    especie: t.animal.especie,
+    tutor: t.tutor.nome,
+    origemId,
+    destinoId: destino?.id ?? origemId,
+    especialidade: nomeEspecialidade(String(t.sugestao)),
+    motivo:
+      t.etapas.observacoes?.trim() ||
+      (t.redFlags.length
+        ? `Sinais de alerta: ${t.redFlags.join(", ")}`
+        : `Encaminhamento gerado a partir da triagem ${t.protocolo}.`),
+    prioridade,
+    status: t.status === "redirecionada" ? "aceito" : "pendente",
+    criadoEm: t.criadoEm,
+    vetSolicitante: "Equipe de triagem",
+  };
+}
 
 function Encaminhamentos() {
-  const [lista, setLista] = useState<Encaminhamento[]>(seed);
+  const triagens = useStore((s) => s.triagens);
+  const lista = useMemo(
+    () =>
+      triagens
+        .filter((t) => t.status === "urgencia" || t.status === "redirecionada")
+        .map(fromTriagem),
+    [triagens],
+  );
+
   const [busca, setBusca] = useState("");
   const [statusF, setStatusF] = useState<string>("todos");
   const [destinoF, setDestinoF] = useState<string>("todos");
-  const [novoOpen, setNovoOpen] = useState(false);
   const [detalhe, setDetalhe] = useState<Encaminhamento | null>(null);
 
   const filtrada = useMemo(() => {
@@ -154,7 +130,7 @@ function Encaminhamentos() {
   const stats = [
     {
       Icon: GitBranchPlus,
-      label: "Total no mês",
+      label: "Total ativos",
       valor: lista.length,
       bg: "bg-primary-50 text-primary",
     },
@@ -166,8 +142,8 @@ function Encaminhamentos() {
     },
     {
       Icon: CheckCircle2,
-      label: "Concluídos",
-      valor: lista.filter((e) => e.status === "concluido").length,
+      label: "Aceitos",
+      valor: lista.filter((e) => e.status === "aceito").length,
       bg: "bg-success-50 text-success-700",
     },
     {
@@ -180,45 +156,18 @@ function Encaminhamentos() {
     },
   ];
 
-  function atualizarStatus(id: string, status: StatusEnc) {
-    setLista((l) => l.map((e) => (e.id === id ? { ...e, status } : e)));
-    setDetalhe((d) => (d && d.id === id ? { ...d, status } : d));
-    toast.success(`Encaminhamento ${status}.`);
-  }
-
-  function criar(novo: Omit<Encaminhamento, "id" | "protocolo" | "criadoEm" | "status">) {
-    const ano = new Date().getFullYear();
-    const seq = String(lista.length + 119).padStart(6, "0");
-    const e: Encaminhamento = {
-      ...novo,
-      id: crypto.randomUUID(),
-      protocolo: `EN-${ano}-${seq}`,
-      criadoEm: new Date().toISOString(),
-      status: "pendente",
-    };
-    setLista((l) => [e, ...l]);
-    setNovoOpen(false);
-    toast.success(`Encaminhamento ${e.protocolo} criado.`);
-  }
-
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-            Equipe
-          </p>
-          <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-text-strong md:text-4xl">
-            Encaminhamentos
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Casos transferidos entre unidades e especialidades com rastreabilidade
-            completa.
-          </p>
-        </div>
-        <Button onClick={() => setNovoOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" /> Novo encaminhamento
-        </Button>
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">
+          Equipe
+        </p>
+        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-text-strong md:text-4xl">
+          Encaminhamentos
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Pacientes redirecionados ou marcados como urgência pela triagem clínica.
+        </p>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -270,8 +219,6 @@ function Encaminhamentos() {
               <SelectItem value="todos">Todos os status</SelectItem>
               <SelectItem value="pendente">Pendente</SelectItem>
               <SelectItem value="aceito">Aceito</SelectItem>
-              <SelectItem value="concluido">Concluído</SelectItem>
-              <SelectItem value="recusado">Recusado</SelectItem>
             </SelectContent>
           </Select>
           <Select value={destinoF} onValueChange={setDestinoF}>
@@ -311,7 +258,7 @@ function Encaminhamentos() {
                     colSpan={6}
                     className="px-4 py-10 text-center text-sm text-muted-foreground"
                   >
-                    Nenhum encaminhamento encontrado para os filtros aplicados.
+                    Nenhum encaminhamento ativo. Quando uma triagem for marcada como urgência ou redirecionada, ela aparecerá aqui automaticamente.
                   </td>
                 </tr>
               ) : (
@@ -384,12 +331,6 @@ function Encaminhamentos() {
       <DetalheDialog
         encaminhamento={detalhe}
         onClose={() => setDetalhe(null)}
-        onStatus={atualizarStatus}
-      />
-      <NovoDialog
-        open={novoOpen}
-        onOpenChange={setNovoOpen}
-        onCriar={criar}
       />
     </div>
   );
@@ -403,19 +344,9 @@ function StatusPill({ s }: { s: StatusEnc }) {
       label: "Pendente",
     },
     aceito: {
-      c: "bg-primary-50 text-primary-800",
-      d: "bg-primary",
-      label: "Aceito",
-    },
-    concluido: {
       c: "bg-success-50 text-success-700",
       d: "bg-success",
-      label: "Concluído",
-    },
-    recusado: {
-      c: "bg-destructive-50 text-destructive",
-      d: "bg-destructive",
-      label: "Recusado",
+      label: "Aceito",
     },
   };
   const cfg = map[s];
@@ -453,11 +384,9 @@ function PrioridadePill({ p }: { p: Encaminhamento["prioridade"] }) {
 function DetalheDialog({
   encaminhamento,
   onClose,
-  onStatus,
 }: {
   encaminhamento: Encaminhamento | null;
   onClose: () => void;
-  onStatus: (id: string, status: StatusEnc) => void;
 }) {
   if (!encaminhamento) return null;
   const e = encaminhamento;
@@ -473,7 +402,7 @@ function DetalheDialog({
         <DialogHeader>
           <DialogTitle className="font-display">{e.protocolo}</DialogTitle>
           <DialogDescription>
-            Detalhes do encaminhamento e ações disponíveis.
+            Detalhes do encaminhamento gerado pela triagem clínica.
           </DialogDescription>
         </DialogHeader>
 
@@ -486,9 +415,7 @@ function DetalheDialog({
           </div>
           <div className="flex items-center justify-between">
             <span className="text-text-soft">Especialidade</span>
-            <span className="font-medium text-text-strong">
-              {e.especialidade}
-            </span>
+            <span className="font-medium text-text-strong">{e.especialidade}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-text-soft">Origem</span>
@@ -496,15 +423,7 @@ function DetalheDialog({
           </div>
           <div className="flex items-center justify-between">
             <span className="text-text-soft">Destino</span>
-            <span className="font-medium text-text-strong">
-              {destino?.nome}
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-text-soft">Solicitante</span>
-            <span className="font-medium text-text-strong">
-              {e.vetSolicitante}
-            </span>
+            <span className="font-medium text-text-strong">{destino?.nome}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-text-soft">Criado em</span>
@@ -520,7 +439,7 @@ function DetalheDialog({
             <span className="text-text-soft">Status</span>
             <StatusPill s={e.status} />
           </div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3">
+          <div className="rounded-xl border border-border bg-muted/30 p-3">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">
               Motivo
             </p>
@@ -528,217 +447,10 @@ function DetalheDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex-wrap gap-2 sm:justify-between">
+        <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Fechar
           </Button>
-          <div className="flex flex-wrap gap-2">
-            {e.status === "pendente" && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => onStatus(e.id, "recusado")}
-                >
-                  Recusar
-                </Button>
-                <Button onClick={() => onStatus(e.id, "aceito")}>Aceitar</Button>
-              </>
-            )}
-            {e.status === "aceito" && (
-              <Button onClick={() => onStatus(e.id, "concluido")}>
-                Marcar como concluído
-              </Button>
-            )}
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function NovoDialog({
-  open,
-  onOpenChange,
-  onCriar,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-  onCriar: (
-    novo: Omit<Encaminhamento, "id" | "protocolo" | "criadoEm" | "status">,
-  ) => void;
-}) {
-  const [paciente, setPaciente] = useState("");
-  const [tutor, setTutor] = useState("");
-  const [especie, setEspecie] = useState<"cao" | "gato">("cao");
-  const [origemId, setOrigemId] = useState(municipio.unidades[0]?.id ?? "");
-  const [destinoId, setDestinoId] = useState(municipio.unidades[1]?.id ?? municipio.unidades[0]?.id ?? "");
-  const [especialidade, setEspecialidade] = useState<string>(
-    municipio.especialidades[0]?.nome ?? "Clínico Geral",
-  );
-  const [prioridade, setPrioridade] = useState<"normal" | "alta" | "urgente">(
-    "normal",
-  );
-  const [motivo, setMotivo] = useState("");
-  const [vetSolicitante, setVetSolicitante] = useState("");
-
-  function reset() {
-    setPaciente("");
-    setTutor("");
-    setEspecie("cao");
-    setMotivo("");
-    setVetSolicitante("");
-    setPrioridade("normal");
-  }
-
-  function enviar() {
-    if (!paciente || !tutor || !motivo || !vetSolicitante) {
-      toast.error("Preencha paciente, tutor, motivo e veterinário solicitante.");
-      return;
-    }
-    if (origemId === destinoId) {
-      toast.error("Origem e destino devem ser diferentes.");
-      return;
-    }
-    onCriar({
-      paciente,
-      tutor,
-      especie,
-      origemId,
-      destinoId,
-      especialidade,
-      prioridade,
-      motivo,
-      vetSolicitante,
-    });
-    reset();
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) reset(); }}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="font-display">Novo encaminhamento</DialogTitle>
-          <DialogDescription>
-            Transfira um caso entre unidades ou especialidades com rastreabilidade.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid gap-3 text-sm">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-                Paciente
-              </label>
-              <Input value={paciente} onChange={(e) => setPaciente(e.target.value)} />
-            </div>
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-                Tutor
-              </label>
-              <Input value={tutor} onChange={(e) => setTutor(e.target.value)} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-                Espécie
-              </label>
-              <Select value={especie} onValueChange={(v) => setEspecie(v as "cao" | "gato")}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cao">Cão</SelectItem>
-                  <SelectItem value="gato">Gato</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-                Prioridade
-              </label>
-              <Select value={prioridade} onValueChange={(v) => setPrioridade(v as typeof prioridade)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="alta">Alta</SelectItem>
-                  <SelectItem value="urgente">Urgente</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-                Origem
-              </label>
-              <Select value={origemId} onValueChange={setOrigemId}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {municipio.unidades.map((u) => (
-                    <SelectItem key={u.id} value={u.id}>{u.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-                Destino
-              </label>
-              <Select value={destinoId} onValueChange={setDestinoId}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {municipio.unidades.map((u) => (
-                    <SelectItem key={u.id} value={u.id}>{u.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-              Especialidade
-            </label>
-            <Select value={especialidade} onValueChange={setEspecialidade}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {municipio.especialidades.map((e) => (
-                  <SelectItem key={e.id} value={e.nome}>{e.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-              Veterinário solicitante
-            </label>
-            <Input
-              value={vetSolicitante}
-              onChange={(e) => setVetSolicitante(e.target.value)}
-              placeholder="Ex.: Dra. Ana Mendes"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-text-soft">
-              Motivo do encaminhamento
-            </label>
-            <Textarea
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-              placeholder="Descreva o quadro clínico e a justificativa..."
-              rows={3}
-            />
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={enviar}>Criar encaminhamento</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
