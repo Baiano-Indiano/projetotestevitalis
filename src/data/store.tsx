@@ -256,14 +256,18 @@ export interface ProntuarioSlice {
   diagnosticos: RegistroDiagnostico[];
   prescricoes: RegistroPrescricao[];
   evolucoesSOAP: RegistroEvolucaoSOAP[];
+  internacoes: Internacao[];
   salvarAnamnese: (r: Omit<RegistroAnamnese, "id" | "criadoEm">) => RegistroAnamnese;
   salvarExameFisico: (r: Omit<RegistroExameFisico, "id" | "criadoEm">) => RegistroExameFisico;
   salvarDiagnostico: (r: Omit<RegistroDiagnostico, "id" | "criadoEm">) => RegistroDiagnostico;
   salvarPrescricao: (r: Omit<RegistroPrescricao, "id" | "criadoEm">) => RegistroPrescricao;
   salvarEvolucaoSOAP: (r: Omit<RegistroEvolucaoSOAP, "id" | "criadoEm">) => RegistroEvolucaoSOAP;
+  adicionarInternacao: (r: Omit<Internacao, "id" | "criadoEm" | "status"> & { status?: StatusInternacao }) => Internacao;
+  alterarStatusInternacao: (id: string, status: StatusInternacao) => void;
 }
 
 export type RootState = TutorSlice & TriagemSlice & ProntuarioSlice;
+
 
 const createTutorSlice: StateCreator<RootState, [], [], TutorSlice> = (set) => ({
   papel: "tutor",
