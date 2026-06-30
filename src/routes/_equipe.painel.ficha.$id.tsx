@@ -13,7 +13,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, FileText, Sparkles, Save, Check, Stethoscope, TestTube } from "lucide-react";
+import {
+  ArrowLeft,
+  FileText,
+  Sparkles,
+  Save,
+  Check,
+  Stethoscope,
+  TestTube,
+  Pill,
+  Plus,
+  Trash2,
+  Printer,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_equipe/painel/ficha/$id")({
@@ -114,6 +126,55 @@ function FichaPage() {
 
   const salvarDiagnostico = () => {
     toast.success("Diagnóstico salvo no prontuário", {
+      description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
+    });
+  };
+
+  type ItemPrescricao = {
+    id: string;
+    medicamento: string;
+    dosagem: string;
+    via: string;
+    frequencia: string;
+    duracao: string;
+  };
+  const [listaPrescricao, setListaPrescricao] = useState<ItemPrescricao[]>([]);
+  const [tempMedicamento, setTempMedicamento] = useState("");
+  const [tempDosagem, setTempDosagem] = useState("");
+  const [tempVia, setTempVia] = useState("");
+  const [tempFrequencia, setTempFrequencia] = useState("");
+  const [tempDuracao, setTempDuracao] = useState("");
+  const [recomendacoes, setRecomendacoes] = useState("");
+
+  const adicionarMedicamento = () => {
+    if (!tempMedicamento.trim()) {
+      toast.error("Informe ao menos o nome do medicamento");
+      return;
+    }
+    setListaPrescricao((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        medicamento: tempMedicamento,
+        dosagem: tempDosagem,
+        via: tempVia,
+        frequencia: tempFrequencia,
+        duracao: tempDuracao,
+      },
+    ]);
+    setTempMedicamento("");
+    setTempDosagem("");
+    setTempVia("");
+    setTempFrequencia("");
+    setTempDuracao("");
+  };
+
+  const removerMedicamento = (id: string) => {
+    setListaPrescricao((prev) => prev.filter((m) => m.id !== id));
+  };
+
+  const salvarPrescricao = () => {
+    toast.success("Prescrição salva no prontuário", {
       description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
     });
   };
@@ -658,13 +719,142 @@ function FichaPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="prescricao" className="mt-6">
+        <TabsContent value="prescricao" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Prescrição</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Pill className="h-4 w-4" /> Receituário médico
+              </CardTitle>
             </CardHeader>
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
-              Módulo em construção — medicamentos, posologia e receituário.
+            <CardContent className="space-y-5">
+              <div className="grid gap-4 md:grid-cols-12">
+                <div className="md:col-span-4">
+                  <Label htmlFor="med">Nome do medicamento</Label>
+                  <Input
+                    id="med"
+                    value={tempMedicamento}
+                    onChange={(e) => setTempMedicamento(e.target.value)}
+                    placeholder="ex.: Meloxicam 0,5 mg"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="dose">Dosagem</Label>
+                  <Input
+                    id="dose"
+                    value={tempDosagem}
+                    onChange={(e) => setTempDosagem(e.target.value)}
+                    placeholder="ex.: 1 cp"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="via">Via</Label>
+                  <Select value={tempVia} onValueChange={setTempVia}>
+                    <SelectTrigger id="via">
+                      <SelectValue placeholder="Via" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="oral">Oral</SelectItem>
+                      <SelectItem value="iv">Intravenosa</SelectItem>
+                      <SelectItem value="sc">Subcutânea</SelectItem>
+                      <SelectItem value="im">Intramuscular</SelectItem>
+                      <SelectItem value="topica">Tópica</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="freq">Frequência</Label>
+                  <Select value={tempFrequencia} onValueChange={setTempFrequencia}>
+                    <SelectTrigger id="freq">
+                      <SelectValue placeholder="Frequência" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="8h">A cada 8 horas</SelectItem>
+                      <SelectItem value="12h">A cada 12 horas</SelectItem>
+                      <SelectItem value="24h">A cada 24 horas</SelectItem>
+                      <SelectItem value="unica">Dose única</SelectItem>
+                      <SelectItem value="continuo">Uso contínuo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="dur">Duração</Label>
+                  <Input
+                    id="dur"
+                    value={tempDuracao}
+                    onChange={(e) => setTempDuracao(e.target.value)}
+                    placeholder="ex.: 5 dias"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={adicionarMedicamento} className="gap-2">
+                  <Plus className="h-4 w-4" /> Adicionar à receita
+                </Button>
+              </div>
+
+              <Separator />
+
+              {listaPrescricao.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  Nenhum medicamento prescrito ainda
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {listaPrescricao.map((m, i) => (
+                    <li
+                      key={m.id}
+                      className="flex items-start justify-between gap-3 rounded-sm border border-border bg-card px-4 py-3"
+                    >
+                      <div className="space-y-1 text-sm">
+                        <p className="font-semibold">
+                          {i + 1}. {m.medicamento}
+                        </p>
+                        <p className="text-muted-foreground">
+                          {[
+                            m.via && `Via: ${m.via}`,
+                            m.dosagem && `Dosagem: ${m.dosagem}`,
+                            m.frequencia && `Frequência: ${m.frequencia}`,
+                            m.duracao && `Duração: ${m.duracao}`,
+                          ]
+                            .filter(Boolean)
+                            .join(" • ")}
+                        </p>
+                      </div>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => removerMedicamento(m.id)}
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div>
+                <Label htmlFor="recomendacoes">
+                  Recomendações e instruções adicionais para o tutor
+                </Label>
+                <Textarea
+                  id="recomendacoes"
+                  rows={4}
+                  value={recomendacoes}
+                  onChange={(e) => setRecomendacoes(e.target.value)}
+                  placeholder="Cuidados, sinais de alerta, retorno"
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <Button variant="outline" className="gap-2">
+                  <Printer className="h-4 w-4" /> Imprimir receita
+                </Button>
+                <Button onClick={salvarPrescricao} className="gap-2">
+                  <Check className="h-4 w-4" /> Salvar prescrição
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
