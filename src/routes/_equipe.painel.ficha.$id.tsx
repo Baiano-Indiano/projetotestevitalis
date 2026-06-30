@@ -25,6 +25,7 @@ import {
   Plus,
   Trash2,
   Printer,
+  ClipboardList,
 } from "lucide-react";
 import { toast } from "sonner";
 
