@@ -26,7 +26,7 @@ import {
   ChevronDown,
   Package,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useVitalisStore } from "@/data/store";
 import { cn } from "@/lib/utils";
 
@@ -44,11 +44,16 @@ interface Item {
 
 
 export function EquipeShell() {
-  const { triagens, papel } = useVitalisStore();
+  const { triagens, papel, setPapel } = useVitalisStore();
   const pendentes = triagens.filter((t) => t.status === "pendente" || t.status === "urgencia").length;
   const urgencias = triagens.filter((t) => t.status === "urgencia").length;
   const location = useLocation();
   const [labOpen, setLabOpen] = useState(true);
+
+  // Garante que ao entrar na área da equipe, o papel não permaneça como "tutor"
+  useEffect(() => {
+    if (papel === "tutor") setPapel("recepcao");
+  }, [papel, setPapel]);
 
   const itemsRecepcao: Item[] = [
     { to: "/painel", label: "Painel da Recepção", Icon: LayoutGrid },
