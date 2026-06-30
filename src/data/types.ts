@@ -100,3 +100,47 @@ export interface Agendamento {
   duracaoMin?: number;
   observacoes?: string;
 }
+
+// ============= Papéis e estado global =============
+export type Papel = "tutor" | "recepcao" | "veterinario";
+
+export type RascunhoTriagem = EtapasTriagem & {
+  animal?: Triagem["animal"];
+  tutor?: Triagem["tutor"];
+};
+
+// ============= Prontuário (consolidações por atendimento) =============
+export interface RegistroAnamnese {
+  id: string;
+  pacienteId: string;
+  criadoEm: string;
+  conteudo: Record<string, unknown>;
+}
+export interface RegistroExameFisico {
+  id: string;
+  pacienteId: string;
+  criadoEm: string;
+  conteudo: Record<string, unknown>;
+}
+export interface RegistroDiagnostico {
+  id: string;
+  pacienteId: string;
+  criadoEm: string;
+  conteudo: Record<string, unknown>;
+}
+export interface RegistroPrescricao {
+  id: string;
+  pacienteId: string;
+  criadoEm: string;
+  conteudo: Record<string, unknown>;
+}
+export interface RegistroEvolucaoSOAP {
+  id: string;
+  pacienteId: string;
+  criadoEm: string;
+  medico: string;
+  subjetivo: string;
+  objetivo: string;
+  avaliacao: string;
+  plano: string;
+}
