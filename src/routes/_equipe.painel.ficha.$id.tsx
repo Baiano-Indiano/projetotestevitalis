@@ -303,16 +303,200 @@ function FichaPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="exame" className="mt-6">
+        <TabsContent value="exame" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Exame físico</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Stethoscope className="h-4 w-4" /> Parâmetros vitais
+              </CardTitle>
             </CardHeader>
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
-              Módulo em construção — parâmetros vitais, inspeção e palpação.
+            <CardContent className="grid gap-5 md:grid-cols-3">
+              <div>
+                <Label htmlFor="temperatura">Temperatura (°C)</Label>
+                <Input
+                  id="temperatura"
+                  type="number"
+                  step="0.1"
+                  value={exameFisico.temperatura}
+                  onChange={(e) => setExameFisico({ ...exameFisico, temperatura: e.target.value })}
+                  placeholder="ex.: 38,5"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fc">Frequência cardíaca (bpm)</Label>
+                <Input
+                  id="fc"
+                  type="number"
+                  value={exameFisico.fc}
+                  onChange={(e) => setExameFisico({ ...exameFisico, fc: e.target.value })}
+                  placeholder="ex.: 120"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fr">Frequência respiratória (mpm)</Label>
+                <Input
+                  id="fr"
+                  type="number"
+                  value={exameFisico.fr}
+                  onChange={(e) => setExameFisico({ ...exameFisico, fr: e.target.value })}
+                  placeholder="ex.: 24"
+                />
+              </div>
+              <div>
+                <Label htmlFor="tpc">TPC (segundos)</Label>
+                <Input
+                  id="tpc"
+                  type="number"
+                  step="0.1"
+                  value={exameFisico.tpc}
+                  onChange={(e) => setExameFisico({ ...exameFisico, tpc: e.target.value })}
+                  placeholder="ex.: 2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="mucosas">Mucosas</Label>
+                <Select
+                  value={exameFisico.mucosas}
+                  onValueChange={(v) => setExameFisico({ ...exameFisico, mucosas: v })}
+                >
+                  <SelectTrigger id="mucosas">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="normocoradas">Normocoradas</SelectItem>
+                    <SelectItem value="palidas">Pálidas</SelectItem>
+                    <SelectItem value="cianoticas">Cianóticas</SelectItem>
+                    <SelectItem value="ictericas">Ictéricas</SelectItem>
+                    <SelectItem value="hiperemicas">Hiperêmicas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="hidratacao">Nível de hidratação</Label>
+                <Select
+                  value={exameFisico.hidratacao}
+                  onValueChange={(v) => setExameFisico({ ...exameFisico, hidratacao: v })}
+                >
+                  <SelectTrigger id="hidratacao">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="leve">Leve</SelectItem>
+                    <SelectItem value="moderada">Moderada</SelectItem>
+                    <SelectItem value="grave">Grave</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="escoreCorporal">Escore corporal (1-9)</Label>
+                <Select
+                  value={exameFisico.escoreCorporal}
+                  onValueChange={(v) => setExameFisico({ ...exameFisico, escoreCorporal: v })}
+                >
+                  <SelectTrigger id="escoreCorporal">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 9 }, (_, i) => String(i + 1)).map((n) => (
+                      <SelectItem key={n} value={n}>
+                        {n}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FileText className="h-4 w-4" /> Inspeção e palpação
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid gap-5 md:grid-cols-2">
+                <div>
+                  <Label htmlFor="linfonodos">Linfonodos</Label>
+                  <Textarea
+                    id="linfonodos"
+                    rows={3}
+                    value={exameFisico.linfonodos}
+                    onChange={(e) => setExameFisico({ ...exameFisico, linfonodos: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sistemaCardio">Sistema cardiovascular</Label>
+                  <Textarea
+                    id="sistemaCardio"
+                    rows={3}
+                    value={exameFisico.sistemaCardio}
+                    onChange={(e) => setExameFisico({ ...exameFisico, sistemaCardio: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sistemaResp">Sistema respiratório</Label>
+                  <Textarea
+                    id="sistemaResp"
+                    rows={3}
+                    value={exameFisico.sistemaResp}
+                    onChange={(e) => setExameFisico({ ...exameFisico, sistemaResp: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sistemaDigest">Sistema digestório / abdominal</Label>
+                  <Textarea
+                    id="sistemaDigest"
+                    rows={3}
+                    value={exameFisico.sistemaDigest}
+                    onChange={(e) => setExameFisico({ ...exameFisico, sistemaDigest: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sistemaLocomotor">Sistema locomotor / articular</Label>
+                  <Textarea
+                    id="sistemaLocomotor"
+                    rows={3}
+                    value={exameFisico.sistemaLocomotor}
+                    onChange={(e) =>
+                      setExameFisico({ ...exameFisico, sistemaLocomotor: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sistemaNeuro">Sistema neurológico</Label>
+                  <Textarea
+                    id="sistemaNeuro"
+                    rows={3}
+                    value={exameFisico.sistemaNeuro}
+                    onChange={(e) => setExameFisico({ ...exameFisico, sistemaNeuro: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="observacoesGerais">Observações gerais do exame físico</Label>
+                <Textarea
+                  id="observacoesGerais"
+                  rows={4}
+                  value={exameFisico.observacoesGerais}
+                  onChange={(e) =>
+                    setExameFisico({ ...exameFisico, observacoesGerais: e.target.value })
+                  }
+                  placeholder="Achados adicionais, impressão clínica geral"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={salvarExame} className="gap-2">
+                  <Check className="h-4 w-4" /> Salvar exame físico
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
+
         <TabsContent value="diagnostico" className="mt-6">
           <Card>
             <CardHeader>
