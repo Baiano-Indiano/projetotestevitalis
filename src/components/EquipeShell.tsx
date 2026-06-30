@@ -38,6 +38,7 @@ interface Item {
   params?: Record<string, string>;
   search?: Record<string, string>;
   tab?: string;
+  sectionBefore?: string;
   children?: { to: string; label: string; search?: Record<string, string> }[];
 }
 
