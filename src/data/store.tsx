@@ -13,7 +13,10 @@ import type {
   RegistroDiagnostico,
   RegistroPrescricao,
   RegistroEvolucaoSOAP,
+  Internacao,
+  StatusInternacao,
 } from "@/data/types";
+
 import { veterinarios } from "@/data/veterinarios";
 import { nomeEspecialidade } from "@/config/municipio";
 
