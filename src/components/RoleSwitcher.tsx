@@ -1,6 +1,6 @@
 import { useVitalisStore, type Papel } from "@/data/store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 
 const labels: Record<Papel, string> = {
   tutor: "Tutor",
@@ -11,6 +11,8 @@ const labels: Record<Papel, string> = {
 export function RoleSwitcher() {
   const { papel, setPapel } = useVitalisStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const selectedPapel = location.pathname.startsWith("/painel") ? papel : "tutor";
 
   const onChange = (v: Papel) => {
     setPapel(v);
@@ -23,7 +25,7 @@ export function RoleSwitcher() {
       <span className="hidden text-xs font-medium uppercase tracking-wide text-text-soft sm:inline">
         Protótipo
       </span>
-      <Select value={papel} onValueChange={(v) => onChange(v as Papel)}>
+      <Select value={selectedPapel} onValueChange={(v) => onChange(v as Papel)}>
         <SelectTrigger className="h-9 w-[200px] bg-surface">
           <SelectValue />
         </SelectTrigger>
