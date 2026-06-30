@@ -65,6 +65,29 @@ function FichaPage() {
     alergias: "",
   });
 
+  const [exameFisico, setExameFisico] = useState({
+    temperatura: "",
+    fc: "",
+    fr: "",
+    tpc: "",
+    hidratacao: "",
+    mucosas: "",
+    escoreCorporal: "",
+    linfonodos: "",
+    sistemaCardio: "",
+    sistemaResp: "",
+    sistemaDigest: "",
+    sistemaLocomotor: "",
+    sistemaNeuro: "",
+    observacoesGerais: "",
+  });
+
+  const salvarExame = () => {
+    toast.success("Exame físico salvo no prontuário", {
+      description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
+    });
+  };
+
   const salvar = () => {
     toast.success("Anamnese salva no prontuário", {
       description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
