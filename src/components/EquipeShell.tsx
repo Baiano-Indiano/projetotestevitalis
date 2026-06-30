@@ -120,6 +120,11 @@ export function EquipeShell() {
               const isLab = it.label === "Laboratório" && it.children;
               return (
                 <li key={`${it.to}-${it.label}`}>
+                  {it.sectionBefore && (
+                    <div className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {it.sectionBefore}
+                    </div>
+                  )}
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   <Link
                     {...(linkProps as any)}
