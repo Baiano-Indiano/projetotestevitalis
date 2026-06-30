@@ -130,6 +130,55 @@ function FichaPage() {
     });
   };
 
+  type ItemPrescricao = {
+    id: string;
+    medicamento: string;
+    dosagem: string;
+    via: string;
+    frequencia: string;
+    duracao: string;
+  };
+  const [listaPrescricao, setListaPrescricao] = useState<ItemPrescricao[]>([]);
+  const [tempMedicamento, setTempMedicamento] = useState("");
+  const [tempDosagem, setTempDosagem] = useState("");
+  const [tempVia, setTempVia] = useState("");
+  const [tempFrequencia, setTempFrequencia] = useState("");
+  const [tempDuracao, setTempDuracao] = useState("");
+  const [recomendacoes, setRecomendacoes] = useState("");
+
+  const adicionarMedicamento = () => {
+    if (!tempMedicamento.trim()) {
+      toast.error("Informe ao menos o nome do medicamento");
+      return;
+    }
+    setListaPrescricao((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        medicamento: tempMedicamento,
+        dosagem: tempDosagem,
+        via: tempVia,
+        frequencia: tempFrequencia,
+        duracao: tempDuracao,
+      },
+    ]);
+    setTempMedicamento("");
+    setTempDosagem("");
+    setTempVia("");
+    setTempFrequencia("");
+    setTempDuracao("");
+  };
+
+  const removerMedicamento = (id: string) => {
+    setListaPrescricao((prev) => prev.filter((m) => m.id !== id));
+  };
+
+  const salvarPrescricao = () => {
+    toast.success("Prescrição salva no prontuário", {
+      description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
+    });
+  };
+
   const salvar = () => {
     toast.success("Anamnese salva no prontuário", {
       description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
