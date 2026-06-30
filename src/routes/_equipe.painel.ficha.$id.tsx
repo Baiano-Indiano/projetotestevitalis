@@ -146,6 +146,67 @@ function FichaPage() {
   const [tempDuracao, setTempDuracao] = useState("");
   const [recomendacoes, setRecomendacoes] = useState("");
 
+  // Evolução clínica (SOAP)
+  const [novaEvolucao, setNovaEvolucao] = useState({
+    subjetivo: "",
+    objetivo: "",
+    avaliacao: "",
+    plano: "",
+  });
+  const [historicoEvolucoes, setHistoricoEvolucoes] = useState<
+    Array<{
+      id: string;
+      dataHora: string;
+      medico: string;
+      subjetivo: string;
+      objetivo: string;
+      avaliacao: string;
+      plano: string;
+    }>
+  >([
+    {
+      id: "ev-mock-1",
+      dataHora: "Ontem, 14:30",
+      medico: "Dr. João Silva",
+      subjetivo:
+        "Tutor relata que o animal apresentou episódio de vômito noturno e diminuição do apetite nas últimas 24h.",
+      objetivo:
+        "FC 120bpm, FR 28rpm, T 39,1°C, mucosas levemente pálidas, TPC 2s, abdome sensível à palpação em região epigástrica.",
+      avaliacao:
+        "Quadro compatível com gastrite aguda. Sem sinais de desidratação severa no momento.",
+      plano:
+        "Manter jejum hídrico por 6h, iniciar protetor gástrico (omeprazol) e antiemético. Reavaliar em 24h.",
+    },
+  ]);
+
+  const salvarEvolucao = () => {
+    if (
+      !novaEvolucao.subjetivo.trim() &&
+      !novaEvolucao.objetivo.trim() &&
+      !novaEvolucao.avaliacao.trim() &&
+      !novaEvolucao.plano.trim()
+    ) {
+      toast.error("Preencha ao menos um campo do SOAP antes de salvar.");
+      return;
+    }
+    const agora = new Date();
+    const dataHora = `Hoje, ${agora.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+    setHistoricoEvolucoes((prev) => [
+      {
+        id: crypto.randomUUID(),
+        dataHora,
+        medico: "Dra. Ana Souza",
+        ...novaEvolucao,
+      },
+      ...prev,
+    ]);
+    setNovaEvolucao({ subjetivo: "", objetivo: "", avaliacao: "", plano: "" });
+    toast.success("Evolução clínica registrada");
+  };
+
   const adicionarMedicamento = () => {
     if (!tempMedicamento.trim()) {
       toast.error("Informe ao menos o nome do medicamento");
