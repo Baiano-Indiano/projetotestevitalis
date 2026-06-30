@@ -127,10 +127,27 @@ function FichaPage() {
   };
 
   const salvarDiagnostico = () => {
+    if (diagnostico.examesSolicitados.length === 0 && !diagnostico.suspeitaPrincipal) {
+      toast.error("Preencha ao menos a suspeita ou solicite exames");
+      return;
+    }
+    persistirDiagnostico({
+      pacienteId: triagem?.id ?? id,
+      conteudo: {
+        ...diagnostico,
+        pacienteNome: triagem?.animal.nome ?? "Paciente",
+        especie: triagem?.animal.especie ?? "",
+        raca: triagem?.animal.raca ?? "",
+        tutorNome: triagem?.tutor.nome ?? "",
+        protocolo: triagem?.protocolo,
+        solicitanteNome: "Dra. Amanda Souza",
+      },
+    });
     toast.success("Diagnóstico salvo no prontuário", {
       description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
     });
   };
+
 
   type ItemPrescricao = {
     id: string;
