@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   UserCircle2,
@@ -33,6 +33,9 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useStore } from "@/data/store";
+import { calcularMotor } from "@/lib/triagem";
+import type { Especie } from "@/data/types";
 
 export const Route = createFileRoute("/_equipe/painel/novo-cadastro")({
   component: NovoCadastroPage,
@@ -58,27 +61,115 @@ const MOTIVOS: { id: string; label: string; Icon: React.ComponentType<{ classNam
   { id: "unidade-movel", label: "Unidade Móvel", Icon: Truck },
 ];
 
-const PERGUNTAS = [
-  "Está comendo normalmente?",
-  "Está bebendo água?",
-  "Já vomitou?",
-  "Teve diarreia?",
-  "Está com dor?",
+const PERGUNTAS: { texto: string; redFlag?: string }[] = [
+  { texto: "Está comendo normalmente?" },
+  { texto: "Está bebendo água?" },
+  { texto: "Já vomitou?", redFlag: "vomito" },
+  { texto: "Teve diarreia?", redFlag: "diarreia" },
+  { texto: "Está com dor?", redFlag: "dor" },
 ];
 
 type Resposta = "sim" | "nao" | "na" | null;
 
 function NovoCadastroPage() {
+  const navigate = useNavigate();
+  const adicionarTriagem = useStore((s) => s.adicionarTriagem);
+
+  // Tutor
+  const [nomeTutor, setNomeTutor] = useState("");
+  const [cpfTutor, setCpfTutor] = useState("");
+  const [nascTutor, setNascTutor] = useState("");
+  const [telefoneTutor, setTelefoneTutor] = useState("");
+  const [whatsTutor, setWhatsTutor] = useState("");
+  const [emailTutor, setEmailTutor] = useState("");
+  const [enderecoTutor, setEnderecoTutor] = useState("");
+  const [bairroTutor, setBairroTutor] = useState("");
+  const [cepTutor, setCepTutor] = useState("");
+  const [cidadeTutor, setCidadeTutor] = useState("");
+  const [estadoTutor, setEstadoTutor] = useState("");
+  const [emergContato, setEmergContato] = useState("");
+  const [obsTutor, setObsTutor] = useState("");
+
+  // Animal
+  const [nomeAnimal, setNomeAnimal] = useState("");
+  const [especieAnimal, setEspecieAnimal] = useState<Especie | "">("");
+  const [racaAnimal, setRacaAnimal] = useState("");
+  const [sexoAnimal, setSexoAnimal] = useState<"macho" | "femea" | "">("");
+  const [idadeAnimal, setIdadeAnimal] = useState("");
+  const [nascAnimal, setNascAnimal] = useState("");
+  const [pesoAnimal, setPesoAnimal] = useState("");
+  const [corAnimal, setCorAnimal] = useState("");
+  const [microchip, setMicrochip] = useState("");
   const [castrado, setCastrado] = useState<"sim" | "nao" | null>(null);
-  const [motivoAtivo, setMotivoAtivo] = useState<string | null>("consulta");
-  const [respostas, setRespostas] = useState<Resposta[]>(Array(PERGUNTAS.length).fill(null));
   const [foto, setFoto] = useState<string | null>(null);
+
+  // Motivo
+  const [motivoAtivo, setMotivoAtivo] = useState<string | null>("consulta");
+  const [motivoObs, setMotivoObs] = useState("");
+
+  // Triagem
+  const [problema, setProblema] = useState("");
+  const [tempo, setTempo] = useState("");
+  const [respostas, setRespostas] = useState<Resposta[]>(Array(PERGUNTAS.length).fill(null));
+  const [encaminhar, setEncaminhar] = useState("triagem-vet");
+  const [salvando, setSalvando] = useState(false);
 
   const protocolo = useMemo(() => {
     const d = new Date();
     const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     return `${ymd}-0001`;
   }, []);
+
+  const handleSalvar = () => {
+    if (!nomeTutor.trim() || !nomeAnimal.trim()) {
+      toast.error("Preencha ao menos o nome do tutor e do animal.");
+      return;
+    }
+    setSalvando(true);
+
+    const motivoLabel = MOTIVOS.find((m) => m.id === motivoAtivo)?.label ?? "Consulta";
+    const redFlags: string[] = [];
+    PERGUNTAS.forEach((p, i) => {
+      if (p.redFlag && respostas[i] === "sim") redFlags.push(p.redFlag);
+    });
+    if (motivoAtivo === "emergencia") redFlags.push("emergencia");
+
+    const motor = calcularMotor(redFlags);
+    const observacoes = [
+      `Motivo: ${motivoLabel}`,
+      problema && `Queixa principal: ${problema}`,
+      tempo && `Tempo: ${tempo}`,
+      motivoObs && `Obs.: ${motivoObs}`,
+    ]
+      .filter(Boolean)
+      .join(" • ");
+
+    const triagem = adicionarTriagem({
+      animal: {
+        nome: nomeAnimal,
+        especie: (especieAnimal || "cao") as Especie,
+        raca: racaAnimal || "SRD",
+        sexo: (sexoAnimal || "macho") as "macho" | "femea",
+        idade: idadeAnimal || "—",
+      },
+      tutor: { nome: nomeTutor, telefone: telefoneTutor || whatsTutor || "—" },
+      canal: "presencial",
+      etapas: {
+        sintomas: [],
+        observacoes,
+      },
+      redFlags: redFlags.length ? redFlags : motor.redFlags,
+      scores: motor.scores,
+      sugestao: motor.sugestao,
+      prioridade: redFlags.length ? "alta" : motor.prioridade,
+    });
+
+    toast.success("Cadastro concluído, paciente enviado para a fila de triagem", {
+      description: `Protocolo ${triagem.protocolo}`,
+      icon: <Check className="h-4 w-4" />,
+    });
+    navigate({ to: "/painel/triagens" });
+  };
 
   return (
     <div className="flex min-h-full flex-col">
@@ -108,24 +199,24 @@ function NovoCadastroPage() {
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <Field label="Nome completo" className="md:col-span-2">
-                <Input placeholder="Ex: Maria Silva" />
+                <Input value={nomeTutor} onChange={(e) => setNomeTutor(e.target.value)} placeholder="Ex: Maria Silva" />
               </Field>
-              <Field label="CPF"><Input placeholder="000.000.000-00" /></Field>
-              <Field label="Data de nascimento"><Input type="date" /></Field>
-              <Field label="Telefone"><Input placeholder="(00) 0000-0000" /></Field>
-              <Field label="WhatsApp"><Input placeholder="(00) 00000-0000" /></Field>
-              <Field label="E-mail" className="md:col-span-2"><Input type="email" placeholder="email@exemplo.com" /></Field>
-              <Field label="Endereço" className="md:col-span-2"><Input placeholder="Rua, número" /></Field>
-              <Field label="Bairro"><Input /></Field>
+              <Field label="CPF"><Input value={cpfTutor} onChange={(e) => setCpfTutor(e.target.value)} placeholder="000.000.000-00" /></Field>
+              <Field label="Data de nascimento"><Input type="date" value={nascTutor} onChange={(e) => setNascTutor(e.target.value)} /></Field>
+              <Field label="Telefone"><Input value={telefoneTutor} onChange={(e) => setTelefoneTutor(e.target.value)} placeholder="(00) 0000-0000" /></Field>
+              <Field label="WhatsApp"><Input value={whatsTutor} onChange={(e) => setWhatsTutor(e.target.value)} placeholder="(00) 00000-0000" /></Field>
+              <Field label="E-mail" className="md:col-span-2"><Input type="email" value={emailTutor} onChange={(e) => setEmailTutor(e.target.value)} placeholder="email@exemplo.com" /></Field>
+              <Field label="Endereço" className="md:col-span-2"><Input value={enderecoTutor} onChange={(e) => setEnderecoTutor(e.target.value)} placeholder="Rua, número" /></Field>
+              <Field label="Bairro"><Input value={bairroTutor} onChange={(e) => setBairroTutor(e.target.value)} /></Field>
               <Field label="CEP">
                 <div className="relative">
-                  <Input placeholder="00000-000" className="pr-9" />
+                  <Input value={cepTutor} onChange={(e) => setCepTutor(e.target.value)} placeholder="00000-000" className="pr-9" />
                   <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 </div>
               </Field>
-              <Field label="Cidade"><Input /></Field>
+              <Field label="Cidade"><Input value={cidadeTutor} onChange={(e) => setCidadeTutor(e.target.value)} /></Field>
               <Field label="Estado">
-                <Select>
+                <Select value={estadoTutor} onValueChange={setEstadoTutor}>
                   <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
                     {["PA","SP","RJ","MG","BA","RS","PR","SC","CE","PE","DF"].map(uf => (
@@ -134,9 +225,9 @@ function NovoCadastroPage() {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Contato de emergência" className="md:col-span-2"><Input placeholder="Nome e telefone" /></Field>
+              <Field label="Contato de emergência" className="md:col-span-2"><Input value={emergContato} onChange={(e) => setEmergContato(e.target.value)} placeholder="Nome e telefone" /></Field>
               <Field label="Observações" className="md:col-span-2">
-                <Textarea rows={3} placeholder="Observações adicionais sobre o tutor" />
+                <Textarea rows={3} value={obsTutor} onChange={(e) => setObsTutor(e.target.value)} placeholder="Observações adicionais sobre o tutor" />
               </Field>
             </CardContent>
           </Card>
@@ -153,9 +244,9 @@ function NovoCadastroPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                <Field label="Nome do animal"><Input placeholder="Ex: Rex" /></Field>
+                <Field label="Nome do animal"><Input value={nomeAnimal} onChange={(e) => setNomeAnimal(e.target.value)} placeholder="Ex: Rex" /></Field>
                 <Field label="Espécie">
-                  <Select>
+                  <Select value={especieAnimal} onValueChange={(v) => setEspecieAnimal(v as Especie)}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="cao">Cão</SelectItem>
@@ -165,7 +256,7 @@ function NovoCadastroPage() {
                   </Select>
                 </Field>
                 <Field label="Raça">
-                  <Select>
+                  <Select value={racaAnimal} onValueChange={setRacaAnimal}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="srd">SRD</SelectItem>
@@ -178,7 +269,7 @@ function NovoCadastroPage() {
               </div>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <Field label="Sexo">
-                  <Select>
+                  <Select value={sexoAnimal} onValueChange={(v) => setSexoAnimal(v as "macho" | "femea")}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="macho">Macho</SelectItem>
@@ -186,12 +277,12 @@ function NovoCadastroPage() {
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label="Idade"><Input placeholder="Ex: 3 anos" /></Field>
-                <Field label="Data de nascimento"><Input type="date" /></Field>
-                <Field label="Peso (kg)"><Input type="number" step="0.1" placeholder="0,0" /></Field>
+                <Field label="Idade"><Input value={idadeAnimal} onChange={(e) => setIdadeAnimal(e.target.value)} placeholder="Ex: 3 anos" /></Field>
+                <Field label="Data de nascimento"><Input type="date" value={nascAnimal} onChange={(e) => setNascAnimal(e.target.value)} /></Field>
+                <Field label="Peso (kg)"><Input type="number" step="0.1" value={pesoAnimal} onChange={(e) => setPesoAnimal(e.target.value)} placeholder="0,0" /></Field>
               </div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                <Field label="Cor"><Input placeholder="Ex: Caramelo" /></Field>
+                <Field label="Cor"><Input value={corAnimal} onChange={(e) => setCorAnimal(e.target.value)} placeholder="Ex: Caramelo" /></Field>
                 <Field label="Castrado?">
                   <div className="inline-flex rounded-md border border-border p-0.5">
                     {(["sim","nao"] as const).map((v) => (
@@ -211,14 +302,14 @@ function NovoCadastroPage() {
                 </Field>
                 <Field label="Microchip">
                   <div className="relative">
-                    <Input placeholder="Número do microchip" className="pr-9" />
+                    <Input value={microchip} onChange={(e) => setMicrochip(e.target.value)} placeholder="Número do microchip" className="pr-9" />
                     <Barcode className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   </div>
                 </Field>
               </div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto]">
                 <Field label="Tutor responsável">
-                  <Select>
+                  <Select defaultValue="atual">
                     <SelectTrigger><SelectValue placeholder="Selecione o tutor" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="atual">Tutor cadastrado acima</SelectItem>
@@ -296,7 +387,7 @@ function NovoCadastroPage() {
               </div>
               <div className="mt-4">
                 <Label className="mb-2 block text-xs">Observações</Label>
-                <Textarea rows={3} placeholder="Detalhes sobre o motivo da visita" />
+                <Textarea rows={3} value={motivoObs} onChange={(e) => setMotivoObs(e.target.value)} placeholder="Detalhes sobre o motivo da visita" />
               </div>
             </CardContent>
           </Card>
@@ -316,16 +407,16 @@ function NovoCadastroPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <Field label="Qual o principal problema?">
-                <Input placeholder="Descreva brevemente" />
+                <Input value={problema} onChange={(e) => setProblema(e.target.value)} placeholder="Descreva brevemente" />
               </Field>
               <Field label="Há quanto tempo?">
-                <Input placeholder="Ex: 2 dias" />
+                <Input value={tempo} onChange={(e) => setTempo(e.target.value)} placeholder="Ex: 2 dias" />
               </Field>
 
               <div className="mt-2 space-y-1.5">
                 {PERGUNTAS.map((p, i) => (
-                  <div key={p} className="flex items-center justify-between gap-2 rounded-md px-1 py-1.5">
-                    <span className="text-sm text-text-strong">{p}</span>
+                  <div key={p.texto} className="flex items-center justify-between gap-2 rounded-md px-1 py-1.5">
+                    <span className="text-sm text-text-strong">{p.texto}</span>
                     <div className="inline-flex overflow-hidden rounded-md border border-border">
                       {(["sim","nao","na"] as const).map((v) => {
                         const active = respostas[i] === v;
@@ -381,7 +472,7 @@ function NovoCadastroPage() {
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <Label className="text-xs text-muted-foreground">Encaminhar para:</Label>
-            <Select defaultValue="triagem-vet">
+            <Select value={encaminhar} onValueChange={setEncaminhar}>
               <SelectTrigger className="h-9 w-[200px]"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="triagem-vet">Triagem Veterinária</SelectItem>
@@ -392,10 +483,8 @@ function NovoCadastroPage() {
             <Button variant="outline" asChild>
               <Link to="/painel">Cancelar</Link>
             </Button>
-            <Button
-              onClick={() => toast.success("Cadastro salvo", { description: `Protocolo ${protocolo}`, icon: <Check className="h-4 w-4" /> })}
-            >
-              Salvar e Continuar →
+            <Button onClick={handleSalvar} disabled={salvando}>
+              {salvando ? "Salvando..." : "Salvar e Continuar →"}
             </Button>
           </div>
         </div>
