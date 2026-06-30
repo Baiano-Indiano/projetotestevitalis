@@ -2,7 +2,7 @@ import type { EspecialidadeId } from "@/config/municipio";
 
 export type NivelTutor = "anonimo" | "identificado" | "verificado";
 export type Especie = "cao" | "gato" | "outro";
-export type CanalTriagem = "online" | "movel";
+export type CanalTriagem = "online" | "movel" | "presencial";
 export type StatusTriagem = "pendente" | "validada" | "urgencia" | "redirecionada";
 export type Prioridade = "alta" | "media" | "baixa";
 
