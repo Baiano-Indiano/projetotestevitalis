@@ -31,6 +31,7 @@ import { Route as EquipePainelLaboratorioRouteImport } from './routes/_equipe.pa
 import { Route as EquipePainelInternacoesRouteImport } from './routes/_equipe.painel.internacoes'
 import { Route as EquipePainelImagemRouteImport } from './routes/_equipe.painel.imagem'
 import { Route as EquipePainelExamesRouteImport } from './routes/_equipe.painel.exames'
+import { Route as EquipePainelEstoqueRouteImport } from './routes/_equipe.painel.estoque'
 import { Route as EquipePainelEncaminhamentosRouteImport } from './routes/_equipe.painel.encaminhamentos'
 import { Route as EquipePainelEmAtendimentoRouteImport } from './routes/_equipe.painel.em-atendimento'
 import { Route as EquipePainelAguardandoRouteImport } from './routes/_equipe.painel.aguardando'
@@ -151,6 +152,11 @@ const EquipePainelExamesRoute = EquipePainelExamesRouteImport.update({
   path: '/painel/exames',
   getParentRoute: () => EquipeRoute,
 } as any)
+const EquipePainelEstoqueRoute = EquipePainelEstoqueRouteImport.update({
+  id: '/painel/estoque',
+  path: '/painel/estoque',
+  getParentRoute: () => EquipeRoute,
+} as any)
 const EquipePainelEncaminhamentosRoute =
   EquipePainelEncaminhamentosRouteImport.update({
     id: '/painel/encaminhamentos',
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/painel/aguardando': typeof EquipePainelAguardandoRoute
   '/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
+  '/painel/estoque': typeof EquipePainelEstoqueRoute
   '/painel/exames': typeof EquipePainelExamesRoute
   '/painel/imagem': typeof EquipePainelImagemRoute
   '/painel/internacoes': typeof EquipePainelInternacoesRoute
@@ -238,6 +245,7 @@ export interface FileRoutesByTo {
   '/painel/aguardando': typeof EquipePainelAguardandoRoute
   '/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
+  '/painel/estoque': typeof EquipePainelEstoqueRoute
   '/painel/exames': typeof EquipePainelExamesRoute
   '/painel/imagem': typeof EquipePainelImagemRoute
   '/painel/internacoes': typeof EquipePainelInternacoesRoute
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/_equipe/painel/aguardando': typeof EquipePainelAguardandoRoute
   '/_equipe/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/_equipe/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
+  '/_equipe/painel/estoque': typeof EquipePainelEstoqueRoute
   '/_equipe/painel/exames': typeof EquipePainelExamesRoute
   '/_equipe/painel/imagem': typeof EquipePainelImagemRoute
   '/_equipe/painel/internacoes': typeof EquipePainelInternacoesRoute
@@ -302,6 +311,7 @@ export interface FileRouteTypes {
     | '/painel/aguardando'
     | '/painel/em-atendimento'
     | '/painel/encaminhamentos'
+    | '/painel/estoque'
     | '/painel/exames'
     | '/painel/imagem'
     | '/painel/internacoes'
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/painel/aguardando'
     | '/painel/em-atendimento'
     | '/painel/encaminhamentos'
+    | '/painel/estoque'
     | '/painel/exames'
     | '/painel/imagem'
     | '/painel/internacoes'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/_equipe/painel/aguardando'
     | '/_equipe/painel/em-atendimento'
     | '/_equipe/painel/encaminhamentos'
+    | '/_equipe/painel/estoque'
     | '/_equipe/painel/exames'
     | '/_equipe/painel/imagem'
     | '/_equipe/painel/internacoes'
@@ -542,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipePainelExamesRouteImport
       parentRoute: typeof EquipeRoute
     }
+    '/_equipe/painel/estoque': {
+      id: '/_equipe/painel/estoque'
+      path: '/painel/estoque'
+      fullPath: '/painel/estoque'
+      preLoaderRoute: typeof EquipePainelEstoqueRouteImport
+      parentRoute: typeof EquipeRoute
+    }
     '/_equipe/painel/encaminhamentos': {
       id: '/_equipe/painel/encaminhamentos'
       path: '/painel/encaminhamentos'
@@ -622,6 +641,7 @@ interface EquipeRouteChildren {
   EquipePainelAguardandoRoute: typeof EquipePainelAguardandoRoute
   EquipePainelEmAtendimentoRoute: typeof EquipePainelEmAtendimentoRoute
   EquipePainelEncaminhamentosRoute: typeof EquipePainelEncaminhamentosRoute
+  EquipePainelEstoqueRoute: typeof EquipePainelEstoqueRoute
   EquipePainelExamesRoute: typeof EquipePainelExamesRoute
   EquipePainelImagemRoute: typeof EquipePainelImagemRoute
   EquipePainelInternacoesRoute: typeof EquipePainelInternacoesRoute
@@ -642,6 +662,7 @@ const EquipeRouteChildren: EquipeRouteChildren = {
   EquipePainelAguardandoRoute: EquipePainelAguardandoRoute,
   EquipePainelEmAtendimentoRoute: EquipePainelEmAtendimentoRoute,
   EquipePainelEncaminhamentosRoute: EquipePainelEncaminhamentosRoute,
+  EquipePainelEstoqueRoute: EquipePainelEstoqueRoute,
   EquipePainelExamesRoute: EquipePainelExamesRoute,
   EquipePainelImagemRoute: EquipePainelImagemRoute,
   EquipePainelInternacoesRoute: EquipePainelInternacoesRoute,
