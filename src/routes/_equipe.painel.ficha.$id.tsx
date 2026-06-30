@@ -89,6 +89,35 @@ function FichaPage() {
     });
   };
 
+  const [diagnostico, setDiagnostico] = useState<{
+    suspeitaPrincipal: string;
+    cidVet: string;
+    justificativa: string;
+    examesSolicitados: string[];
+    observacoesExame: string;
+  }>({
+    suspeitaPrincipal: "",
+    cidVet: "",
+    justificativa: "",
+    examesSolicitados: [],
+    observacoesExame: "",
+  });
+
+  const toggleExame = (id: string) => {
+    setDiagnostico((prev) => ({
+      ...prev,
+      examesSolicitados: prev.examesSolicitados.includes(id)
+        ? prev.examesSolicitados.filter((e) => e !== id)
+        : [...prev.examesSolicitados, id],
+    }));
+  };
+
+  const salvarDiagnostico = () => {
+    toast.success("Diagnóstico salvo no prontuário", {
+      description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
+    });
+  };
+
   const salvar = () => {
     toast.success("Anamnese salva no prontuário", {
       description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
