@@ -13,7 +13,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, FileText, Sparkles, Save, Check, Stethoscope, TestTube } from "lucide-react";
+import {
+  ArrowLeft,
+  FileText,
+  Sparkles,
+  Save,
+  Check,
+  Stethoscope,
+  TestTube,
+  Pill,
+  Plus,
+  Trash2,
+  Printer,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_equipe/painel/ficha/$id")({
