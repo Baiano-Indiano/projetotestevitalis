@@ -73,6 +73,7 @@ export function EquipeShell() {
     { to: "/painel/laboratorio", label: "Laboratório Clínico", Icon: Beaker },
     { to: "/painel/imagem", label: "Diagnóstico por Imagem", Icon: ScanLine },
     { to: "/painel/unidade-movel", label: "Unidade Móvel", Icon: ClipboardList },
+    { to: "/painel/estoque", label: "Logística e Estoque", Icon: Package, sectionBefore: "Logística" },
   ];
 
   const items = papel === "veterinario" ? itemsVeterinario : itemsRecepcao;
