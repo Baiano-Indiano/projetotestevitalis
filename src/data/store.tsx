@@ -13,7 +13,10 @@ import type {
   RegistroDiagnostico,
   RegistroPrescricao,
   RegistroEvolucaoSOAP,
+  Internacao,
+  StatusInternacao,
 } from "@/data/types";
+
 import { veterinarios } from "@/data/veterinarios";
 import { nomeEspecialidade } from "@/config/municipio";
 
@@ -253,14 +256,18 @@ export interface ProntuarioSlice {
   diagnosticos: RegistroDiagnostico[];
   prescricoes: RegistroPrescricao[];
   evolucoesSOAP: RegistroEvolucaoSOAP[];
+  internacoes: Internacao[];
   salvarAnamnese: (r: Omit<RegistroAnamnese, "id" | "criadoEm">) => RegistroAnamnese;
   salvarExameFisico: (r: Omit<RegistroExameFisico, "id" | "criadoEm">) => RegistroExameFisico;
   salvarDiagnostico: (r: Omit<RegistroDiagnostico, "id" | "criadoEm">) => RegistroDiagnostico;
   salvarPrescricao: (r: Omit<RegistroPrescricao, "id" | "criadoEm">) => RegistroPrescricao;
   salvarEvolucaoSOAP: (r: Omit<RegistroEvolucaoSOAP, "id" | "criadoEm">) => RegistroEvolucaoSOAP;
+  adicionarInternacao: (r: Omit<Internacao, "id" | "criadoEm" | "status"> & { status?: StatusInternacao }) => Internacao;
+  alterarStatusInternacao: (id: string, status: StatusInternacao) => void;
 }
 
 export type RootState = TutorSlice & TriagemSlice & ProntuarioSlice;
+
 
 const createTutorSlice: StateCreator<RootState, [], [], TutorSlice> = (set) => ({
   papel: "tutor",
@@ -335,7 +342,68 @@ const createProntuarioSlice: StateCreator<RootState, [], [], ProntuarioSlice> = 
   examesFisicos: [],
   diagnosticos: [],
   prescricoes: [],
-  evolucoesSOAP: [],
+  evolucoesSOAP: [
+    {
+      id: "soap-seed-1",
+      pacienteId: "int-seed-1",
+      criadoEm: minutosAtras(180),
+      medico: "Dra. Mariana Lima",
+      subjetivo: "Tutor relata melhora discreta do apetite na última refeição.",
+      objetivo: "FC 120 bpm, FR 32 mpm, T 39,1 °C. Mucosas levemente pálidas. Hidratação 6%.",
+      avaliacao: "Parvovirose em evolução favorável. Manter suporte intensivo.",
+      plano: "Manter fluidoterapia, antieméticos a cada 8h, reavaliar hemograma em 12h.",
+    },
+  ],
+  internacoes: [
+    {
+      id: "int-seed-1",
+      pacienteId: "int-seed-1",
+      pacienteNome: "Thor",
+      especie: "Canino",
+      raca: "Golden Retriever",
+      leito: "01",
+      responsavel: "Dra. Mariana Lima",
+      tutorNome: "João Silva",
+      tutorTelefone: "(91) 99102 4411",
+      diagnostico: "Parvovirose",
+      observacoes: "Jejum hídrico até 12h. Alergia a penicilina.",
+      status: "critico",
+      criadoEm: minutosAtras(60 * 24 * 4),
+    },
+    {
+      id: "int-seed-2",
+      pacienteId: "int-seed-2",
+      pacienteNome: "Luna",
+      especie: "Felino",
+      raca: "SRD",
+      leito: "03",
+      responsavel: "Dr. Ricardo Silva",
+      tutorNome: "Carla Dias",
+      tutorTelefone: "(91) 98231 7720",
+      diagnostico: "Lipidose hepática",
+      status: "internado",
+      criadoEm: minutosAtras(60 * 24 * 2),
+    },
+  ],
+  adicionarInternacao: (r) => {
+    const reg: Internacao = {
+      ...r,
+      id: `int-${Date.now().toString(36)}`,
+      status: r.status ?? "internado",
+      criadoEm: new Date().toISOString(),
+    };
+    set((s) => ({ internacoes: [reg, ...s.internacoes] }));
+    return reg;
+  },
+  alterarStatusInternacao: (id, status) =>
+    set((s) => ({
+      internacoes: s.internacoes.map((i) =>
+        i.id === id
+          ? { ...i, status, altaEm: status === "alta" || status === "obito" ? new Date().toISOString() : i.altaEm }
+          : i,
+      ),
+    })),
+
   salvarAnamnese: (r) => {
     const reg = novoRegistro(r);
     set((s) => ({ anamneses: [reg, ...s.anamneses] }));

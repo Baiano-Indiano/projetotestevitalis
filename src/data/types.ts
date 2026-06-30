@@ -144,3 +144,23 @@ export interface RegistroEvolucaoSOAP {
   avaliacao: string;
   plano: string;
 }
+
+export type StatusInternacao = "internado" | "critico" | "alta" | "obito";
+
+export interface Internacao {
+  id: string;
+  pacienteId: string;
+  pacienteNome: string;
+  especie: string;
+  raca: string;
+  leito: string;
+  responsavel: string;
+  tutorNome: string;
+  tutorTelefone?: string;
+  diagnostico: string;
+  observacoes?: string;
+  status: StatusInternacao;
+  criadoEm: string;
+  altaEm?: string;
+}
+

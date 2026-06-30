@@ -1,28 +1,103 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Sliders, Download, ChevronDown, Bed, AlertTriangle, LogOut, Pill, Stethoscope, Phone, Clock, FileWarning } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Search, Bed, AlertTriangle, LogOut, Stethoscope, Phone, Clock, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/data/store";
+import { toast } from "sonner";
+import type { Internacao } from "@/data/types";
 
 export const Route = createFileRoute("/_equipe/painel/internacoes")({
   head: () => ({ meta: [{ title: "Internações. Vitalis Belém" }] }),
   component: Internacoes,
 });
 
-const internados = [
-  { nome: "Thor", info: "Canino · Golden Retriever · Leito 01", responsavel: "Dra. Silva", tempo: "Internado há 4 dias", status: "critico" },
-  { nome: "Luna", info: "Felino · SRD · Leito 03", responsavel: "Dr. Costa", tempo: "Internado há 2 dias", status: "estavel" },
-  { nome: "Bidu", info: "Canino · Poodle · Leito 04", responsavel: "Dra. Marina", tempo: "Internado há 1 dia", status: "estavel" },
-];
+const TOTAL_LEITOS = 8;
+
+function tempoInternado(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  const dias = Math.floor(ms / (1000 * 60 * 60 * 24));
+  if (dias >= 1) return `Internado há ${dias} dia${dias > 1 ? "s" : ""}`;
+  const horas = Math.floor(ms / (1000 * 60 * 60));
+  return `Internado há ${Math.max(horas, 1)}h`;
+}
+
+function formatHora(iso: string): string {
+  return new Date(iso).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
 
 function Internacoes() {
+  const internacoes = useStore((s) => s.internacoes);
+  const evolucoesSOAP = useStore((s) => s.evolucoesSOAP);
+  const alterarStatusInternacao = useStore((s) => s.alterarStatusInternacao);
+  const salvarEvolucaoSOAP = useStore((s) => s.salvarEvolucaoSOAP);
+
+  const [busca, setBusca] = useState("");
+  const [selId, setSelId] = useState<string | null>(internacoes[0]?.id ?? null);
+  const [novaOpen, setNovaOpen] = useState(false);
+  const [novaEvol, setNovaEvol] = useState({ subjetivo: "", objetivo: "", avaliacao: "", plano: "" });
+
+  const filtrados = useMemo(
+    () =>
+      internacoes.filter((i) =>
+        `${i.pacienteNome} ${i.leito} ${i.diagnostico}`.toLowerCase().includes(busca.toLowerCase()),
+      ),
+    [internacoes, busca],
+  );
+
+  const ativas = internacoes.filter((i) => i.status === "internado" || i.status === "critico");
+  const criticos = internacoes.filter((i) => i.status === "critico").length;
+  const altasHoje = internacoes.filter(
+    (i) => i.status === "alta" && i.altaEm && new Date(i.altaEm).toDateString() === new Date().toDateString(),
+  ).length;
+  const ocupados = ativas.length;
+  const livres = Math.max(TOTAL_LEITOS - ocupados, 0);
+
+  const leitosOcupadosMap = new Map(ativas.map((i) => [i.leito, i] as const));
+  const leitosGrid = Array.from({ length: TOTAL_LEITOS }, (_, i) => {
+    const num = String(i + 1).padStart(2, "0");
+    return { num, internacao: leitosOcupadosMap.get(num) ?? null };
+  });
+
+  const sel = internacoes.find((i) => i.id === selId) ?? ativas[0] ?? null;
+  const evolucoesPaciente = sel
+    ? evolucoesSOAP.filter((e) => e.pacienteId === sel.pacienteId).sort((a, b) => +new Date(b.criadoEm) - +new Date(a.criadoEm))
+    : [];
+
+  const darAlta = (i: Internacao) => {
+    alterarStatusInternacao(i.id, "alta");
+    toast.success(`Alta médica registrada · Leito ${i.leito}`, { description: i.pacienteNome });
+  };
+
+  const abrirNovaEvolucao = () => {
+    if (!sel) return;
+    setNovaEvol({ subjetivo: "", objetivo: "", avaliacao: "", plano: "" });
+    setNovaOpen(true);
+  };
+
+  const salvarNova = () => {
+    if (!sel) return;
+    if (!novaEvol.subjetivo && !novaEvol.objetivo && !novaEvol.avaliacao && !novaEvol.plano) {
+      toast.error("Preencha pelo menos um campo do SOAP");
+      return;
+    }
+    salvarEvolucaoSOAP({
+      pacienteId: sel.pacienteId,
+      medico: sel.responsavel,
+      ...novaEvol,
+    });
+    setNovaOpen(false);
+    toast.success("Evolução registrada no prontuário", { description: sel.pacienteNome });
+  };
+
   const stats = [
-    { Icon: Stethoscope, label: "Internados", valor: 1, bg: "bg-primary-50 text-primary" },
-    { Icon: AlertTriangle, label: "Casos Críticos", valor: 2, bg: "bg-destructive-50 text-destructive", destacado: true },
-    { Icon: LogOut, label: "Altas Hoje", valor: 3, bg: "bg-success-50 text-success-700" },
-    { Icon: Pill, label: "Meds Pendentes", valor: 5, bg: "bg-warning-50 text-warning-700" },
-    { Icon: Bed, label: "Procedimentos", valor: 8, bg: "bg-primary-50 text-primary" },
-    { Icon: Bed, label: "Leitos Livres", valor: 4, bg: "bg-success-50 text-success-700" },
+    { Icon: Stethoscope, label: "Internados", valor: ocupados, bg: "bg-primary-50 text-primary" },
+    { Icon: AlertTriangle, label: "Críticos", valor: criticos, bg: "bg-destructive-50 text-destructive", destacado: criticos > 0 },
+    { Icon: LogOut, label: "Altas Hoje", valor: altasHoje, bg: "bg-success-50 text-success-700" },
+    { Icon: Bed, label: "Leitos Livres", valor: livres, bg: "bg-success-50 text-success-700" },
   ];
 
   return (
@@ -33,27 +108,33 @@ function Internacoes() {
             Internações
           </h1>
           <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5"><Bed className="h-4 w-4" /> 12 Total</span>
-            <span className="inline-flex items-center gap-1.5"><Bed className="h-4 w-4" /> 8 Ocupados</span>
-            <span className="inline-flex items-center gap-1.5 text-success-700">● 4 Livres</span>
-            <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" /> 3.5 Dias Média</span>
+            <span className="inline-flex items-center gap-1.5"><Bed className="h-4 w-4" /> {TOTAL_LEITOS} Total</span>
+            <span className="inline-flex items-center gap-1.5"><Bed className="h-4 w-4" /> {ocupados} Ocupados</span>
+            <span className="inline-flex items-center gap-1.5 text-success-700">● {livres} Livres</span>
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input className="w-64 pl-9" placeholder="Buscar paciente, leito..." />
-          </div>
-          <Button variant="outline" size="icon"><Sliders className="h-4 w-4" /></Button>
-          <Button variant="outline" size="icon"><Download className="h-4 w-4" /></Button>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            className="w-64 pl-9"
+            placeholder="Buscar paciente, leito..."
+          />
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => {
           const Icone = s.Icon;
           return (
-            <div key={s.label} className={cn("rounded-2xl border bg-surface p-4 text-center shadow-sm", s.destacado ? "border-destructive/40" : "border-border")}>
+            <div
+              key={s.label}
+              className={cn(
+                "rounded-2xl border bg-surface p-4 text-center shadow-sm",
+                s.destacado ? "border-destructive/40" : "border-border",
+              )}
+            >
               <span className={cn("mx-auto grid h-9 w-9 place-items-center rounded-xl", s.bg)}>
                 <Icone className="h-4 w-4" />
               </span>
@@ -64,87 +145,228 @@ function Internacoes() {
         })}
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
-        <div>
-          <h2 className="font-display text-base font-semibold text-text-strong">Pacientes em Monitoramento</h2>
-          <ul className="mt-3 space-y-3">
-            {internados.map((i) => {
-              const critico = i.status === "critico";
+      {/* Mapa de leitos */}
+      <div className="mt-6">
+        <h2 className="font-display text-base font-semibold text-text-strong">Mapa de Leitos</h2>
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
+          {leitosGrid.map(({ num, internacao }) => {
+            if (!internacao) {
               return (
-                <li key={i.nome} className={cn(
-                  "flex flex-wrap items-center gap-4 rounded-2xl border bg-surface p-4 shadow-sm",
-                  critico ? "border-l-4 border-l-destructive border-y border-r border-y-border border-r-border" : "border-l-4 border-l-success border-y border-r border-y-border border-r-border",
-                )}>
-                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary-50 text-primary font-bold">
-                    {i.nome[0]}
+                <div
+                  key={num}
+                  className="rounded-2xl border-2 border-dashed border-success-700/40 bg-success-50/40 p-4 text-center"
+                >
+                  <Bed className="mx-auto h-5 w-5 text-success-700" />
+                  <p className="mt-2 font-display text-sm font-semibold text-success-700">Leito {num}</p>
+                  <p className="text-xs text-success-700/80">Leito Disponível</p>
+                </div>
+              );
+            }
+            const critico = internacao.status === "critico";
+            const ativo = sel?.id === internacao.id;
+            return (
+              <button
+                key={num}
+                type="button"
+                onClick={() => setSelId(internacao.id)}
+                className={cn(
+                  "rounded-2xl border bg-surface p-4 text-left shadow-sm transition-all",
+                  critico ? "border-l-4 border-l-destructive border-border" : "border-l-4 border-l-primary border-border",
+                  ativo && "ring-2 ring-primary/40",
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-text-soft">
+                    LEITO {num}
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-text-strong">{i.nome}</p>
-                    <p className="text-xs text-text-soft">{i.info}</p>
-                  </div>
-                  <div className="text-xs">
-                    <p className="text-text-soft">Responsável</p>
-                    <p className="font-medium text-text-strong">{i.responsavel}</p>
-                  </div>
-                  <div className="text-xs">
-                    <p className="text-text-soft">Tempo</p>
-                    <p className="font-medium text-text-strong">{i.tempo}</p>
-                  </div>
-                  <span className={cn(
-                    "rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider",
-                    critico ? "bg-destructive text-destructive-foreground" : "bg-success-50 text-success-700",
-                  )}>
+                  <span
+                    className={cn(
+                      "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
+                      critico ? "bg-destructive text-destructive-foreground" : "bg-success-50 text-success-700",
+                    )}
+                  >
                     {critico ? "Crítico" : "Estável"}
                   </span>
-                  <ChevronDown className="h-4 w-4 text-text-soft" />
-                </li>
-              );
-            })}
-          </ul>
+                </div>
+                <p className="mt-2 font-display text-base font-semibold text-text-strong">{internacao.pacienteNome}</p>
+                <p className="text-xs text-text-soft">{internacao.especie} · {internacao.raca}</p>
+                <p className="mt-1 text-xs text-text-soft">{tempoInternado(internacao.criadoEm)}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Detalhes + Evolução SOAP */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_360px]">
+        <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          {sel ? (
+            <>
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-12 w-12 place-items-center rounded-full bg-primary-50 text-primary font-bold">
+                    {sel.pacienteNome[0]}
+                  </span>
+                  <div>
+                    <p className="font-display text-lg font-semibold text-text-strong">{sel.pacienteNome}</p>
+                    <p className="text-xs text-text-soft">
+                      {sel.especie} · {sel.raca} · Leito {sel.leito} · {tempoInternado(sel.criadoEm)}
+                    </p>
+                  </div>
+                </div>
+                <Button size="sm" onClick={abrirNovaEvolucao} className="gap-1.5">
+                  <Plus className="h-4 w-4" /> Nova Evolução
+                </Button>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between">
+                <h3 className="font-display text-base font-semibold text-text-strong">
+                  Diário Clínico (SOAP)
+                </h3>
+                <span className="text-xs text-text-soft">{evolucoesPaciente.length} registro(s)</span>
+              </div>
+
+              {evolucoesPaciente.length === 0 ? (
+                <p className="mt-3 rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                  Nenhuma evolução registrada. Clique em "Nova Evolução" para iniciar.
+                </p>
+              ) : (
+                <ul className="mt-3 space-y-3">
+                  {evolucoesPaciente.map((e) => (
+                    <li key={e.id} className="rounded-xl border border-border bg-background p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2">
+                        <p className="text-xs font-semibold text-text-strong">{e.medico}</p>
+                        <p className="text-[11px] text-text-soft">{formatHora(e.criadoEm)}</p>
+                      </div>
+                      <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+                        <CampoSoap rotulo="S — Subjetivo" valor={e.subjetivo} />
+                        <CampoSoap rotulo="O — Objetivo" valor={e.objetivo} />
+                        <CampoSoap rotulo="A — Avaliação" valor={e.avaliacao} />
+                        <CampoSoap rotulo="P — Plano" valor={e.plano} />
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Selecione um leito ocupado para ver as evoluções.</p>
+          )}
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
-            <h3 className="font-display text-base font-semibold text-primary-700">Resumo do Paciente</h3>
-            <dl className="mt-3 space-y-2 text-sm">
-              <Info rotulo="Diagnóstico Principal" valor="Parvovirose" />
-              <Info rotulo="Restrições" valor="Jejum hídrico até 12h" />
-              <Info rotulo="Alergias" valor="Penicilina" destaque="destructive" />
-            </dl>
-            <div className="mt-4 border-t border-border pt-3 text-sm">
-              <p className="text-xs text-text-soft">Contato Tutor</p>
-              <p className="mt-1 inline-flex items-center gap-2 font-medium text-text-strong">
-                João Silva <Phone className="h-3.5 w-3.5 text-primary" />
-              </p>
+          {sel && (
+            <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+              <h3 className="font-display text-base font-semibold text-primary-700">Resumo do Paciente</h3>
+              <dl className="mt-3 space-y-2 text-sm">
+                <Info rotulo="Diagnóstico" valor={sel.diagnostico} />
+                <Info rotulo="Responsável" valor={sel.responsavel} />
+                {sel.observacoes && <Info rotulo="Observações" valor={sel.observacoes} />}
+              </dl>
+              <div className="mt-4 border-t border-border pt-3 text-sm">
+                <p className="text-xs text-text-soft">Contato Tutor</p>
+                <p className="mt-1 inline-flex items-center gap-2 font-medium text-text-strong">
+                  {sel.tutorNome} {sel.tutorTelefone && <Phone className="h-3.5 w-3.5 text-primary" />}
+                </p>
+                {sel.tutorTelefone && <p className="text-xs text-text-soft">{sel.tutorTelefone}</p>}
+              </div>
+              <div className="mt-4 grid gap-2">
+                <Button size="sm" variant="outline" className="gap-1.5" onClick={() => darAlta(sel)}>
+                  <LogOut className="h-4 w-4" /> Registrar Alta
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 text-destructive"
+                  onClick={() => {
+                    alterarStatusInternacao(sel.id, sel.status === "critico" ? "internado" : "critico");
+                    toast.info(sel.status === "critico" ? "Status: Estável" : "Status: Crítico");
+                  }}
+                >
+                  <AlertTriangle className="h-4 w-4" /> Alternar Criticidade
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
             <h3 className="inline-flex items-center gap-2 font-display text-base font-semibold text-text-strong">
-              <AlertTriangle className="h-4 w-4 text-warning-700" /> Alertas da Internação
+              <Clock className="h-4 w-4 text-warning-700" /> Filtros e Histórico
             </h3>
-            <ul className="mt-3 space-y-2.5 text-sm">
-              <li className="rounded-lg bg-warning-50/60 p-2.5">
-                <p className="inline-flex items-center gap-1.5 font-medium text-warning-700"><Clock className="h-3.5 w-3.5" /> Medicação Atrasada</p>
-                <p className="mt-0.5 text-xs text-text-strong">Thor (Leito 01) · Dipirona IV (14:00)</p>
-              </li>
-              <li className="rounded-lg bg-warning-50/40 p-2.5">
-                <p className="inline-flex items-center gap-1.5 font-medium text-warning-700"><FileWarning className="h-3.5 w-3.5" /> Exame Pendente</p>
-                <p className="mt-0.5 text-xs text-text-strong">Bidu (Leito 04) · Hemograma</p>
-              </li>
+            <ul className="mt-3 space-y-2 text-xs">
+              {filtrados.slice(0, 6).map((i) => (
+                <li key={i.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSelId(i.id)}
+                    className={cn(
+                      "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left",
+                      sel?.id === i.id ? "bg-primary-50 text-primary-800" : "hover:bg-muted/40",
+                    )}
+                  >
+                    <span>
+                      Leito {i.leito} · <span className="font-semibold">{i.pacienteNome}</span>
+                    </span>
+                    <span className="text-text-soft">{i.status}</span>
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
         </aside>
       </div>
+
+      <Dialog open={novaOpen} onOpenChange={setNovaOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Nova Evolução SOAP — {sel?.pacienteNome}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(
+              [
+                ["subjetivo", "S — Subjetivo"],
+                ["objetivo", "O — Objetivo"],
+                ["avaliacao", "A — Avaliação"],
+                ["plano", "P — Plano"],
+              ] as const
+            ).map(([key, label]) => (
+              <div key={key}>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">{label}</p>
+                <Textarea
+                  rows={4}
+                  className="mt-1"
+                  value={novaEvol[key]}
+                  onChange={(e) => setNovaEvol({ ...novaEvol, [key]: e.target.value })}
+                />
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNovaOpen(false)}>
+              <X className="mr-1.5 h-4 w-4" /> Cancelar
+            </Button>
+            <Button onClick={salvarNova}>Salvar Evolução</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function Info({ rotulo, valor, destaque }: { rotulo: string; valor: string; destaque?: "destructive" }) {
+function CampoSoap({ rotulo, valor }: { rotulo: string; valor: string }) {
+  return (
+    <div className="rounded-md border border-border bg-surface p-2">
+      <dt className="text-[10px] font-semibold uppercase tracking-wider text-text-soft">{rotulo}</dt>
+      <dd className="mt-0.5 text-text-strong">{valor || <span className="text-muted-foreground">—</span>}</dd>
+    </div>
+  );
+}
+
+function Info({ rotulo, valor }: { rotulo: string; valor: string }) {
   return (
     <div className="flex justify-between gap-2">
       <dt className="text-text-soft">{rotulo}:</dt>
-      <dd className={cn("font-medium", destaque === "destructive" ? "text-destructive" : "text-text-strong")}>{valor}</dd>
+      <dd className="text-right font-medium text-text-strong">{valor}</dd>
     </div>
   );
 }
