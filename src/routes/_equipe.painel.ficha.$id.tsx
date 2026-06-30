@@ -46,8 +46,9 @@ function labelSintoma(id: string): string {
 
 function FichaPage() {
   const { id } = Route.useParams();
-  const { triagens } = useVitalisStore();
+  const { triagens, salvarDiagnostico: persistirDiagnostico } = useVitalisStore();
   const triagem = useMemo(() => triagens.find((t) => t.id === id), [triagens, id]);
+
 
   // Pré-preenchimento da anamnese a partir da triagem
   const sintomasTexto = useMemo(() => {
