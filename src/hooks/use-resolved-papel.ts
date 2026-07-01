@@ -13,7 +13,7 @@ import { useVitalisStore, type Papel } from "@/data/store";
  */
 export function useResolvedPapel(): Papel {
   const location = useLocation();
-  const papel = useVitalisStore((s) => s.papel);
+  const { papel } = useVitalisStore();
   const isPainel = location.pathname.startsWith("/painel");
 
   if (!isPainel) return "tutor";
