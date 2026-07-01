@@ -239,10 +239,10 @@ function Internacoes() {
                         <p className="text-[11px] text-text-soft">{formatHora(e.criadoEm)}</p>
                       </div>
                       <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-                        <CampoSoap rotulo="S — Subjetivo" valor={e.subjetivo} />
-                        <CampoSoap rotulo="O — Objetivo" valor={e.objetivo} />
+                        <CampoSoap rotulo="S — Queixa" valor={e.subjetivo} />
+                        <CampoSoap rotulo="O — Parâmetros" valor={e.objetivo} />
                         <CampoSoap rotulo="A — Avaliação" valor={e.avaliacao} />
-                        <CampoSoap rotulo="P — Plano" valor={e.plano} />
+                        <CampoSoap rotulo="P — Conduta Clínica / Tratamento" valor={e.plano} />
                       </dl>
                     </li>
                   ))}
@@ -324,10 +324,10 @@ function Internacoes() {
           <div className="grid gap-3 sm:grid-cols-2">
             {(
               [
-                ["subjetivo", "S — Subjetivo"],
-                ["objetivo", "O — Objetivo"],
+                ["subjetivo", "S — Queixa"],
+                ["objetivo", "O — Parâmetros"],
                 ["avaliacao", "A — Avaliação"],
-                ["plano", "P — Plano"],
+                ["plano", "P — Conduta Clínica / Tratamento"],
               ] as const
             ).map(([key, label]) => (
               <div key={key}>
