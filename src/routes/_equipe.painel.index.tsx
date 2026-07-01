@@ -1,3 +1,4 @@
+import { useResolvedPapel } from "@/hooks/use-resolved-papel";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Users,
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/_equipe/painel/")({
 });
 
 function PainelHome() {
-  const { papel } = useVitalisStore();
+  const papel = useResolvedPapel();
   if (papel === "veterinario") return <PainelVeterinario />;
   return <PainelRecepcao />;
 }

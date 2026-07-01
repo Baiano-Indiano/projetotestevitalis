@@ -1,3 +1,4 @@
+import { useResolvedPapel } from "@/hooks/use-resolved-papel";
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
@@ -44,7 +45,8 @@ interface Item {
 
 
 export function EquipeShell() {
-  const { triagens, papel } = useVitalisStore();
+  const { triagens } = useVitalisStore();
+  const papel = useResolvedPapel();
   const pendentes = triagens.filter((t) => t.status === "pendente" || t.status === "urgencia").length;
   const urgencias = triagens.filter((t) => t.status === "urgencia").length;
   const location = useLocation();
