@@ -81,7 +81,7 @@ function Internacoes() {
   const salvarNova = () => {
     if (!sel) return;
     if (!novaEvol.subjetivo && !novaEvol.objetivo && !novaEvol.avaliacao && !novaEvol.plano) {
-      toast.error("Preencha pelo menos um campo do SOAP");
+      toast.error("Preencha pelo menos um campo");
       return;
     }
     salvarEvolucaoSOAP({
@@ -221,7 +221,7 @@ function Internacoes() {
 
               <div className="mt-4 flex items-center justify-between">
                 <h3 className="font-display text-base font-semibold text-text-strong">
-                  Diário Clínico (SOAP)
+                  Diário Clínico
                 </h3>
                 <span className="text-xs text-text-soft">{evolucoesPaciente.length} registro(s)</span>
               </div>
@@ -239,10 +239,10 @@ function Internacoes() {
                         <p className="text-[11px] text-text-soft">{formatHora(e.criadoEm)}</p>
                       </div>
                       <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-                        <CampoSoap rotulo="S — Queixa" valor={e.subjetivo} />
-                        <CampoSoap rotulo="O — Parâmetros" valor={e.objetivo} />
-                        <CampoSoap rotulo="A — Avaliação" valor={e.avaliacao} />
-                        <CampoSoap rotulo="P — Conduta Clínica / Tratamento" valor={e.plano} />
+                        <CampoSoap rotulo="Queixa" valor={e.subjetivo} />
+                        <CampoSoap rotulo="Parâmetros" valor={e.objetivo} />
+                        <CampoSoap rotulo="Avaliação" valor={e.avaliacao} />
+                        <CampoSoap rotulo="Conduta Clínica / Tratamento" valor={e.plano} />
                       </dl>
                     </li>
                   ))}
@@ -319,15 +319,15 @@ function Internacoes() {
       <Dialog open={novaOpen} onOpenChange={setNovaOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Nova Evolução SOAP — {sel?.pacienteNome}</DialogTitle>
+            <DialogTitle>Nova Evolução — {sel?.pacienteNome}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-3 sm:grid-cols-2">
             {(
               [
-                ["subjetivo", "S — Queixa"],
-                ["objetivo", "O — Parâmetros"],
-                ["avaliacao", "A — Avaliação"],
-                ["plano", "P — Conduta Clínica / Tratamento"],
+                ["subjetivo", "Queixa"],
+                ["objetivo", "Parâmetros"],
+                ["avaliacao", "Avaliação"],
+                ["plano", "Conduta Clínica / Tratamento"],
               ] as const
             ).map(([key, label]) => (
               <div key={key}>
