@@ -12,19 +12,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/data/store";
 import { cn } from "@/lib/utils";
+import { categoriasExames, itensDaCategoria } from "@/data/exames-catalogo";
 
 export const Route = createFileRoute("/_equipe/painel/laboratorio")({
   head: () => ({ meta: [{ title: "Laboratório. Vitalis Belém" }] }),
   component: Laboratorio,
 });
 
-const EXAMES_LAB: Record<string, string> = {
-  hemograma: "Hemograma completo",
-  renal: "Perfil renal",
-  hepatico: "Perfil hepático",
-  urinalise: "Urinálise",
-  sorologias: "Sorologias rápidas",
-};
+function acharExameLab(id: string): { label: string; categoria: string } | null {
+  for (const cat of categoriasExames) {
+    if (cat.id === "imagem") continue;
+    const item = itensDaCategoria(cat).find((i) => i.id === id);
+    if (item) return { label: item.label, categoria: cat.nome };
+  }
+  return null;
+}
 
 interface SolicitacaoLab {
   key: string;
