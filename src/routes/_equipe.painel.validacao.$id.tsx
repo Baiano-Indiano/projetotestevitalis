@@ -235,7 +235,7 @@ function Detalhe() {
               })}
             </div>
             {t.etapas.estadoAtual && (
-              <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border pt-4 text-sm md:grid-cols-4">
+              <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border pt-4 text-sm xl:grid-cols-4">
                 <Info l="Consciência" v={t.etapas.estadoAtual.consciencia} />
                 <Info l="Apetite" v={t.etapas.estadoAtual.apetite} />
                 <Info l="Hidratação" v={t.etapas.estadoAtual.hidratacao} />
@@ -243,7 +243,7 @@ function Detalhe() {
               </dl>
             )}
             {t.etapas.tempo && t.etapas.ambiente && (
-              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm md:grid-cols-4">
+              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm xl:grid-cols-4">
                 <Info l="Início" v={t.etapas.tempo.inicio} />
                 <Info l="Duração" v={t.etapas.tempo.duracao} />
                 <Info l="Ambiente" v={t.etapas.ambiente.ambiente} />
