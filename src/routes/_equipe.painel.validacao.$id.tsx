@@ -361,9 +361,9 @@ function Detalhe() {
                 </>
               ) : (
                 <>
-                  <Button onClick={() => decidirCaso("confirmar")}>
-                    <Check className="mr-1.5 h-4 w-4" /> Confirmar encaminhamento para{" "}
-                    {nomeEspecialidade(especialidade)}
+                  <Button onClick={() => decidirCaso("confirmar")} className="h-auto min-h-10 whitespace-normal py-2 text-center leading-tight">
+                    <Check className="mr-1.5 h-4 w-4 shrink-0" />
+                    <span>Confirmar encaminhamento para {nomeEspecialidade(especialidade)}</span>
                   </Button>
                   <Button variant="outline" onClick={() => decidirCaso("redirecionar")}>
                     <RotateCcw className="mr-1.5 h-4 w-4" /> Redirecionar
