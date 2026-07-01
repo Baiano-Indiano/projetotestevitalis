@@ -61,12 +61,13 @@ function Laboratorio() {
       const c = d.conteudo as Record<string, unknown>;
       const exames = (c.examesSolicitados as string[] | undefined) ?? [];
       for (const exId of exames) {
-        if (!EXAMES_LAB[exId]) continue;
+        const info = acharExameLab(exId);
+        if (!info) continue;
         lista.push({
           key: `${d.id}:${exId}`,
           diagnosticoId: d.id,
           exameId: exId,
-          exameLabel: EXAMES_LAB[exId],
+          exameLabel: info.label,
           pacienteNome: String(c.pacienteNome ?? "Paciente"),
           especie: String(c.especie ?? ""),
           raca: String(c.raca ?? ""),
