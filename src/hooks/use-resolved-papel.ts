@@ -12,8 +12,8 @@ import { useVitalisStore, type Papel } from "@/data/store";
  *    assume "recepcao" como fallback profissional.
  */
 export function useResolvedPapel(): Papel {
-  const pathname = useLocation({ select: (l) => l.pathname });
-  const papel = useVitalisStore((s) => s.papel);
+  const { pathname } = useLocation();
+  const { papel } = useVitalisStore();
   const isPainel = pathname.startsWith("/painel");
 
   if (!isPainel) return "tutor";
