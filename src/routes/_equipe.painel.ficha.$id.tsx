@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useVitalisStore } from "@/data/store";
 import { categoriasParte1, categoriasParte2 } from "@/data/sintomas-categorias";
@@ -47,8 +47,13 @@ function labelSintoma(id: string): string {
 
 function FichaPage() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const { triagens, salvarDiagnostico: persistirDiagnostico } = useVitalisStore();
   const triagem = useMemo(() => triagens.find((t) => t.id === id), [triagens, id]);
+  const triagensDisponiveis = useMemo(
+    () => [...triagens].sort((a, b) => (b.criadoEm ?? "").localeCompare(a.criadoEm ?? "")),
+    [triagens],
+  );
 
 
   // Pré-preenchimento da anamnese a partir da triagem
@@ -287,6 +292,44 @@ function FichaPage() {
           <Save className="h-4 w-4" /> Salvar prontuário
         </Button>
       </div>
+
+      {/* Vincular paciente quando ficha ainda não tem triagem */}
+      {!triagem && (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col gap-3 py-5 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Nenhum animal vinculado a esta ficha</p>
+              <p className="text-xs text-muted-foreground">
+                Selecione um paciente com triagem já registrada ou faça um novo cadastro presencial.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 md:flex-row md:items-center">
+              <Select
+                onValueChange={(v) => navigate({ to: "/painel/ficha/$id", params: { id: v } })}
+              >
+                <SelectTrigger className="w-full md:w-[320px]">
+                  <SelectValue placeholder="Vincular paciente por triagem…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {triagensDisponiveis.length === 0 && (
+                    <div className="px-2 py-3 text-sm text-muted-foreground">
+                      Nenhuma triagem disponível
+                    </div>
+                  )}
+                  {triagensDisponiveis.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.protocolo} — {t.animal.nome || "Sem nome"} ({t.tutor.nome || "tutor"})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button variant="outline" asChild>
+                <Link to="/painel/novo-cadastro">Novo cadastro presencial</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Cabeçalho do paciente */}
       <Card>
