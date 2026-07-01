@@ -12,17 +12,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/data/store";
 import { cn } from "@/lib/utils";
+import { categoriasImagem, itensDaCategoriaImagem } from "@/data/imagem-catalogo";
 
 export const Route = createFileRoute("/_equipe/painel/imagem")({
   head: () => ({ meta: [{ title: "Exames de Imagem. Vitalis Belém" }] }),
   component: ImagemRoute,
 });
 
-const EXAMES_IMG: Record<string, string> = {
-  raiox: "Radiografia (Raio-X)",
-  usg: "Ultrassonografia abdominal",
-  eco: "Ecocardiograma",
-};
+function acharExameImagem(id: string): { label: string; categoria: string } | null {
+  for (const cat of categoriasImagem) {
+    const item = itensDaCategoriaImagem(cat).find((i) => i.id === id);
+    if (item) return { label: item.label, categoria: cat.nome };
+  }
+  return null;
+}
 
 interface SolicitacaoImg {
   key: string;
