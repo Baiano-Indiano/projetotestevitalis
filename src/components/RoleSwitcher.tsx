@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useVitalisStore, type Papel } from "@/data/store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation, useNavigate } from "@tanstack/react-router";
@@ -12,7 +13,18 @@ export function RoleSwitcher() {
   const { papel, setPapel } = useVitalisStore();
   const navigate = useNavigate();
   const location = useLocation();
-  const selectedPapel = location.pathname.startsWith("/painel") ? papel : "tutor";
+
+  const isPainel = location.pathname.startsWith("/painel");
+
+  // Sincroniza o papel do store com a rota atual, para que TODOS os componentes
+  // que leem `papel` (sidebar, header, dashboards) exibam o perfil correto.
+  useEffect(() => {
+    if (!isPainel && papel !== "tutor") {
+      setPapel("tutor");
+    } else if (isPainel && papel === "tutor") {
+      setPapel("recepcao");
+    }
+  }, [isPainel, papel, setPapel]);
 
   const onChange = (v: Papel) => {
     setPapel(v);
@@ -25,7 +37,7 @@ export function RoleSwitcher() {
       <span className="hidden text-xs font-medium uppercase tracking-wide text-text-soft sm:inline">
         Protótipo
       </span>
-      <Select value={selectedPapel} onValueChange={(v) => onChange(v as Papel)}>
+      <Select value={papel} onValueChange={(v) => onChange(v as Papel)}>
         <SelectTrigger className="h-9 w-[200px] bg-surface">
           <SelectValue />
         </SelectTrigger>
