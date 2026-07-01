@@ -403,9 +403,9 @@ function Detalhe() {
 
 function Info({ l, v }: { l: string; v: string }) {
   return (
-    <div>
-      <dt className="text-[11px] uppercase tracking-wide text-text-soft">{l}</dt>
-      <dd className="mt-0.5 text-sm font-medium text-text-strong capitalize">{v}</dd>
+    <div className="min-w-0">
+      <dt className="text-[11px] uppercase tracking-wide text-text-soft break-words">{l}</dt>
+      <dd className="mt-0.5 text-sm font-medium text-text-strong capitalize break-words">{v}</dd>
     </div>
   );
 }
