@@ -1,0 +1,30 @@
+# Padrão de commits: Conventional Commits + "por quê"
+#
+# Formato:
+#   <tipo>(<escopo opcional>): <resumo curto no imperativo>
+#
+#   <corpo opcional — explique O PORQUÊ da mudança, não o "o quê">
+#
+#   Refs: #issue (opcional)
+#
+# Tipos permitidos:
+#   feat      nova funcionalidade visível ao usuário
+#   fix       correção de bug
+#   refactor  mudança de código sem alterar comportamento
+#   style     formatação, espaços, sem impacto lógico
+#   docs      documentação (README, CHANGELOG, comentários)
+#   test      adição/ajuste de testes
+#   chore     build, deps, config, tarefas de manutenção
+#   perf      melhoria de performance
+#
+# Exemplo:
+#   feat(triagem): adiciona modal de red-flag na etapa 3
+#
+#   Tutores estavam finalizando triagens críticas sem alerta visual.
+#   O modal força reconhecimento antes de prosseguir, reduzindo risco
+#   clínico e alinhando com o requisito de segurança da build 1.
+#
+# Regras rápidas:
+#   - Assunto <= 72 caracteres, sem ponto final.
+#   - Corpo separado do assunto por linha em branco.
+#   - Sempre inclua o motivo no corpo, mesmo em commits pequenos.

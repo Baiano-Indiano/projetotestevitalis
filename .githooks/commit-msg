@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+# commit-msg hook — valida Conventional Commits e exige "porquê" no corpo.
+# Instale com: git config core.hooksPath .githooks
+
+msg_file="$1"
+# Ignora commits de merge/revert automáticos
+first_line=$(head -n1 "$msg_file")
+case "$first_line" in
+  "Merge "*|"Revert "*|"fixup!"*|"squash!"*) exit 0 ;;
+esac
+
+pattern='^(feat|fix|refactor|style|docs|test|chore|perf)(\([a-z0-9\-]+\))?: .{1,72}$'
+if ! printf '%s' "$first_line" | grep -Eq "$pattern"; then
+  echo "❌ Commit rejeitado: assunto fora do padrão Conventional Commits."
+  echo "   Esperado: <tipo>(<escopo>): <resumo> (<=72 chars)"
+  echo "   Tipos:    feat|fix|refactor|style|docs|test|chore|perf"
+  echo "   Exemplo:  feat(triagem): adiciona modal de red-flag"
+  exit 1
+fi
+
+# Exige corpo com o "porquê" (linha em branco + ao menos 1 linha de conteúdo)
+body=$(sed -n '3,$p' "$msg_file" | grep -v '^#' | tr -d '[:space:]')
+if [ -z "$body" ]; then
+  echo "❌ Commit rejeitado: adicione um corpo explicando o MOTIVO da mudança."
+  echo "   Deixe 1 linha em branco após o assunto e escreva o porquê."
+  exit 1
+fi
+
+exit 0
