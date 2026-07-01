@@ -950,7 +950,7 @@ function FichaPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="soap-s">
-                    <span className="font-semibold">S — Subjetivo</span>
+                    <span className="font-semibold">S — Queixa</span>
                     <span className="ml-1 text-xs font-normal text-muted-foreground">
                       Relato de comportamento, queixas e estado percebido do paciente.
                     </span>
@@ -967,7 +967,7 @@ function FichaPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="soap-o">
-                    <span className="font-semibold">O — Objetivo</span>
+                    <span className="font-semibold">O — Parâmetros</span>
                     <span className="ml-1 text-xs font-normal text-muted-foreground">
                       Parâmetros clínicos aferidos e achados de exames.
                     </span>
@@ -1001,7 +1001,7 @@ function FichaPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="soap-p">
-                    <span className="font-semibold">P — Plano</span>
+                    <span className="font-semibold">P — Conduta Clínica / Tratamento</span>
                     <span className="ml-1 text-xs font-normal text-muted-foreground">
                       Procedimentos, nova conduta terapêutica e recomendações.
                     </span>
