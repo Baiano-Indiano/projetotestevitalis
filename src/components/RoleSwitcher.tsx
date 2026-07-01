@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useVitalisStore, type Papel } from "@/data/store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useLocation, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { useResolvedPapel } from "@/hooks/use-resolved-papel";
 
 const labels: Record<Papel, string> = {
   tutor: "Tutor",
@@ -12,19 +13,12 @@ const labels: Record<Papel, string> = {
 export function RoleSwitcher() {
   const { papel, setPapel } = useVitalisStore();
   const navigate = useNavigate();
-  const location = useLocation();
+  const resolved = useResolvedPapel();
 
-  const isPainel = location.pathname.startsWith("/painel");
-
-  // Sincroniza o papel do store com a rota atual, para que TODOS os componentes
-  // que leem `papel` (sidebar, header, dashboards) exibam o perfil correto.
+  // Mantém o store alinhado com a rota (fonte de verdade = rota).
   useEffect(() => {
-    if (!isPainel && papel !== "tutor") {
-      setPapel("tutor");
-    } else if (isPainel && papel === "tutor") {
-      setPapel("recepcao");
-    }
-  }, [isPainel, papel, setPapel]);
+    if (papel !== resolved) setPapel(resolved);
+  }, [resolved, papel, setPapel]);
 
   const onChange = (v: Papel) => {
     setPapel(v);
@@ -37,7 +31,7 @@ export function RoleSwitcher() {
       <span className="hidden text-xs font-medium uppercase tracking-wide text-text-soft sm:inline">
         Protótipo
       </span>
-      <Select value={papel} onValueChange={(v) => onChange(v as Papel)}>
+      <Select value={resolved} onValueChange={(v) => onChange(v as Papel)}>
         <SelectTrigger className="h-9 w-[200px] bg-surface">
           <SelectValue />
         </SelectTrigger>
@@ -52,3 +46,4 @@ export function RoleSwitcher() {
     </div>
   );
 }
+
