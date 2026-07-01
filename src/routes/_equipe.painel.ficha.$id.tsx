@@ -721,83 +721,16 @@ function FichaPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <TestTube className="h-4 w-4" /> Solicitação de exames complementares
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-5">
-                  {[
-                    {
-                      grupo: "Laboratório",
-                      itens: [
-                        { id: "hemograma", label: "Hemograma completo" },
-                        { id: "renal", label: "Perfil renal" },
-                        { id: "hepatico", label: "Perfil hepático" },
-                        { id: "urinalise", label: "Urinálise" },
-                        { id: "sorologias", label: "Sorologias rápidas" },
-                      ],
-                    },
-                    {
-                      grupo: "Imagem",
-                      itens: [
-                        { id: "raiox", label: "Radiografia (Raio-X)" },
-                        { id: "usg", label: "Ultrassonografia abdominal" },
-                        { id: "eco", label: "Ecocardiograma" },
-                      ],
-                    },
-                  ].map((g) => (
-                    <div key={g.grupo} className="space-y-2">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        {g.grupo}
-                      </p>
-                      <div className="space-y-2">
-                        {g.itens.map((item) => (
-                          <label
-                            key={item.id}
-                            className="flex cursor-pointer items-center gap-2 rounded-sm border border-border bg-card px-3 py-2 text-sm hover:bg-muted"
-                          >
-                            <Checkbox
-                              checked={diagnostico.examesSolicitados.includes(item.id)}
-                              onCheckedChange={() => toggleExame(item.id)}
-                            />
-                            <span>{item.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="obsExames">Observações e diretrizes para o laboratório</Label>
-                    <Textarea
-                      id="obsExames"
-                      rows={8}
-                      value={diagnostico.observacoesExame}
-                      onChange={(e) =>
-                        setDiagnostico({ ...diagnostico, observacoesExame: e.target.value })
-                      }
-                      placeholder="Jejum, prioridade, coletas especiais, contato do solicitante"
-                    />
-                  </div>
-                  <Button variant="outline" className="gap-2">
-                    <FileText className="h-4 w-4" /> Gerar guia de solicitação
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button onClick={salvarDiagnostico} className="gap-2">
-                  <Check className="h-4 w-4" /> Salvar diagnóstico
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <SolicitacaoExames
+            selecionados={diagnostico.examesSolicitados}
+            onToggle={toggleExame}
+            onSetSelecionados={(ids) =>
+              setDiagnostico({ ...diagnostico, examesSolicitados: ids })
+            }
+            observacoes={diagnostico.observacoesExame}
+            onObsChange={(v) => setDiagnostico({ ...diagnostico, observacoesExame: v })}
+            onSalvar={salvarDiagnostico}
+          />
         </TabsContent>
         <TabsContent value="prescricao" className="mt-6 space-y-6">
           <Card>
