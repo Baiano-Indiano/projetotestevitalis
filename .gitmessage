@@ -1,9 +1,9 @@
-# Padrão de commits: Conventional Commits + "por quê"
+# Padrão de commits: Conventional Commits + descrição detalhada
 #
 # Formato:
 #   <tipo>(<escopo opcional>): <resumo curto no imperativo>
 #
-#   <corpo opcional — explique O PORQUÊ da mudança, não o "o quê">
+#   <corpo OBRIGATÓRIO — descreva em DETALHE cada alteração feita>
 #
 #   Refs: #issue (opcional)
 #
@@ -17,14 +17,30 @@
 #   chore     build, deps, config, tarefas de manutenção
 #   perf      melhoria de performance
 #
+# O CORPO deve conter, em bullets:
+#   - MOTIVO da mudança (por quê)
+#   - LISTA DETALHADA de cada arquivo tocado e o que mudou nele
+#   - IMPACTO esperado (UX, performance, segurança, etc.)
+#
 # Exemplo:
 #   feat(triagem): adiciona modal de red-flag na etapa 3
 #
-#   Tutores estavam finalizando triagens críticas sem alerta visual.
-#   O modal força reconhecimento antes de prosseguir, reduzindo risco
-#   clínico e alinhando com o requisito de segurança da build 1.
+#   Motivo: tutores finalizavam triagens críticas sem alerta visual,
+#   gerando risco clínico.
 #
-# Regras rápidas:
-#   - Assunto <= 72 caracteres, sem ponto final.
-#   - Corpo separado do assunto por linha em branco.
-#   - Sempre inclua o motivo no corpo, mesmo em commits pequenos.
+#   Alterações:
+#   - src/components/RedFlagModal.tsx (novo): modal bloqueante com
+#     lista dos sinais críticos detectados e botão de confirmação.
+#   - src/routes/_tutor.triagem.tsx: dispara o modal quando
+#     `redFlags.length > 0` antes de avançar para a etapa 4.
+#   - src/lib/triagem.ts: exporta helper `hasRedFlag()` para
+#     centralizar a checagem.
+#
+#   Impacto: reduz risco clínico; adiciona 1 clique extra apenas
+#   quando há red-flag; alinhado ao requisito de segurança da build 1.
+#
+# Regras:
+#   - Assunto <= 72 caracteres, sem ponto final, no imperativo.
+#   - Corpo separado do assunto por 1 linha em branco.
+#   - Cada arquivo alterado DEVE aparecer no corpo com o que mudou.
+#   - Nunca escreva apenas "ajustes" ou "fix bug" — seja específico.

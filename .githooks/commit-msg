@@ -1,9 +1,8 @@
 #!/usr/bin/env sh
-# commit-msg hook — valida Conventional Commits e exige "porquê" no corpo.
+# commit-msg hook — Conventional Commits + descrição detalhada.
 # Instale com: git config core.hooksPath .githooks
 
 msg_file="$1"
-# Ignora commits de merge/revert automáticos
 first_line=$(head -n1 "$msg_file")
 case "$first_line" in
   "Merge "*|"Revert "*|"fixup!"*|"squash!"*) exit 0 ;;
@@ -11,18 +10,34 @@ esac
 
 pattern='^(feat|fix|refactor|style|docs|test|chore|perf)(\([a-z0-9\-]+\))?: .{1,72}$'
 if ! printf '%s' "$first_line" | grep -Eq "$pattern"; then
-  echo "❌ Commit rejeitado: assunto fora do padrão Conventional Commits."
+  echo "❌ Assunto fora do padrão Conventional Commits."
   echo "   Esperado: <tipo>(<escopo>): <resumo> (<=72 chars)"
   echo "   Tipos:    feat|fix|refactor|style|docs|test|chore|perf"
-  echo "   Exemplo:  feat(triagem): adiciona modal de red-flag"
   exit 1
 fi
 
-# Exige corpo com o "porquê" (linha em branco + ao menos 1 linha de conteúdo)
-body=$(sed -n '3,$p' "$msg_file" | grep -v '^#' | tr -d '[:space:]')
-if [ -z "$body" ]; then
-  echo "❌ Commit rejeitado: adicione um corpo explicando o MOTIVO da mudança."
-  echo "   Deixe 1 linha em branco após o assunto e escreva o porquê."
+# Extrai o corpo (linhas 3+, ignorando comentários).
+body=$(sed -n '3,$p' "$msg_file" | grep -v '^#')
+body_trim=$(printf '%s' "$body" | tr -d '[:space:]')
+if [ -z "$body_trim" ]; then
+  echo "❌ Corpo vazio. Descreva em detalhe CADA alteração feita."
+  exit 1
+fi
+
+# Exige corpo minimamente detalhado: >=200 chars e >=3 linhas úteis
+char_count=$(printf '%s' "$body_trim" | wc -c | tr -d ' ')
+line_count=$(printf '%s\n' "$body" | grep -c '[^[:space:]]')
+if [ "$char_count" -lt 200 ] || [ "$line_count" -lt 3 ]; then
+  echo "❌ Descrição insuficiente (${char_count} chars, ${line_count} linhas)."
+  echo "   Exigido: >=200 caracteres e >=3 linhas."
+  echo "   Inclua MOTIVO, LISTA de arquivos alterados e IMPACTO."
+  exit 1
+fi
+
+# Exige ao menos uma referência a arquivo/caminho no corpo.
+if ! printf '%s' "$body" | grep -Eq '(src/|\.tsx?|\.css|\.md|\.json)'; then
+  echo "❌ Corpo não menciona nenhum arquivo alterado."
+  echo "   Liste os caminhos (ex.: src/components/Foo.tsx) e o que mudou."
   exit 1
 fi
 
