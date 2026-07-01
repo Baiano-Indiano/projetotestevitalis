@@ -28,6 +28,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { toast } from "sonner";
+import { SolicitacaoExames } from "@/components/SolicitacaoExames";
 
 export const Route = createFileRoute("/_equipe/painel/ficha/$id")({
   head: () => ({ meta: [{ title: "Ficha clínica. Vitalis" }] }),
