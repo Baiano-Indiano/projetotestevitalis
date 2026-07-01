@@ -1,3 +1,4 @@
+import { useResolvedPapel } from "@/hooks/use-resolved-papel";
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
