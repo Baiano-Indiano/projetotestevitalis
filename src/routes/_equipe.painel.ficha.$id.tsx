@@ -205,7 +205,7 @@ function FichaPage() {
       !novaEvolucao.avaliacao.trim() &&
       !novaEvolucao.plano.trim()
     ) {
-      toast.error("Preencha ao menos um campo do SOAP antes de salvar.");
+      toast.error("Preencha ao menos um campo antes de salvar.");
       return;
     }
     const agora = new Date();
@@ -950,7 +950,7 @@ function FichaPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="soap-s">
-                    <span className="font-semibold">S — Queixa</span>
+                    <span className="font-semibold">Queixa</span>
                     <span className="ml-1 text-xs font-normal text-muted-foreground">
                       Relato de comportamento, queixas e estado percebido do paciente.
                     </span>
@@ -967,7 +967,7 @@ function FichaPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="soap-o">
-                    <span className="font-semibold">O — Parâmetros</span>
+                    <span className="font-semibold">Parâmetros</span>
                     <span className="ml-1 text-xs font-normal text-muted-foreground">
                       Parâmetros clínicos aferidos e achados de exames.
                     </span>
@@ -984,7 +984,7 @@ function FichaPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="soap-a">
-                    <span className="font-semibold">A — Avaliação</span>
+                    <span className="font-semibold">Avaliação</span>
                     <span className="ml-1 text-xs font-normal text-muted-foreground">
                       Análise clínica e conclusão médica sobre o quadro atual.
                     </span>
@@ -1001,7 +1001,7 @@ function FichaPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="soap-p">
-                    <span className="font-semibold">P — Conduta Clínica / Tratamento</span>
+                    <span className="font-semibold">Conduta Clínica / Tratamento</span>
                     <span className="ml-1 text-xs font-normal text-muted-foreground">
                       Procedimentos, nova conduta terapêutica e recomendações.
                     </span>
