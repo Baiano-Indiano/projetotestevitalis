@@ -11,6 +11,24 @@ Formato: [Data] — Título
 
 ---
 
+## [2026-07-01] — Commits exigem descrição detalhada por arquivo
+
+- **Contexto:** commits curtos dificultavam a revisão no GitHub; o usuário
+  pediu que cada commit descreva em detalhe o que mudou.
+- **Mudanças:**
+  - `.gitmessage`: template expandido com seções obrigatórias
+    (Motivo, Alterações por arquivo, Impacto) e exemplo detalhado.
+  - `.githooks/commit-msg`: passa a exigir corpo com ≥200 caracteres,
+    ≥3 linhas úteis e ao menos uma referência a caminho de arquivo
+    (`src/`, `.tsx`, `.ts`, `.css`, `.md`, `.json`).
+  - `CONTRIBUTING.md`: novo formato documentado com exemplo completo
+    e regras aplicadas pelo hook.
+- **Impacto:** commits ficam auto-explicativos; revisão no GitHub
+  passa a mostrar motivo, escopo por arquivo e impacto esperado.
+- **Arquivos:** `.gitmessage`, `.githooks/commit-msg`, `CONTRIBUTING.md`.
+
+---
+
 ## [2026-07-01] — Padrão de commits + hook de validação
 
 - **Contexto:** facilitar análise no GitHub exigindo que todo commit traga o
