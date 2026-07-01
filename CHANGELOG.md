@@ -11,6 +11,20 @@ Formato: [Data] — Título
 
 ---
 
+## [2026-07-01] — Padrão de commits + hook de validação
+
+- **Contexto:** facilitar análise no GitHub exigindo que todo commit traga o
+  motivo da mudança, no formato Conventional Commits.
+- **Mudanças:**
+  - Template `.gitmessage` com guia de tipos e exemplo.
+  - Hook `.githooks/commit-msg` que valida assunto (`tipo(escopo): resumo`,
+    ≤72 chars) e exige corpo com o "porquê".
+  - `CONTRIBUTING.md` com instruções de ativação
+    (`git config core.hooksPath .githooks`).
+- **Arquivos:** `.gitmessage`, `.githooks/commit-msg`, `CONTRIBUTING.md`.
+
+---
+
 ## [2026-07-01] — Sincronização de papel por rota (hook `useResolvedPapel`)
 
 - **Contexto:** o seletor de perfil piscava com o valor antigo ao trocar de
