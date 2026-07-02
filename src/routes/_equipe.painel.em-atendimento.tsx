@@ -9,11 +9,24 @@ export const Route = createFileRoute("/_equipe/painel/em-atendimento")({
   component: EmAtendimento,
 });
 
-const pacientes = [
-  { nome: "Rex", especie: "cao", tutor: "Maria Silva", vet: "Dr. Ricardo Silva", esp: "Ortopedia", inicio: "10:45", duracao: "15 min", status: "procedimento" },
-  { nome: "Luna", especie: "gato", tutor: "João Souza", vet: "Dra. Ana Mendes", esp: "Clínica Geral", inicio: "10:30", duracao: "30 min", status: "atendimento" },
-  { nome: "Thor", especie: "cao", tutor: "Ana Oliveira", vet: "Dr. Marcos Souza", esp: "Cardiologia", inicio: "10:15", duracao: "45 min", status: "exames" },
-  { nome: "Bidu", especie: "cao", tutor: "Carlos Mendes", vet: "Dra. Juliana Pires", esp: "Nefrologia", inicio: "09:50", duracao: "70 min", status: "atendimento" },
+type Prioridade = "vermelho" | "laranja" | "amarelo" | "verde" | "azul";
+
+const prioridadeMap: Record<Prioridade, { dot: string; label: string }> = {
+  vermelho: { dot: "bg-red-500", label: "Emergência" },
+  laranja: { dot: "bg-orange-500", label: "Muito urgente" },
+  amarelo: { dot: "bg-yellow-500", label: "Urgente" },
+  verde: { dot: "bg-emerald-500", label: "Pouco urgente" },
+  azul: { dot: "bg-blue-500", label: "Não urgente" },
+};
+
+const pacientes: Array<{
+  nome: string; especie: string; tutor: string; vet: string; esp: string;
+  inicio: string; duracao: string; status: string; prioridade: Prioridade;
+}> = [
+  { nome: "Rex", especie: "cao", tutor: "Maria Silva", vet: "Dr. Ricardo Silva", esp: "Ortopedia", inicio: "10:45", duracao: "15 min", status: "procedimento", prioridade: "laranja" },
+  { nome: "Luna", especie: "gato", tutor: "João Souza", vet: "Dra. Ana Mendes", esp: "Clínica Geral", inicio: "10:30", duracao: "30 min", status: "atendimento", prioridade: "verde" },
+  { nome: "Thor", especie: "cao", tutor: "Ana Oliveira", vet: "Dr. Marcos Souza", esp: "Cardiologia", inicio: "10:15", duracao: "45 min", status: "exames", prioridade: "vermelho" },
+  { nome: "Bidu", especie: "cao", tutor: "Carlos Mendes", vet: "Dra. Juliana Pires", esp: "Nefrologia", inicio: "09:50", duracao: "70 min", status: "atendimento", prioridade: "amarelo" },
 ];
 
 function EmAtendimento() {
