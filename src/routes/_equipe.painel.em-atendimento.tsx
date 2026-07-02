@@ -96,7 +96,17 @@ function EmAtendimento() {
         </div>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-[11px] text-text-soft">
+        <span className="font-semibold uppercase tracking-wider">Protocolo de Manchester:</span>
+        {(Object.keys(prioridadeMap) as Prioridade[]).map((k) => (
+          <span key={k} className="inline-flex items-center gap-1.5">
+            <span className={cn("h-2 w-2 rounded-full", prioridadeMap[k].dot)} />
+            {prioridadeMap[k].label}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
         <table className="w-full">
           <thead className="border-b border-border text-left text-[11px] font-semibold uppercase tracking-wider text-text-soft">
             <tr>
