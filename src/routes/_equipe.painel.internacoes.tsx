@@ -39,6 +39,8 @@ function Internacoes() {
   const [selId, setSelId] = useState<string | null>(internacoes[0]?.id ?? null);
   const [novaOpen, setNovaOpen] = useState(false);
   const [novaEvol, setNovaEvol] = useState({ subjetivo: "", objetivo: "", avaliacao: "", plano: "" });
+  const [insumosOpen, setInsumosOpen] = useState(false);
+  const [insumosQtd, setInsumosQtd] = useState<Record<string, number>>({});
 
   const filtrados = useMemo(
     () =>
