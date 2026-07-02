@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Bed, AlertTriangle, LogOut, Stethoscope, Phone, Clock, Plus, X } from "lucide-react";
+import { Search, Bed, AlertTriangle, LogOut, Stethoscope, Phone, Clock, Plus, X, Package, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/data/store";
 import { toast } from "sonner";
