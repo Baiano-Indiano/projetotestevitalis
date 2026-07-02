@@ -17,6 +17,15 @@ export const Route = createFileRoute("/_equipe/painel/internacoes")({
 
 const TOTAL_LEITOS = 8;
 
+const INSUMOS_UTI = [
+  { id: "seringa-3ml", nome: "Seringa 3ml" },
+  { id: "soro-fisio-500", nome: "Soro Fisiológico 500ml" },
+  { id: "gaze", nome: "Compressa Gaze" },
+  { id: "cateter", nome: "Cateter" },
+  { id: "equipo", nome: "Equipo Macrogotas" },
+  { id: "esparadrapo", nome: "Esparadrapo" },
+] as const;
+
 function tempoInternado(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime();
   const dias = Math.floor(ms / (1000 * 60 * 60 * 24));
