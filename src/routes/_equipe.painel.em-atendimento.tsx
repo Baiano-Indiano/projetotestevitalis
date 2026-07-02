@@ -128,7 +128,14 @@ function EmAtendimento() {
                         <Icone className="h-4 w-4" />
                       </span>
                       <span className="flex flex-col">
-                        <span className="font-semibold text-text-strong">{p.nome}</span>
+                        <span className="inline-flex items-center gap-2">
+                          <span
+                            className={cn("h-2.5 w-2.5 rounded-full ring-2 ring-white", prioridadeMap[p.prioridade].dot)}
+                            title={`Manchester: ${prioridadeMap[p.prioridade].label}`}
+                            aria-label={`Prioridade ${prioridadeMap[p.prioridade].label}`}
+                          />
+                          <span className="font-semibold text-text-strong">{p.nome}</span>
+                        </span>
                         <span className="text-xs text-text-soft">Tutor: {p.tutor}</span>
                       </span>
                     </span>
