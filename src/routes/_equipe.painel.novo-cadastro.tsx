@@ -93,6 +93,8 @@ function NovoCadastroPage() {
   const [estadoTutor, setEstadoTutor] = useState("");
   const [emergContato, setEmergContato] = useState("");
   const [obsTutor, setObsTutor] = useState("");
+  const [residenteMunicipio, setResidenteMunicipio] = useState<"sim" | "nao" | "">("");
+  const [comprovanteResidencia, setComprovanteResidencia] = useState<string | null>(null);
 
   // Animal
   const [nomeAnimal, setNomeAnimal] = useState("");
