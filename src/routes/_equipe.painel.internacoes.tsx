@@ -371,6 +371,73 @@ function Internacoes() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={insumosOpen} onOpenChange={setInsumosOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="inline-flex items-center gap-2">
+              <Package className="h-4 w-4 text-primary" /> Baixar Materiais / Insumos
+              {sel && <span className="text-sm font-normal text-text-soft">— {sel.pacienteNome}</span>}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-text-soft">
+            Selecione os itens utilizados no leito. Os valores serão deduzidos do estoque da UTI.
+          </p>
+          <ul className="mt-2 divide-y divide-border rounded-lg border border-border bg-surface">
+            {INSUMOS_UTI.map((i) => {
+              const qtd = insumosQtd[i.id] ?? 0;
+              const setQtd = (n: number) =>
+                setInsumosQtd((prev) => ({ ...prev, [i.id]: Math.max(0, n) }));
+              return (
+                <li key={i.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                  <span className="text-sm text-text-strong">{i.nome}</span>
+                  <div className="inline-flex items-center gap-2">
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="h-7 w-7"
+                      onClick={() => setQtd(qtd - 1)}
+                      disabled={qtd === 0}
+                    >
+                      <Minus className="h-3.5 w-3.5" />
+                    </Button>
+                    <span className="w-8 text-center text-sm font-semibold">{qtd}</span>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="h-7 w-7"
+                      onClick={() => setQtd(qtd + 1)}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInsumosOpen(false)}>
+              <X className="mr-1.5 h-4 w-4" /> Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                const total = Object.values(insumosQtd).reduce((a, b) => a + b, 0);
+                if (total === 0) {
+                  toast.error("Informe a quantidade de pelo menos um item");
+                  return;
+                }
+                setInsumosOpen(false);
+                setInsumosQtd({});
+                toast.success("Materiais deduzidos do Estoque da UTI", {
+                  description: sel ? `Leito ${sel.leito} · ${sel.pacienteNome}` : undefined,
+                });
+              }}
+            >
+              Confirmar baixa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
