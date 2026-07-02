@@ -901,9 +901,20 @@ function FichaPage() {
                       className="flex items-start justify-between gap-3 rounded-sm border border-border bg-card px-4 py-3"
                     >
                       <div className="space-y-1 text-sm">
-                        <p className="font-semibold">
-                          {i + 1}. {m.medicamento}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-semibold">
+                            {i + 1}. {m.medicamento}
+                          </p>
+                          {m.farmaciaMunicipal ? (
+                            <Badge className="border-transparent bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
+                              Retirar no Almoxarifado
+                            </Badge>
+                          ) : (
+                            <Badge className="border-transparent bg-orange-100 text-orange-800 hover:bg-orange-100">
+                              Compra Externa do Tutor
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-muted-foreground">
                           {[
                             m.via && `Via: ${m.via}`,
@@ -915,6 +926,7 @@ function FichaPage() {
                             .join(" • ")}
                         </p>
                       </div>
+
                       <Button
                         size="icon"
                         variant="ghost"
