@@ -46,6 +46,27 @@ function EmAtendimento() {
         Acompanhe e gerencie os atendimentos veterinários em andamento na unidade.
       </p>
 
+      {/* Banner de última chamada */}
+      <div className="mt-6 rounded-2xl border border-primary-100 bg-primary-50 p-5 shadow-sm">
+        <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/70 text-primary shadow-sm">
+              <Volume2 className="h-5 w-5 animate-pulse" />
+            </span>
+            <div className="flex flex-col">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-700">Última chamada</span>
+              <span className="text-xs text-text-soft">Painel de chamada pública</span>
+            </div>
+          </div>
+          <div className="flex-1 text-left md:text-center">
+            <p className="font-display text-4xl font-bold leading-tight tracking-tight text-primary-900 md:text-5xl">
+              REX <span className="text-primary-400">·</span> Consultório 02
+            </p>
+          </div>
+          <div className="hidden md:block md:w-[140px]" aria-hidden />
+        </div>
+      </div>
+
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => {
           const Icone = s.Icon;
