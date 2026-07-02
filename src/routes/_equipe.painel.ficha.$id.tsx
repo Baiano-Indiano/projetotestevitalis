@@ -1089,6 +1089,62 @@ function FichaPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="encaminhar" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Send className="h-4 w-4 text-primary" /> Encaminhamento para especialista externo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <p className="text-sm text-muted-foreground">
+                Use este formulário quando o hospital municipal não dispuser da especialidade
+                necessária. A guia gerada deve ser entregue ao tutor para apresentar na clínica parceira.
+              </p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="enc-esp">Especialidade de destino</Label>
+                  <Select
+                    value={encaminhamento.especialidade}
+                    onValueChange={(v) =>
+                      setEncaminhamento((p) => ({ ...p, especialidade: v }))
+                    }
+                  >
+                    <SelectTrigger id="enc-esp">
+                      <SelectValue placeholder="Selecione a especialidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Oftalmologia">Oftalmologia</SelectItem>
+                      <SelectItem value="Cardiologia">Cardiologia</SelectItem>
+                      <SelectItem value="Neurologia">Neurologia</SelectItem>
+                      <SelectItem value="Ortopedia">Ortopedia</SelectItem>
+                      <SelectItem value="Oncologia">Oncologia</SelectItem>
+                      <SelectItem value="Dermatologia">Dermatologia</SelectItem>
+                      <SelectItem value="Endocrinologia">Endocrinologia</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="enc-motivo">Motivo clínico do encaminhamento</Label>
+                <Textarea
+                  id="enc-motivo"
+                  rows={5}
+                  value={encaminhamento.motivo}
+                  onChange={(e) =>
+                    setEncaminhamento((p) => ({ ...p, motivo: e.target.value }))
+                  }
+                  placeholder="Descreva sinais clínicos, exames já realizados e a hipótese que motiva o encaminhamento."
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={gerarGuiaEncaminhamento} className="gap-2">
+                  <Printer className="h-4 w-4" /> Gerar Guia de Referência Externa
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
