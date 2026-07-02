@@ -165,6 +165,7 @@ function FichaPage() {
     via: string;
     frequencia: string;
     duracao: string;
+    farmaciaMunicipal: boolean;
   };
   const [listaPrescricao, setListaPrescricao] = useState<ItemPrescricao[]>([]);
   const [tempMedicamento, setTempMedicamento] = useState("");
@@ -172,7 +173,21 @@ function FichaPage() {
   const [tempVia, setTempVia] = useState("");
   const [tempFrequencia, setTempFrequencia] = useState("");
   const [tempDuracao, setTempDuracao] = useState("");
+  const [tempFarmaciaMunicipal, setTempFarmaciaMunicipal] = useState(true);
   const [recomendacoes, setRecomendacoes] = useState("");
+
+  // Encaminhamento externo
+  const [encaminhamento, setEncaminhamento] = useState({ especialidade: "", motivo: "" });
+  const gerarGuiaEncaminhamento = () => {
+    if (!encaminhamento.especialidade) {
+      toast.error("Selecione a especialidade de destino");
+      return;
+    }
+    toast.success("Guia de Referência Externa gerada", {
+      description: `Encaminhado para ${encaminhamento.especialidade}. Documento pronto para impressão.`,
+    });
+  };
+
 
   // Evolução clínica (SOAP)
   const [novaEvolucao, setNovaEvolucao] = useState({
