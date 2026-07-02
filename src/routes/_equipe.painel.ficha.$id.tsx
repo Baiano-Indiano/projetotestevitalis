@@ -867,11 +867,25 @@ function FichaPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/30 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="farm-mun"
+                    checked={tempFarmaciaMunicipal}
+                    onCheckedChange={setTempFarmaciaMunicipal}
+                  />
+                  <Label htmlFor="farm-mun" className="cursor-pointer text-sm">
+                    Disponível na Farmácia Municipal?
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                      Marque se o item pode ser retirado no almoxarifado da unidade.
+                    </span>
+                  </Label>
+                </div>
                 <Button variant="outline" onClick={adicionarMedicamento} className="gap-2">
                   <Plus className="h-4 w-4" /> Adicionar à receita
                 </Button>
               </div>
+
 
               <Separator />
 
