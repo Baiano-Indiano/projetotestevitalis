@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Stethoscope, CalendarDays, Clock, AlertTriangle, PawPrint, Cat } from "lucide-react";
+import { Search, Filter, Stethoscope, CalendarDays, Clock, AlertTriangle, PawPrint, Cat, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_equipe/painel/em-atendimento")({
