@@ -393,13 +393,15 @@ function FichaPage() {
       </Card>
 
       <Tabs defaultValue="anamnese" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
           <TabsTrigger value="exame">Exame físico</TabsTrigger>
           <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
           <TabsTrigger value="prescricao">Prescrição</TabsTrigger>
           <TabsTrigger value="evolucao">Evolução</TabsTrigger>
+          <TabsTrigger value="encaminhar">Encaminhar</TabsTrigger>
         </TabsList>
+
 
         {/* ANAMNESE */}
         <TabsContent value="anamnese" className="mt-6 space-y-6">
