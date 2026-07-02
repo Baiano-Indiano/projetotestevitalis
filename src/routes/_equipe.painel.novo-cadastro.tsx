@@ -17,7 +17,11 @@ import {
   Search,
   Barcode,
   Check,
+  Upload,
+  AlertTriangle,
 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -89,6 +93,8 @@ function NovoCadastroPage() {
   const [estadoTutor, setEstadoTutor] = useState("");
   const [emergContato, setEmergContato] = useState("");
   const [obsTutor, setObsTutor] = useState("");
+  const [residenteMunicipio, setResidenteMunicipio] = useState<"sim" | "nao" | "">("");
+  const [comprovanteResidencia, setComprovanteResidencia] = useState<string | null>(null);
 
   // Animal
   const [nomeAnimal, setNomeAnimal] = useState("");
@@ -226,6 +232,60 @@ function NovoCadastroPage() {
                 </Select>
               </Field>
               <Field label="Contato de emergência" className="md:col-span-2"><Input value={emergContato} onChange={(e) => setEmergContato(e.target.value)} placeholder="Nome e telefone" /></Field>
+
+              <div className="md:col-span-2 space-y-2 rounded-lg border border-border bg-muted/30 p-3">
+                <Label className="text-xs font-semibold uppercase tracking-wider text-text-soft">
+                  Validação de munícipe
+                </Label>
+                <p className="text-sm text-text-strong">Tutor reside no município?</p>
+                <RadioGroup
+                  value={residenteMunicipio}
+                  onValueChange={(v) => setResidenteMunicipio(v as "sim" | "nao")}
+                  className="flex gap-4"
+                >
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <RadioGroupItem value="sim" id="mun-sim" /> Sim
+                  </label>
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <RadioGroupItem value="nao" id="mun-nao" /> Não
+                  </label>
+                </RadioGroup>
+
+                {residenteMunicipio === "sim" && (
+                  <label
+                    htmlFor="comprovante-residencia"
+                    className="mt-2 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-primary/40 bg-primary-50/50 px-4 py-6 text-center transition-colors hover:bg-primary-50"
+                  >
+                    <Upload className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium text-primary-800">
+                      {comprovanteResidencia ?? "Anexar Comprovante de Residência ou Cartão SUS"}
+                    </span>
+                    <span className="text-xs text-muted-foreground">PDF, JPG ou PNG</span>
+                    <input
+                      id="comprovante-residencia"
+                      type="file"
+                      accept="image/*,application/pdf"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) setComprovanteResidencia(f.name);
+                      }}
+                    />
+                  </label>
+                )}
+
+                {residenteMunicipio === "nao" && (
+                  <Alert variant="destructive" className="mt-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Atendimento restrito</AlertTitle>
+                    <AlertDescription>
+                      O atendimento de animais de outros municípios é estritamente proibido por lei
+                      municipal, exceto em casos de Risco de Morte (Classificação Vermelha).
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+
               <Field label="Observações" className="md:col-span-2">
                 <Textarea rows={3} value={obsTutor} onChange={(e) => setObsTutor(e.target.value)} placeholder="Observações adicionais sobre o tutor" />
               </Field>
