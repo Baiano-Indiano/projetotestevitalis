@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import {
   ArrowLeft,
   FileText,
@@ -26,8 +27,10 @@ import {
   Trash2,
   Printer,
   ClipboardList,
+  Send,
 } from "lucide-react";
 import { toast } from "sonner";
+
 import { SolicitacaoExames } from "@/components/SolicitacaoExames";
 
 export const Route = createFileRoute("/_equipe/painel/ficha/$id")({
@@ -162,6 +165,7 @@ function FichaPage() {
     via: string;
     frequencia: string;
     duracao: string;
+    farmaciaMunicipal: boolean;
   };
   const [listaPrescricao, setListaPrescricao] = useState<ItemPrescricao[]>([]);
   const [tempMedicamento, setTempMedicamento] = useState("");
@@ -169,7 +173,21 @@ function FichaPage() {
   const [tempVia, setTempVia] = useState("");
   const [tempFrequencia, setTempFrequencia] = useState("");
   const [tempDuracao, setTempDuracao] = useState("");
+  const [tempFarmaciaMunicipal, setTempFarmaciaMunicipal] = useState(true);
   const [recomendacoes, setRecomendacoes] = useState("");
+
+  // Encaminhamento externo
+  const [encaminhamento, setEncaminhamento] = useState({ especialidade: "", motivo: "" });
+  const gerarGuiaEncaminhamento = () => {
+    if (!encaminhamento.especialidade) {
+      toast.error("Selecione a especialidade de destino");
+      return;
+    }
+    toast.success("Guia de Referência Externa gerada", {
+      description: `Encaminhado para ${encaminhamento.especialidade}. Documento pronto para impressão.`,
+    });
+  };
+
 
   // Evolução clínica (SOAP)
   const [novaEvolucao, setNovaEvolucao] = useState({
@@ -246,6 +264,7 @@ function FichaPage() {
         via: tempVia,
         frequencia: tempFrequencia,
         duracao: tempDuracao,
+        farmaciaMunicipal: tempFarmaciaMunicipal,
       },
     ]);
     setTempMedicamento("");
@@ -253,6 +272,8 @@ function FichaPage() {
     setTempVia("");
     setTempFrequencia("");
     setTempDuracao("");
+    setTempFarmaciaMunicipal(true);
+
   };
 
   const removerMedicamento = (id: string) => {
@@ -372,13 +393,15 @@ function FichaPage() {
       </Card>
 
       <Tabs defaultValue="anamnese" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
           <TabsTrigger value="exame">Exame físico</TabsTrigger>
           <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
           <TabsTrigger value="prescricao">Prescrição</TabsTrigger>
           <TabsTrigger value="evolucao">Evolução</TabsTrigger>
+          <TabsTrigger value="encaminhar">Encaminhar</TabsTrigger>
         </TabsList>
+
 
         {/* ANAMNESE */}
         <TabsContent value="anamnese" className="mt-6 space-y-6">
@@ -844,11 +867,25 @@ function FichaPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/30 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="farm-mun"
+                    checked={tempFarmaciaMunicipal}
+                    onCheckedChange={setTempFarmaciaMunicipal}
+                  />
+                  <Label htmlFor="farm-mun" className="cursor-pointer text-sm">
+                    Disponível na Farmácia Municipal?
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                      Marque se o item pode ser retirado no almoxarifado da unidade.
+                    </span>
+                  </Label>
+                </div>
                 <Button variant="outline" onClick={adicionarMedicamento} className="gap-2">
                   <Plus className="h-4 w-4" /> Adicionar à receita
                 </Button>
               </div>
+
 
               <Separator />
 
@@ -864,9 +901,20 @@ function FichaPage() {
                       className="flex items-start justify-between gap-3 rounded-sm border border-border bg-card px-4 py-3"
                     >
                       <div className="space-y-1 text-sm">
-                        <p className="font-semibold">
-                          {i + 1}. {m.medicamento}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-semibold">
+                            {i + 1}. {m.medicamento}
+                          </p>
+                          {m.farmaciaMunicipal ? (
+                            <Badge className="border-transparent bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
+                              Retirar no Almoxarifado
+                            </Badge>
+                          ) : (
+                            <Badge className="border-transparent bg-orange-100 text-orange-800 hover:bg-orange-100">
+                              Compra Externa do Tutor
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-muted-foreground">
                           {[
                             m.via && `Via: ${m.via}`,
@@ -878,6 +926,7 @@ function FichaPage() {
                             .join(" • ")}
                         </p>
                       </div>
+
                       <Button
                         size="icon"
                         variant="ghost"
@@ -1037,6 +1086,62 @@ function FichaPage() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="encaminhar" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Send className="h-4 w-4 text-primary" /> Encaminhamento para especialista externo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <p className="text-sm text-muted-foreground">
+                Use este formulário quando o hospital municipal não dispuser da especialidade
+                necessária. A guia gerada deve ser entregue ao tutor para apresentar na clínica parceira.
+              </p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="enc-esp">Especialidade de destino</Label>
+                  <Select
+                    value={encaminhamento.especialidade}
+                    onValueChange={(v) =>
+                      setEncaminhamento((p) => ({ ...p, especialidade: v }))
+                    }
+                  >
+                    <SelectTrigger id="enc-esp">
+                      <SelectValue placeholder="Selecione a especialidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Oftalmologia">Oftalmologia</SelectItem>
+                      <SelectItem value="Cardiologia">Cardiologia</SelectItem>
+                      <SelectItem value="Neurologia">Neurologia</SelectItem>
+                      <SelectItem value="Ortopedia">Ortopedia</SelectItem>
+                      <SelectItem value="Oncologia">Oncologia</SelectItem>
+                      <SelectItem value="Dermatologia">Dermatologia</SelectItem>
+                      <SelectItem value="Endocrinologia">Endocrinologia</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="enc-motivo">Motivo clínico do encaminhamento</Label>
+                <Textarea
+                  id="enc-motivo"
+                  rows={5}
+                  value={encaminhamento.motivo}
+                  onChange={(e) =>
+                    setEncaminhamento((p) => ({ ...p, motivo: e.target.value }))
+                  }
+                  placeholder="Descreva sinais clínicos, exames já realizados e a hipótese que motiva o encaminhamento."
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={gerarGuiaEncaminhamento} className="gap-2">
+                  <Printer className="h-4 w-4" /> Gerar Guia de Referência Externa
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
