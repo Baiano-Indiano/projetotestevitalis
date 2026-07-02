@@ -287,6 +287,17 @@ function Internacoes() {
                 >
                   <AlertTriangle className="h-4 w-4" /> Alternar Criticidade
                 </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={() => {
+                    setInsumosQtd({});
+                    setInsumosOpen(true);
+                  }}
+                >
+                  <Package className="h-4 w-4" /> Baixar Materiais / Insumos
+                </Button>
               </div>
             </div>
           )}
