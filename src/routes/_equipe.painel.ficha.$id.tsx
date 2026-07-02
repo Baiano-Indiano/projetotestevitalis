@@ -264,6 +264,7 @@ function FichaPage() {
         via: tempVia,
         frequencia: tempFrequencia,
         duracao: tempDuracao,
+        farmaciaMunicipal: tempFarmaciaMunicipal,
       },
     ]);
     setTempMedicamento("");
@@ -271,6 +272,8 @@ function FichaPage() {
     setTempVia("");
     setTempFrequencia("");
     setTempDuracao("");
+    setTempFarmaciaMunicipal(true);
+
   };
 
   const removerMedicamento = (id: string) => {
