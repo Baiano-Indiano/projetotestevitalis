@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_tutor/unidades")({
   head: () => ({
     meta: [
       { title: "Unidades. Vitalis Belém" },
-      { name: "description", content: "Conheça as unidades da rede Vitalis em Belém." },
+      { name: "description", content: "Endereços, horários e contatos das unidades do Hospital Veterinário Público Municipal de Belém — atendimento gratuito para tutores e animais da rede pública." },
     ],
   }),
   component: Unidades,
