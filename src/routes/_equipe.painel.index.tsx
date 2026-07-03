@@ -16,7 +16,13 @@ import {
 import { useVitalisStore } from "@/data/store";
 
 export const Route = createFileRoute("/_equipe/painel/")({
-  head: () => ({ meta: [{ title: "Painel. Vitalis Belém" }] }),
+  head: () => ({
+    meta: [
+      { title: "Painel. Vitalis Belém" },
+      { name: "description", content: "Painel clínico da rede Vitalis: recepção, triagens, internações e exames do Hospital Veterinário Público Municipal de Belém." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: PainelHome,
 });
 
