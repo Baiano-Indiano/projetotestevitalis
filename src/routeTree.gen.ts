@@ -34,6 +34,7 @@ import { Route as EquipePainelExamesRouteImport } from './routes/_equipe.painel.
 import { Route as EquipePainelEstoqueRouteImport } from './routes/_equipe.painel.estoque'
 import { Route as EquipePainelEncaminhamentosRouteImport } from './routes/_equipe.painel.encaminhamentos'
 import { Route as EquipePainelEmAtendimentoRouteImport } from './routes/_equipe.painel.em-atendimento'
+import { Route as EquipePainelConfiguracoesRouteImport } from './routes/_equipe.painel.configuracoes'
 import { Route as EquipePainelAguardandoRouteImport } from './routes/_equipe.painel.aguardando'
 import { Route as EquipePainelAgendaRouteImport } from './routes/_equipe.painel.agenda'
 import { Route as EquipePainelAdminRouteImport } from './routes/_equipe.painel.admin'
@@ -169,6 +170,12 @@ const EquipePainelEmAtendimentoRoute =
     path: '/painel/em-atendimento',
     getParentRoute: () => EquipeRoute,
   } as any)
+const EquipePainelConfiguracoesRoute =
+  EquipePainelConfiguracoesRouteImport.update({
+    id: '/painel/configuracoes',
+    path: '/painel/configuracoes',
+    getParentRoute: () => EquipeRoute,
+  } as any)
 const EquipePainelAguardandoRoute = EquipePainelAguardandoRouteImport.update({
   id: '/painel/aguardando',
   path: '/painel/aguardando',
@@ -212,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/painel/admin': typeof EquipePainelAdminRoute
   '/painel/agenda': typeof EquipePainelAgendaRoute
   '/painel/aguardando': typeof EquipePainelAguardandoRoute
+  '/painel/configuracoes': typeof EquipePainelConfiguracoesRoute
   '/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
   '/painel/estoque': typeof EquipePainelEstoqueRoute
@@ -243,6 +251,7 @@ export interface FileRoutesByTo {
   '/painel/admin': typeof EquipePainelAdminRoute
   '/painel/agenda': typeof EquipePainelAgendaRoute
   '/painel/aguardando': typeof EquipePainelAguardandoRoute
+  '/painel/configuracoes': typeof EquipePainelConfiguracoesRoute
   '/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
   '/painel/estoque': typeof EquipePainelEstoqueRoute
@@ -276,6 +285,7 @@ export interface FileRoutesById {
   '/_equipe/painel/admin': typeof EquipePainelAdminRoute
   '/_equipe/painel/agenda': typeof EquipePainelAgendaRoute
   '/_equipe/painel/aguardando': typeof EquipePainelAguardandoRoute
+  '/_equipe/painel/configuracoes': typeof EquipePainelConfiguracoesRoute
   '/_equipe/painel/em-atendimento': typeof EquipePainelEmAtendimentoRoute
   '/_equipe/painel/encaminhamentos': typeof EquipePainelEncaminhamentosRoute
   '/_equipe/painel/estoque': typeof EquipePainelEstoqueRoute
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/painel/admin'
     | '/painel/agenda'
     | '/painel/aguardando'
+    | '/painel/configuracoes'
     | '/painel/em-atendimento'
     | '/painel/encaminhamentos'
     | '/painel/estoque'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/painel/admin'
     | '/painel/agenda'
     | '/painel/aguardando'
+    | '/painel/configuracoes'
     | '/painel/em-atendimento'
     | '/painel/encaminhamentos'
     | '/painel/estoque'
@@ -372,6 +384,7 @@ export interface FileRouteTypes {
     | '/_equipe/painel/admin'
     | '/_equipe/painel/agenda'
     | '/_equipe/painel/aguardando'
+    | '/_equipe/painel/configuracoes'
     | '/_equipe/painel/em-atendimento'
     | '/_equipe/painel/encaminhamentos'
     | '/_equipe/painel/estoque'
@@ -575,6 +588,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipePainelEmAtendimentoRouteImport
       parentRoute: typeof EquipeRoute
     }
+    '/_equipe/painel/configuracoes': {
+      id: '/_equipe/painel/configuracoes'
+      path: '/painel/configuracoes'
+      fullPath: '/painel/configuracoes'
+      preLoaderRoute: typeof EquipePainelConfiguracoesRouteImport
+      parentRoute: typeof EquipeRoute
+    }
     '/_equipe/painel/aguardando': {
       id: '/_equipe/painel/aguardando'
       path: '/painel/aguardando'
@@ -639,6 +659,7 @@ interface EquipeRouteChildren {
   EquipePainelAdminRoute: typeof EquipePainelAdminRoute
   EquipePainelAgendaRoute: typeof EquipePainelAgendaRoute
   EquipePainelAguardandoRoute: typeof EquipePainelAguardandoRoute
+  EquipePainelConfiguracoesRoute: typeof EquipePainelConfiguracoesRoute
   EquipePainelEmAtendimentoRoute: typeof EquipePainelEmAtendimentoRoute
   EquipePainelEncaminhamentosRoute: typeof EquipePainelEncaminhamentosRoute
   EquipePainelEstoqueRoute: typeof EquipePainelEstoqueRoute
@@ -660,6 +681,7 @@ const EquipeRouteChildren: EquipeRouteChildren = {
   EquipePainelAdminRoute: EquipePainelAdminRoute,
   EquipePainelAgendaRoute: EquipePainelAgendaRoute,
   EquipePainelAguardandoRoute: EquipePainelAguardandoRoute,
+  EquipePainelConfiguracoesRoute: EquipePainelConfiguracoesRoute,
   EquipePainelEmAtendimentoRoute: EquipePainelEmAtendimentoRoute,
   EquipePainelEncaminhamentosRoute: EquipePainelEncaminhamentosRoute,
   EquipePainelEstoqueRoute: EquipePainelEstoqueRoute,
@@ -733,13 +755,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
