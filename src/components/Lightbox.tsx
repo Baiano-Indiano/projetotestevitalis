@@ -151,7 +151,7 @@ export function Lightbox({ fotos, index, onClose, onIndexChange }: LightboxProps
         >
           <img
             src={foto.url}
-            alt={foto.nome}
+            alt={`Foto ${index + 1} de ${fotos.length} anexada à triagem`}
             draggable={false}
             className="max-h-full max-w-full select-none transition-transform"
             style={{
