@@ -52,8 +52,12 @@ export const Route = createFileRoute("/_tutor/triagem")({
   head: () => ({
     meta: [
       { title: "Triagem online. Vitalis Belém" },
-      { name: "description", content: "Triagem online em quatro etapas, gratuita, validada por veterinário." },
+      { name: "description", content: "Triagem online em quatro etapas, gratuita, validada por veterinário municipal de Belém." },
+      { property: "og:title", content: "Triagem online — Vitalis Belém" },
+      { property: "og:description", content: "Triagem veterinária online gratuita com classificação de risco (Protocolo de Manchester)." },
+      { property: "og:url", content: "https://projetotestevitalis.lovable.app/triagem" },
     ],
+    links: [{ rel: "canonical", href: "https://projetotestevitalis.lovable.app/triagem" }],
   }),
   component: TriagemRoute,
 });

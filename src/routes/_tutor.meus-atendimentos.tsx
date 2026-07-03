@@ -10,7 +10,11 @@ export const Route = createFileRoute("/_tutor/meus-atendimentos")({
         content:
           "Acompanhe suas triagens, agendamentos e orientações veterinárias na rede pública municipal de Belém.",
       },
+      { property: "og:title", content: "Meus atendimentos — Vitalis Belém" },
+      { property: "og:description", content: "Histórico de triagens e agendamentos vinculado ao seu cadastro municipal." },
+      { property: "og:url", content: "https://projetotestevitalis.lovable.app/meus-atendimentos" },
     ],
+    links: [{ rel: "canonical", href: "https://projetotestevitalis.lovable.app/meus-atendimentos" }],
   }),
   component: () => (
     <ScaffoldPage
