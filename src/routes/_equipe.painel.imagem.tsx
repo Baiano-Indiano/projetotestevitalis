@@ -171,6 +171,8 @@ function ImagemRoute() {
         ) : (
           filtrados.map((s) => {
             const concluido = s.status === "concluido";
+            const emAnalise = s.status === "em_analise";
+            const badge = badgeInfo(s.status);
             return (
               <div key={s.key} className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-3">
