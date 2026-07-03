@@ -170,6 +170,11 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => {
+    const saved = localStorage.getItem("vitalis-theme");
+    if (saved === "dark") document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <VitalisStoreProvider>
