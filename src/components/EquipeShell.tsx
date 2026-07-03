@@ -67,6 +67,7 @@ export function EquipeShell() {
 
   const itemsVeterinario: Item[] = [
     { to: "/painel", label: "Painel do Veterinário", Icon: LayoutGrid },
+    { to: "/painel/aguardando", label: "Pacientes Aguardando", Icon: Users, badge: () => pendentes > 0 ? <Badge count={pendentes} /> : null },
     { to: "/painel/em-atendimento", label: "Pacientes em Atendimento", Icon: UserSquare2 },
     { to: "/painel/ficha/$id", label: "Prontuários", Icon: FileText, params: { id: "novo" } },
     { to: "/painel/exames", label: "Solicitações de Exames", Icon: FlaskConical },
