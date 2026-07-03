@@ -378,8 +378,14 @@ function Triagem() {
 
                   <div>
                     <Label className="text-sm font-semibold text-text-strong">
-                      Fotos do animal (opcional)
+                      Fotos do animal {exigeProvaVisual ? "(obrigatório)" : "(opcional)"}
                     </Label>
+                    {exigeProvaVisual && (
+                      <p className="mt-1 flex items-start gap-1.5 text-xs font-medium text-destructive">
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                        Foto obrigatória para o sintoma grave selecionado.
+                      </p>
+                    )}
                     <p className="mt-1 text-xs text-muted-foreground">
                       Anexe até 5 fotos (máx. 5MB cada) para ajudar a equipe a contextualizar.
                     </p>
