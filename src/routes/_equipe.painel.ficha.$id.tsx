@@ -476,6 +476,47 @@ function FichaPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-5 md:grid-cols-2">
+              <div className="md:col-span-2 rounded-lg border border-primary/30 bg-gradient-to-r from-primary/5 via-fuchsia-500/5 to-primary/5 p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/10 text-primary">
+                      <Sparkles className="h-4 w-4" />
+                    </span>
+                    <div>
+                      <p className="font-medium text-text-strong">Assistente Clínico IA</p>
+                      <p className="text-xs text-muted-foreground">
+                        Transcreve a consulta em tempo real e preenche a anamnese automaticamente.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={iniciarAIScribe}
+                    disabled={gravandoIA}
+                    className={
+                      gravandoIA
+                        ? "gap-2 bg-red-600 text-white hover:bg-red-600 animate-pulse shadow-[0_0_0_6px_rgba(239,68,68,0.15)]"
+                        : "gap-2 bg-gradient-to-r from-primary to-fuchsia-600 text-white hover:opacity-90"
+                    }
+                  >
+                    {gravandoIA ? (
+                      <>
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white" />
+                        </span>
+                        Gravando…
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="h-4 w-4" /> Ouvir Consulta com IA (BETA)
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
               <div className="md:col-span-2">
                 <Label htmlFor="queixa">Queixa principal</Label>
                 <Textarea
@@ -486,6 +527,7 @@ function FichaPage() {
                   placeholder="Motivo da consulta relatado pelo tutor"
                 />
               </div>
+
 
               <div>
                 <Label htmlFor="inicio">Início dos sintomas</Label>
