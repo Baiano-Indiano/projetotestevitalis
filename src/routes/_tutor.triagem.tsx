@@ -334,6 +334,8 @@ function Triagem() {
               sexo={sexo} setSexo={setSexo}
               pelagem={pelagem} setPelagem={setPelagem}
               peso={peso} setPeso={setPeso}
+              municipe={municipe} setMunicipe={setMunicipe}
+              comprovante={comprovante} setComprovante={setComprovante}
             />
           )}
 
