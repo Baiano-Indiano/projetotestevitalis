@@ -229,7 +229,7 @@ function ImagemRoute() {
                   ) : (
                     <>
                       <Button variant="outline" size="sm">Abrir visualizador</Button>
-                      <Button size="sm" onClick={() => marcarConcluido(s.key)}>
+                      <Button size="sm" onClick={() => marcarConcluido(s)}>
                         Emitir laudo
                       </Button>
                     </>
