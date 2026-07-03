@@ -9,7 +9,11 @@ export const Route = createFileRoute("/_tutor/unidades")({
     meta: [
       { title: "Unidades. Vitalis Belém" },
       { name: "description", content: "Endereços, horários e contatos das unidades do Hospital Veterinário Público Municipal de Belém — atendimento gratuito para tutores e animais da rede pública." },
+      { property: "og:title", content: "Unidades — Vitalis Belém" },
+      { property: "og:description", content: "Endereços, horários e contatos das unidades veterinárias municipais de Belém." },
+      { property: "og:url", content: "https://projetotestevitalis.lovable.app/unidades" },
     ],
+    links: [{ rel: "canonical", href: "https://projetotestevitalis.lovable.app/unidades" }],
   }),
   component: Unidades,
 });

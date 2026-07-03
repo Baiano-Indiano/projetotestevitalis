@@ -30,7 +30,7 @@ export function Logo({
       >
         <img
           src={logoAsset.url}
-          alt="Vitalis"
+          alt="Vitalis Belém — Hospital Veterinário Público Municipal"
           className="h-full w-full object-contain"
           loading="eager"
           decoding="async"

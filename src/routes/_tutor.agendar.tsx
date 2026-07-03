@@ -22,8 +22,12 @@ export const Route = createFileRoute("/_tutor/agendar")({
   head: () => ({
     meta: [
       { title: "Agendar atendimento. Vitalis Belém" },
-      { name: "description", content: "Selecione especialidade, data e horário para a consulta do seu pet." },
+      { name: "description", content: "Selecione especialidade, data e horário para a consulta do seu pet na rede veterinária municipal de Belém." },
+      { property: "og:title", content: "Agendar atendimento — Vitalis Belém" },
+      { property: "og:description", content: "Agende consultas veterinárias públicas por especialidade, data e horário." },
+      { property: "og:url", content: "https://projetotestevitalis.lovable.app/agendar" },
     ],
+    links: [{ rel: "canonical", href: "https://projetotestevitalis.lovable.app/agendar" }],
   }),
   component: AgendarRoute,
 });

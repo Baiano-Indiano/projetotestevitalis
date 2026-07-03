@@ -6,8 +6,47 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_tutor/informacoes")({
   head: () => ({
     meta: [
-      { title: "Central de informações para tutores. Vitalis Belém" },
-      { name: "description", content: "Tudo que você precisa saber para garantir o melhor atendimento do seu pet na rede municipal." },
+      { title: "Central de informações para tutores — Vitalis Belém" },
+      { name: "description", content: "Tudo que você precisa saber para garantir o melhor atendimento do seu pet na rede veterinária municipal de Belém." },
+      { property: "og:title", content: "Central de informações para tutores — Vitalis Belém" },
+      { property: "og:description", content: "Documentos, horários, serviços e dúvidas frequentes da rede veterinária pública de Belém." },
+      { property: "og:url", content: "https://projetotestevitalis.lovable.app/informacoes" },
+    ],
+    links: [{ rel: "canonical", href: "https://projetotestevitalis.lovable.app/informacoes" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "O serviço é gratuito?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Sim. Todos os atendimentos da rede municipal Vitalis Belém são oferecidos gratuitamente pela Prefeitura, mediante triagem e cadastro do tutor.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Posso agendar por telefone?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "O agendamento principal é feito online ou nas unidades móveis. Em casos específicos, ligue para a Clínica Municipal Centro: (91) 3000 0001.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Atendem animais silvestres?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Animais silvestres apreendidos ou resgatados devem ser encaminhados ao IBAMA. Atendemos apenas cães, gatos e pequenos roedores domésticos.",
+              },
+            },
+          ],
+        }),
+      },
     ],
   }),
   component: Informacoes,
@@ -63,9 +102,9 @@ function Informacoes() {
                 <span className={cn("grid h-10 w-10 place-items-center rounded-xl", cor.icon)}>
                   <Icone className="h-5 w-5" />
                 </span>
-                <h3 className="mt-4 font-display text-base font-semibold text-text-strong">
+                <h2 className="mt-4 font-display text-base font-semibold text-text-strong">
                   {c.titulo}
-                </h3>
+                </h2>
                 <p className="mt-1 text-sm text-muted-foreground">{c.desc}</p>
               </div>
             );
