@@ -14,6 +14,35 @@ export const Route = createFileRoute("/_tutor/unidades")({
       { property: "og:url", content: "https://projetotestevitalis.lovable.app/unidades" },
     ],
     links: [{ rel: "canonical", href: "https://projetotestevitalis.lovable.app/unidades" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: `Unidades ${municipio.nomeRede}`,
+          itemListElement: municipio.unidades.map((u, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+              "@type": u.tipo === "hospital" ? "AnimalShelter" : "VeterinaryCare",
+              name: u.nome,
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: u.endereco,
+                addressLocality: municipio.cidade,
+                addressRegion: municipio.uf,
+                addressCountry: "BR",
+              },
+              geo: { "@type": "GeoCoordinates", latitude: u.lat, longitude: u.lng },
+              telephone: u.telefone,
+              openingHours: u.atendimento24h ? "Mo-Su 00:00-24:00" : "Mo-Fr 08:00-17:00",
+              availableService: u.servicos.map((s) => ({ "@type": "MedicalProcedure", name: s })),
+            },
+          })),
+        }),
+      },
+    ],
   }),
   component: Unidades,
 });
