@@ -95,6 +95,8 @@ function Triagem() {
   const [sexo, setSexo] = useState<"macho" | "femea" | "">("");
   const [pelagem, setPelagem] = useState("");
   const [peso, setPeso] = useState("");
+  const [municipe, setMunicipe] = useState<"sim" | "nao" | "">("");
+  const [comprovante, setComprovante] = useState<{ nome: string; url: string } | null>(null);
 
   // Fases 2 e 3 — sintomas
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
