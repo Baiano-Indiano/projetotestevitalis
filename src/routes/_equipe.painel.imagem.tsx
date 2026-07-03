@@ -105,8 +105,16 @@ function ImagemRoute() {
     { label: "Hoje", valor: solicitacoes.filter((s) => new Date(s.criadoEm).toDateString() === new Date().toDateString()).length, Icon: FileText, tone: "bg-muted text-text-strong" },
   ];
 
+  const iniciarAnalise = (s: SolicitacaoImg) =>
+    atualizarStatusExame(s.diagnosticoId, s.exameId, "em_analise");
   const marcarConcluido = (s: SolicitacaoImg) =>
     atualizarStatusExame(s.diagnosticoId, s.exameId, "concluido");
+
+  const badgeInfo = (st: SolicitacaoImg["status"]) => {
+    if (st === "concluido") return { tone: "bg-success-50 text-success-700", dot: "bg-success", label: "Laudo emitido" };
+    if (st === "em_analise") return { tone: "bg-primary-50 text-primary-800", dot: "bg-primary", label: "Em análise" };
+    return { tone: "bg-warning-50 text-warning-700", dot: "bg-warning", label: "Aguardando laudo" };
+  };
 
 
   return (
