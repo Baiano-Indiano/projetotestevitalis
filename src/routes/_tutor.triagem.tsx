@@ -447,6 +447,28 @@ function Triagem() {
                       </ul>
                     )}
                   </div>
+
+                  {exigeProvaVisual && (
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Risco de Reclassificação Hospitalar</AlertTitle>
+                      <AlertDescription>
+                        Você selecionou uma Emergência Grave. Ao chegar no hospital, o paciente
+                        passará por validação imediata. Caso o quadro não corresponda aos sintomas
+                        relatados, o paciente perderá a prioridade e será redirecionado para o{" "}
+                        <strong>FINAL DA FILA VERDE</strong>, podendo esperar horas. Apenas confirme
+                        se a situação for real.
+                      </AlertDescription>
+                      <label className="mt-4 flex cursor-pointer items-start gap-2 text-sm font-medium text-destructive">
+                        <Checkbox
+                          checked={aceiteTermo}
+                          onCheckedChange={(v) => setAceiteTermo(v === true)}
+                          className="mt-0.5 border-destructive data-[state=checked]:bg-destructive data-[state=checked]:text-destructive-foreground"
+                        />
+                        <span>Estou ciente das regras de reclassificação.</span>
+                      </label>
+                    </Alert>
+                  )}
                 </div>
               }
             />
