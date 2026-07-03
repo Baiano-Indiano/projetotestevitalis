@@ -129,7 +129,7 @@ export const blocosTriagem: BlocoEspecialidadeTriagem[] = [
     corIcone: "text-primary",
     perguntas: [
       { id: "urina-freq", tipo: "simnao", label: "O animal está urinando com frequência aumentada?" },
-      { id: "dor", tipo: "simnao", label: "Existe dificuldade ou dor ao urinar?" },
+      { id: "dor", tipo: "checkbox", label: "O animal apresenta algum destes sinais ao urinar? (Selecione todos aplicáveis)", opcoes: ["Dificuldade para urinar", "Dor ao urinar", "Nenhum"] },
       { id: "sangue", tipo: "simnao", label: "Houve presença de sangue na urina?" },
       { id: "agua", tipo: "simnao", label: "O animal está bebendo mais água que o normal?" },
       { id: "associados", tipo: "checkbox", label: "Sintomas associados:", opcoes: ["Perda de apetite", "Perda de peso", "Vômitos", "Apatia"] },
