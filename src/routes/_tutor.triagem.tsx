@@ -168,7 +168,10 @@ function Triagem() {
   const [aceite, setAceite] = useState(false);
 
   const valida1 = () =>
-    Boolean(especie && idadeValor && tutorNome && tutorTel && tutorEnd && animalNome);
+    Boolean(
+      especie && idadeValor && tutorNome && tutorTel && tutorEnd && animalNome &&
+      municipe === "sim" && comprovante,
+    );
 
   const [redFlagAtivo, setRedFlagAtivo] = useState<{ id: string; label: string } | null>(null);
 
