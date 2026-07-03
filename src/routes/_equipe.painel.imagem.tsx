@@ -162,7 +162,7 @@ function ImagemRoute() {
           </div>
         ) : (
           filtrados.map((s) => {
-            const concluido = !!concluidos[s.key];
+            const concluido = s.status === "concluido";
             return (
               <div key={s.key} className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-3">
