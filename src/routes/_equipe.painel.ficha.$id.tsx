@@ -353,8 +353,8 @@ function FichaPage() {
       )}
 
       {/* Cabeçalho do paciente */}
-      <Card>
-        <CardContent className="grid gap-4 py-5 md:grid-cols-4">
+      <Card className="relative">
+        <CardContent className="grid gap-4 py-5 md:grid-cols-4 pr-12">
           <div>
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Paciente</p>
             <p className="font-medium">{triagem?.animal.nome ?? "Animal não vinculado"}</p>
@@ -390,6 +390,17 @@ function FichaPage() {
             </Badge>
           </div>
         </CardContent>
+        {triagem && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-4 top-4 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+            onClick={() => navigate({ to: "/painel/ficha/novo" })}
+            title="Trocar paciente"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </Card>
 
       <Tabs defaultValue="anamnese" className="w-full">
