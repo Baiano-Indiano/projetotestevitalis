@@ -255,6 +255,23 @@ export interface TriagemSlice {
   setUltimaTriagemId: (id?: string) => void;
 }
 
+export type StatusExame = "solicitado" | "em_analise" | "concluido";
+
+export interface ItemEstoque {
+  id: string;
+  nome: string;
+  categoria: string;
+  quantidade: number;
+  alertaMinimo: number;
+  unidade?: string;
+}
+
+export interface EstoqueSlice {
+  estoque: ItemEstoque[];
+  atualizarQuantidadeEstoque: (id: string, novaQuantidade: number) => void;
+  ajustarQuantidadeEstoque: (id: string, delta: number) => void;
+}
+
 export interface ProntuarioSlice {
   anamneses: RegistroAnamnese[];
   examesFisicos: RegistroExameFisico[];
@@ -269,7 +286,9 @@ export interface ProntuarioSlice {
   salvarEvolucaoSOAP: (r: Omit<RegistroEvolucaoSOAP, "id" | "criadoEm">) => RegistroEvolucaoSOAP;
   adicionarInternacao: (r: Omit<Internacao, "id" | "criadoEm" | "status"> & { status?: StatusInternacao }) => Internacao;
   alterarStatusInternacao: (id: string, status: StatusInternacao) => void;
+  atualizarStatusExame: (diagnosticoId: string, exameId: string, novoStatus: StatusExame) => void;
 }
+
 
 export type RootState = TutorSlice & TriagemSlice & ProntuarioSlice;
 
