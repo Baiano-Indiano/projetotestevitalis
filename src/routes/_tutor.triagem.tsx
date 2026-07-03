@@ -291,9 +291,9 @@ function Triagem() {
       {/* Top bar */}
       <div className="border-b border-border bg-surface">
         <div className="container-app flex h-14 items-center justify-between">
-          <span className="font-display text-sm font-semibold text-text-strong">
+          <h1 className="font-display text-sm font-semibold text-text-strong">
             Triagem
-          </span>
+          </h1>
           {enviando ? (
             <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground opacity-50">
               Cancelar triagem <X className="h-4 w-4" />

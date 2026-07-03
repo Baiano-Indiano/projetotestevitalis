@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_tutor/informacoes")({
 
 const cards = [
   { icone: FolderOpen, titulo: "Documentos Necessários", desc: "RG, CPF do tutor e comprovante de residência atualizado.", cor: "primary" as const },
-  { icone: Clock, titulo: "Horários", desc: "Atendimento das 08h às 17h para triagem. Urgências 24h (Hospital).", cor: "success" as const },
+  { icone: Clock, titulo: "Horários", desc: "Atendimento das 08h às 17h para triagem e consultas.", cor: "success" as const },
   { icone: Stethoscope, titulo: "Serviços", desc: "Consultas, vacinas, cirurgias e exames laboratoriais.", cor: "muted" as const },
   { icone: AlertTriangle, titulo: "Emergências", desc: "O que configura uma emergência médica e como proceder.", cor: "destructive" as const },
 ];
@@ -99,7 +99,6 @@ function Informacoes() {
                 <Beneficio>Atendimento de emergências e traumas complexos.</Beneficio>
                 <Beneficio>Cirurgias ortopédicas e tecidos moles.</Beneficio>
                 <Beneficio>Internação com monitoramento contínuo.</Beneficio>
-                <Beneficio>Atendimento 24h para casos graves.</Beneficio>
               </ul>
             </div>
           </div>

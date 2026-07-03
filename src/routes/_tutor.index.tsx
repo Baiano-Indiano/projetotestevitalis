@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_tutor/")({
   head: () => ({
     meta: [
-      { title: "Atendimento veterinário público mais organizado e acessível. Vitalis Belém" },
+      { title: "Hospital Veterinário Público | Vitalis Belém" },
       { name: "description", content: "Triagem online gratuita e atendimento veterinário na rede municipal de Belém. Reduza filas e priorize quem precisa de cuidado urgente." },
       { property: "og:title", content: "Vitalis Belém. Saúde veterinária pública" },
       { property: "og:description", content: "Triagem online gratuita e atendimento na rede veterinária de Belém." },

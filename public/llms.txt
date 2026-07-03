@@ -1,0 +1,10 @@
+Vitalis Belém - Hospital Veterinário Público
+
+Vitalis Belém é a plataforma de atendimento veterinário da rede pública municipal de Belém. 
+Oferece um sistema inovador de triagem online onde o tutor pode relatar os sintomas do seu animal (cão ou gato).
+O sistema classifica o risco de acordo com o Protocolo de Manchester Veterinário, direcionando urgências para o atendimento imediato e organizando o fluxo da recepção.
+
+Principais funcionalidades:
+- Triagem Online Inteligente (Baseada no Protocolo de Manchester)
+- Atendimento gratuito exclusivo para munícipes de Belém
+- Controle de internação, farmácia e exames laboratoriais
