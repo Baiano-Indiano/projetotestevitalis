@@ -85,9 +85,33 @@ function Internacoes() {
 
   const marcarMed = (internacaoId: string, horario: string, medIdx: number, nome: string) => {
     const key = `${internacaoId}|${horario}|${medIdx}`;
-    if (medStatus[key]) return;
+    if (medStatus[key]) {
+      // Já administrado — permitir desfazer em caso de clique acidental
+      const ok = window.confirm(
+        `Desfazer administração de ${nome} às ${horario}?\n\nUse apenas em caso de clique acidental.`,
+      );
+      if (!ok) return;
+      setMedStatus((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+      toast.warning(`${nome} — administração desfeita`, { description: `Horário ${horario}` });
+      return;
+    }
     setMedStatus((prev) => ({ ...prev, [key]: true }));
-    toast.success(`${nome} administrado`, { description: `Horário ${horario}` });
+    toast.success(`${nome} administrado`, {
+      description: `Horário ${horario}`,
+      action: {
+        label: "Desfazer",
+        onClick: () =>
+          setMedStatus((prev) => {
+            const next = { ...prev };
+            delete next[key];
+            return next;
+          }),
+      },
+    });
   };
 
 
