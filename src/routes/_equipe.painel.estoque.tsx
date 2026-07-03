@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { useVitalisStore } from "@/data/store";
+import { useStore } from "@/data/store";
 
 export const Route = createFileRoute("/_equipe/painel/estoque")({
   component: EstoquePage,
