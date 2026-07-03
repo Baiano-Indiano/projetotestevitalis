@@ -108,11 +108,35 @@ function FichaPage() {
     observacoesGerais: "",
   });
 
+  const [gravandoIA, setGravandoIA] = useState(false);
+  const iniciarAIScribe = () => {
+    if (gravandoIA) return;
+    setGravandoIA(true);
+    toast.info("Ouvindo consulta…", { description: "IA capturando áudio em tempo real (simulação)" });
+    setTimeout(() => {
+      setAnamnese((a) => ({
+        ...a,
+        queixa:
+          "Tutor relata quadro de apatia progressiva há aproximadamente 48 horas, associado a episódios de vômito alimentar (2 episódios em 24h) e recusa parcial da alimentação seca. Nega diarreia, tosse ou trauma recente.",
+        historico:
+          "Animal previamente hígido, sem comorbidades relatadas. Última vermifugação há 4 meses. Vacinação em dia. Convive apenas com humanos, sem contactantes doentes no domicílio.",
+        sintomas: [a.sintomas, "vômito alimentar, hiporexia, prostração leve, mucosas normocoradas ao exame preliminar"]
+          .filter(Boolean)
+          .join("; "),
+      }));
+      setGravandoIA(false);
+      toast.success("Transcrição concluída com sucesso via IA", {
+        description: "Campos preenchidos automaticamente. Revise antes de salvar.",
+      });
+    }, 3000);
+  };
+
   const salvarExame = () => {
     toast.success("Exame físico salvo no prontuário", {
       description: triagem ? `Protocolo ${triagem.protocolo}` : undefined,
     });
   };
+
 
   const [diagnostico, setDiagnostico] = useState<{
     suspeitaPrincipal: string;
