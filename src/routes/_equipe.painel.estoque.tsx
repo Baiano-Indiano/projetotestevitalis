@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { useVitalisStore } from "@/data/store";
+import { useStore } from "@/data/store";
 
 export const Route = createFileRoute("/_equipe/painel/estoque")({
   component: EstoquePage,
@@ -87,7 +87,7 @@ function getStatusEstoque(quantidade: number, alertaMinimo: number): StatusEstoq
 
 function EstoquePage() {
   const [apenasAlertas, setApenasAlertas] = useState(false);
-  const estoqueStore = useVitalisStore((s) => s.estoque);
+  const estoqueStore = useStore((s) => s.estoque);
   
   const itens = estoqueStore.map((it) => {
     const visual = getCategoriaVisual(it.categoria);
