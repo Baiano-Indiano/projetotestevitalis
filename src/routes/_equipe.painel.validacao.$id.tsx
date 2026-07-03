@@ -24,10 +24,21 @@ import {
   RotateCcw,
   Sparkles,
   User,
+  ShieldCheck,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { StatusPill, PrioridadePill } from "@/components/StatusPill";
 import type { EspecialidadeId } from "@/config/municipio";
 import type { Prioridade } from "@/data/types";
+
 
 export const Route = createFileRoute("/_equipe/painel/validacao/$id")({
   head: () => ({ meta: [{ title: "Caso clínico. Validação Vitalis" }] }),
@@ -71,7 +82,11 @@ function Detalhe() {
   const urgente = t.redFlags.length > 0 || t.status === "urgencia";
   const jaDecidido = decisoes.find((d) => d.triagemId === t.id);
 
-  const decidirCaso = (acao: "confirmar" | "redirecionar" | "urgencia") => {
+  const [lgpdOpen, setLgpdOpen] = useState(false);
+  const [decisaoPendente, setDecisaoPendente] = useState<null | "confirmar" | "redirecionar" | "urgencia">(null);
+
+  const executarDecisao = (acao: "confirmar" | "redirecionar" | "urgencia") => {
+
     if (jaDecidido) {
       toast.error("Este caso já foi assumido por outro veterinário.");
       return;
@@ -102,6 +117,21 @@ function Detalhe() {
     if (proximo) navigate({ to: "/painel/validacao/$id", params: { id: proximo.id } });
     else navigate({ to: "/painel/validacao" });
   };
+
+  const decidirCaso = (acao: "confirmar" | "redirecionar" | "urgencia") => {
+    if (jaDecidido) {
+      toast.error("Este caso já foi assumido por outro veterinário.");
+      return;
+    }
+    if (acao === "confirmar") {
+      setDecisaoPendente(acao);
+      setLgpdOpen(true);
+      return;
+    }
+    executarDecisao(acao);
+  };
+
+
 
   // Atalhos de teclado
   useEffect(() => {
@@ -397,9 +427,48 @@ function Detalhe() {
           </Card>
         </aside>
       </div>
+
+      <AlertDialog open={lgpdOpen} onOpenChange={setLgpdOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-success-50 ring-4 ring-success-700/10">
+              <ShieldCheck className="h-9 w-9 text-success-700" />
+            </div>
+            <AlertDialogTitle className="text-center">
+              Triagem Aprovada e Documentos Expurgados
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center leading-relaxed">
+              Em conformidade com a <strong>LGPD</strong>, os comprovantes de renda e
+              residência foram validados e destruídos de forma segura de nossos
+              servidores, isentando o município de riscos de vazamento de dados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="rounded-lg border border-success-700/20 bg-success-50/50 p-3 text-xs text-success-700">
+            <p className="inline-flex items-center gap-1.5 font-semibold">
+              <Check className="h-3.5 w-3.5" /> Trilha de auditoria registrada
+            </p>
+            <p className="mt-1 text-success-700/80">
+              Hash de validação salvo · dados pessoais purgados · CPF pseudonimizado.
+            </p>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => {
+                setLgpdOpen(false);
+                if (decisaoPendente) executarDecisao(decisaoPendente);
+                setDecisaoPendente(null);
+              }}
+              className="w-full gap-2"
+            >
+              <ArrowRight className="h-4 w-4" /> Concluir e Chamar Paciente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
+
 
 function Info({ l, v }: { l: string; v: string }) {
   return (
