@@ -301,7 +301,8 @@ function Internacoes() {
                             </button>
                           );
                         })}
-                      </>
+                      </Fragment>
+
                     ))}
                   </div>
                 </div>
