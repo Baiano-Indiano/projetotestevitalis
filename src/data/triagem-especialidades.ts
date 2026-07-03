@@ -168,7 +168,7 @@ export const blocosTriagem: BlocoEspecialidadeTriagem[] = [
     corIcone: "text-primary",
     perguntas: [
       { id: "andar", tipo: "simnao", label: "O animal apresenta dificuldade para andar?" },
-      { id: "mancar", tipo: "simnao", label: "Existe mancar ou perda de equilíbrio?" },
+      { id: "mancar", tipo: "checkbox", label: "O animal apresenta algum destes sinais? (Selecione todos aplicáveis)", opcoes: ["Mancar", "Perda de equilíbrio", "Nenhum"] },
       { id: "trauma", tipo: "simnao", label: "Houve alguma queda, trauma ou acidente recente?" },
       { id: "dor", tipo: "simnao", label: "O animal demonstra dor ao se movimentar?" },
       { id: "inchaco", tipo: "simnao", label: "Existe inchaço em patas ou articulações?" },
