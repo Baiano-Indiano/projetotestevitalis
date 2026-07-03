@@ -82,7 +82,11 @@ function Detalhe() {
   const urgente = t.redFlags.length > 0 || t.status === "urgencia";
   const jaDecidido = decisoes.find((d) => d.triagemId === t.id);
 
-  const decidirCaso = (acao: "confirmar" | "redirecionar" | "urgencia") => {
+  const [lgpdOpen, setLgpdOpen] = useState(false);
+  const [decisaoPendente, setDecisaoPendente] = useState<null | "confirmar" | "redirecionar" | "urgencia">(null);
+
+  const executarDecisao = (acao: "confirmar" | "redirecionar" | "urgencia") => {
+
     if (jaDecidido) {
       toast.error("Este caso já foi assumido por outro veterinário.");
       return;
