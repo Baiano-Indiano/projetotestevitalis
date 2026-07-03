@@ -32,7 +32,7 @@ import {
   Shield,
   Upload,
 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   categoriasParte1,
   categoriasParte2,
@@ -170,6 +170,8 @@ function Triagem() {
 
   // Aceite
   const [aceite, setAceite] = useState(false);
+  // Termo de reclassificação (só relevante quando há red flag na Fase 3)
+  const [aceiteTermo, setAceiteTermo] = useState(false);
 
   const valida1 = () =>
     Boolean(
@@ -208,8 +210,13 @@ function Triagem() {
     return { titulo: "Triagem", subtitulo: b ? b.titulo : "" };
   };
 
+  const exigeProvaVisual = motor.redFlags.length > 0;
+
   const podeAvancar = (): boolean => {
     if (fase === 1) return valida1();
+    if (fase === 3 && exigeProvaVisual) {
+      return anexos.length >= 1 && aceiteTermo;
+    }
     if (fase === FASE_REVISAO) return aceite;
     return true;
   };
@@ -371,8 +378,14 @@ function Triagem() {
 
                   <div>
                     <Label className="text-sm font-semibold text-text-strong">
-                      Fotos do animal (opcional)
+                      Fotos do animal {exigeProvaVisual ? "(obrigatório)" : "(opcional)"}
                     </Label>
+                    {exigeProvaVisual && (
+                      <p className="mt-1 flex items-start gap-1.5 text-xs font-medium text-destructive">
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                        Foto obrigatória para o sintoma grave selecionado.
+                      </p>
+                    )}
                     <p className="mt-1 text-xs text-muted-foreground">
                       Anexe até 5 fotos (máx. 5MB cada) para ajudar a equipe a contextualizar.
                     </p>
@@ -434,6 +447,28 @@ function Triagem() {
                       </ul>
                     )}
                   </div>
+
+                  {exigeProvaVisual && (
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Risco de Reclassificação Hospitalar</AlertTitle>
+                      <AlertDescription>
+                        Você selecionou uma Emergência Grave. Ao chegar no hospital, o paciente
+                        passará por validação imediata. Caso o quadro não corresponda aos sintomas
+                        relatados, o paciente perderá a prioridade e será redirecionado para o{" "}
+                        <strong>FINAL DA FILA VERDE</strong>, podendo esperar horas. Apenas confirme
+                        se a situação for real.
+                      </AlertDescription>
+                      <label className="mt-4 flex cursor-pointer items-start gap-2 text-sm font-medium text-destructive">
+                        <Checkbox
+                          checked={aceiteTermo}
+                          onCheckedChange={(v) => setAceiteTermo(v === true)}
+                          className="mt-0.5 border-destructive data-[state=checked]:bg-destructive data-[state=checked]:text-destructive-foreground"
+                        />
+                        <span>Estou ciente das regras de reclassificação.</span>
+                      </label>
+                    </Alert>
+                  )}
                 </div>
               }
             />
