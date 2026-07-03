@@ -128,30 +128,41 @@ function SimNao({
   name: string;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {["Sim", "Não"].map((opt) => {
+    <div className="grid grid-cols-2 gap-3" role="radiogroup">
+      {(["Sim", "Não"] as const).map((opt) => {
         const ativo = value === opt;
+        const isSim = opt === "Sim";
+        const Icone = isSim ? Check : X;
+        const activeClasses = isSim
+          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+          : "border-primary bg-primary-50 text-primary";
         return (
           <button
             key={opt}
             type="button"
             onClick={() => onChange(opt)}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-colors",
+              "flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-all",
               ativo
-                ? "border-primary bg-primary-50 text-primary"
+                ? activeClasses
                 : "border-border bg-background text-text-strong hover:border-primary/40",
             )}
             aria-pressed={ativo}
+            role="radio"
+            aria-checked={ativo}
             name={name}
           >
             <span
               className={cn(
-                "grid h-4 w-4 place-items-center rounded-full border-2",
-                ativo ? "border-primary" : "border-muted-foreground/50",
+                "grid h-5 w-5 place-items-center rounded-full border-2 transition-colors",
+                ativo
+                  ? isSim
+                    ? "border-primary-foreground bg-primary-foreground text-primary"
+                    : "border-primary bg-primary text-primary-foreground"
+                  : "border-muted-foreground/50",
               )}
             >
-              {ativo && <span className="h-2 w-2 rounded-full bg-primary" />}
+              {ativo && <Icone className="h-3.5 w-3.5" strokeWidth={3} />}
             </span>
             {opt}
           </button>
