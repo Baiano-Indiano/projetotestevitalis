@@ -290,7 +290,7 @@ export interface ProntuarioSlice {
 }
 
 
-export type RootState = TutorSlice & TriagemSlice & ProntuarioSlice;
+export type RootState = TutorSlice & TriagemSlice & ProntuarioSlice & EstoqueSlice;
 
 
 const createTutorSlice: StateCreator<RootState, [], [], TutorSlice> = (set) => ({
