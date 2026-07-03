@@ -85,9 +85,33 @@ function Internacoes() {
 
   const marcarMed = (internacaoId: string, horario: string, medIdx: number, nome: string) => {
     const key = `${internacaoId}|${horario}|${medIdx}`;
-    if (medStatus[key]) return;
+    if (medStatus[key]) {
+      // Já administrado — permitir desfazer em caso de clique acidental
+      const ok = window.confirm(
+        `Desfazer administração de ${nome} às ${horario}?\n\nUse apenas em caso de clique acidental.`,
+      );
+      if (!ok) return;
+      setMedStatus((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+      toast.warning(`${nome} — administração desfeita`, { description: `Horário ${horario}` });
+      return;
+    }
     setMedStatus((prev) => ({ ...prev, [key]: true }));
-    toast.success(`${nome} administrado`, { description: `Horário ${horario}` });
+    toast.success(`${nome} administrado`, {
+      description: `Horário ${horario}`,
+      action: {
+        label: "Desfazer",
+        onClick: () =>
+          setMedStatus((prev) => {
+            const next = { ...prev };
+            delete next[key];
+            return next;
+          }),
+      },
+    });
   };
 
 
@@ -289,7 +313,7 @@ function Internacoes() {
                                 pendente && "border-warning-500/50 bg-warning-50 text-warning-700 animate-pulse hover:scale-105 hover:shadow-md",
                                 futuro && "border-border bg-muted/30 text-text-soft cursor-not-allowed",
                               )}
-                              title={done ? "Administrado" : pendente ? "Pendente — clique para administrar" : "Agendado"}
+                              title={done ? "Administrado — clique para desfazer" : pendente ? "Pendente — clique para administrar" : "Agendado"}
                             >
                               {done ? (
                                 <Check className="h-4 w-4" />
