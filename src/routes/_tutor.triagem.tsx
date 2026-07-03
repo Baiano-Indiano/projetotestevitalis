@@ -210,8 +210,13 @@ function Triagem() {
     return { titulo: "Triagem", subtitulo: b ? b.titulo : "" };
   };
 
+  const exigeProvaVisual = motor.redFlags.length > 0;
+
   const podeAvancar = (): boolean => {
     if (fase === 1) return valida1();
+    if (fase === 3 && exigeProvaVisual) {
+      return anexos.length >= 1 && aceiteTermo;
+    }
     if (fase === FASE_REVISAO) return aceite;
     return true;
   };
