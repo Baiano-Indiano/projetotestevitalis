@@ -43,7 +43,9 @@ interface SolicitacaoLab {
   observacoesExame: string;
   suspeita: string;
   criadoEm: string;
+  status: "solicitado" | "em_analise" | "concluido";
 }
+
 
 function formatarData(iso: string): string {
   const d = new Date(iso);
