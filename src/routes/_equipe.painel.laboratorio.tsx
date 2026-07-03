@@ -106,8 +106,16 @@ function Laboratorio() {
     { label: "Hoje", valor: solicitacoes.filter((s) => new Date(s.criadoEm).toDateString() === new Date().toDateString()).length, Icon: FileText, tone: "bg-muted text-text-strong" },
   ];
 
+  const iniciarAnalise = (s: SolicitacaoLab) =>
+    atualizarStatusExame(s.diagnosticoId, s.exameId, "em_analise");
   const marcarConcluido = (s: SolicitacaoLab) =>
     atualizarStatusExame(s.diagnosticoId, s.exameId, "concluido");
+
+  const badgeInfo = (st: SolicitacaoLab["status"]) => {
+    if (st === "concluido") return { tone: "bg-success-50 text-success-700", dot: "bg-success", label: "Concluído" };
+    if (st === "em_analise") return { tone: "bg-primary-50 text-primary-800", dot: "bg-primary", label: "Em análise" };
+    return { tone: "bg-warning-50 text-warning-700", dot: "bg-warning", label: "Pendente" };
+  };
 
 
   return (
@@ -164,6 +172,8 @@ function Laboratorio() {
         ) : (
           filtrados.map((s) => {
             const concluido = s.status === "concluido";
+            const emAnalise = s.status === "em_analise";
+            const badge = badgeInfo(s.status);
             return (
               <div key={s.key} className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -193,13 +203,11 @@ function Laboratorio() {
                   <span
                     className={cn(
                       "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold",
-                      concluido
-                        ? "bg-success-50 text-success-700"
-                        : "bg-warning-50 text-warning-700",
+                      badge.tone,
                     )}
                   >
-                    <span className={cn("h-1.5 w-1.5 rounded-full", concluido ? "bg-success" : "bg-warning")} />
-                    {concluido ? "Concluído" : "Pendente"}
+                    <span className={cn("h-1.5 w-1.5 rounded-full", badge.dot)} />
+                    {badge.label}
                   </span>
                 </div>
 
@@ -228,6 +236,11 @@ function Laboratorio() {
                   ) : (
                     <>
                       <Button variant="outline" size="sm">Imprimir etiquetas</Button>
+                      {!emAnalise && (
+                        <Button variant="outline" size="sm" onClick={() => iniciarAnalise(s)}>
+                          Iniciar análise
+                        </Button>
+                      )}
                       <Button size="sm" onClick={() => marcarConcluido(s)}>
                         Analisar e liberar
                       </Button>
