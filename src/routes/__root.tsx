@@ -171,9 +171,11 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
-    const saved = localStorage.getItem("vitalis-theme");
-    if (saved === "dark") document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
+    // Apply saved theme, or fall back to OS preference on first visit.
+    import("../lib/theme").then(({ applyTheme, getStoredTheme, watchSystemTheme }) => {
+      applyTheme(getStoredTheme());
+      return watchSystemTheme();
+    });
   }, []);
   return (
     <QueryClientProvider client={queryClient}>
