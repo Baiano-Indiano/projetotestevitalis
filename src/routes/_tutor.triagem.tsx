@@ -32,7 +32,7 @@ import {
   Shield,
   Upload,
 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   categoriasParte1,
   categoriasParte2,
