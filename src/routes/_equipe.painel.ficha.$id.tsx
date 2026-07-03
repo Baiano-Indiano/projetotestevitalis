@@ -28,6 +28,7 @@ import {
   Printer,
   ClipboardList,
   Send,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
