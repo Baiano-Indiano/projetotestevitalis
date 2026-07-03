@@ -237,6 +237,11 @@ function ImagemRoute() {
                   ) : (
                     <>
                       <Button variant="outline" size="sm">Abrir visualizador</Button>
+                      {!emAnalise && (
+                        <Button variant="outline" size="sm" onClick={() => iniciarAnalise(s)}>
+                          Iniciar análise
+                        </Button>
+                      )}
                       <Button size="sm" onClick={() => marcarConcluido(s)}>
                         Emitir laudo
                       </Button>
