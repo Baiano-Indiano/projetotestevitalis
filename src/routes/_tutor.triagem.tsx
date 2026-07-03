@@ -676,6 +676,105 @@ function FaseInicial(props: {
       </SectionCard>
 
       <SectionCard>
+        <SectionHeader icon={Shield} titulo="Validação Municipal" />
+        <div className="grid gap-3">
+          <Label className="text-sm">O tutor reside no município de Belém?</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => props.setMunicipe("sim")}
+              className={cn(
+                "rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
+                props.municipe === "sim"
+                  ? "border-primary bg-primary-50 text-primary"
+                  : "border-border bg-background text-text-strong hover:border-primary/40",
+              )}
+            >
+              Sim
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                props.setMunicipe("nao");
+                props.setComprovante(null);
+              }}
+              className={cn(
+                "rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
+                props.municipe === "nao"
+                  ? "border-primary bg-primary-50 text-primary"
+                  : "border-border bg-background text-text-strong hover:border-primary/40",
+              )}
+            >
+              Não
+            </button>
+          </div>
+
+          {props.municipe === "nao" && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                O atendimento público é exclusivo para residentes. Em caso de urgência extrema,
+                dirija-se pessoalmente à triagem do hospital.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {props.municipe === "sim" && (
+            <div>
+              <Label className="text-sm font-semibold text-text-strong">
+                Foto do Comprovante de Residência
+              </Label>
+              <label
+                htmlFor="comprovante-residencia"
+                className="mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/30 px-4 py-6 text-center transition hover:bg-muted/50"
+              >
+                <Upload className="h-5 w-5 text-text-soft" />
+                {props.comprovante ? (
+                  <span className="text-sm font-medium text-primary">{props.comprovante.nome}</span>
+                ) : (
+                  <>
+                    <span className="text-sm font-medium text-text-strong">Toque para anexar</span>
+                    <span className="text-xs text-text-soft">
+                      Anexe uma conta de luz, água ou telefone recente.
+                    </span>
+                  </>
+                )}
+                <input
+                  id="comprovante-residencia"
+                  type="file"
+                  accept="image/*,application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    if (f.size > 5 * 1024 * 1024) {
+                      toast.error("Arquivo excede 5MB.");
+                      return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = () =>
+                      props.setComprovante({ nome: f.name, url: String(reader.result) });
+                    reader.readAsDataURL(f);
+                  }}
+                />
+              </label>
+              {props.comprovante && (
+                <button
+                  type="button"
+                  onClick={() => props.setComprovante(null)}
+                  className="mt-2 text-xs text-text-soft underline"
+                >
+                  Remover comprovante
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </SectionCard>
+
+
+
+      <SectionCard>
         <SectionHeader icon={ClipboardList} titulo="Dados do Animal" />
         <div className="grid gap-3">
           <Campo label="Nome do animal">
