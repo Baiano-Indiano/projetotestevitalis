@@ -1,22 +1,140 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Plus, Clock, Calendar, Droplet, Activity, Microscope, CheckCircle2, Check, Printer, X, FileText, Eye } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Plus,
+  Clock,
+  Calendar,
+  Droplet,
+  Activity,
+  Microscope,
+  CheckCircle2,
+  Check,
+  FileText,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useStore, type StatusExame } from "@/data/store";
+import { categoriasExames, itensDaCategoria } from "@/data/exames-catalogo";
+import { categoriasImagem, itensDaCategoriaImagem } from "@/data/imagem-catalogo";
 
 export const Route = createFileRoute("/_equipe/painel/exames")({
   head: () => ({ meta: [{ title: "Solicitações de Exames. Vitalis Belém" }] }),
   component: Exames,
 });
 
+type Modalidade = "laboratorio" | "imagem";
+
+interface Solicitacao {
+  key: string;
+  diagnosticoId: string;
+  exameId: string;
+  exameLabel: string;
+  categoria: string;
+  modalidade: Modalidade;
+  pacienteNome: string;
+  especie: string;
+  raca: string;
+  tutorNome: string;
+  solicitanteNome: string;
+  protocolo?: string;
+  justificativa: string;
+  criadoEm: string;
+  status: StatusExame;
+}
+
+function acharExame(id: string): { label: string; categoria: string; modalidade: Modalidade } | null {
+  for (const cat of categoriasExames) {
+    if (cat.id === "imagem") continue;
+    const item = itensDaCategoria(cat).find((i) => i.id === id);
+    if (item) return { label: item.label, categoria: cat.nome, modalidade: "laboratorio" };
+  }
+  for (const cat of categoriasImagem) {
+    const item = itensDaCategoriaImagem(cat).find((i) => i.id === id);
+    if (item) return { label: item.label, categoria: cat.nome, modalidade: "imagem" };
+  }
+  return null;
+}
+
+function formatarData(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+
+function statusLabel(s: StatusExame): string {
+  if (s === "concluido") return "Concluído";
+  if (s === "em_analise") return "Em análise";
+  return "Solicitado";
+}
+
+function statusTone(s: StatusExame): string {
+  if (s === "concluido") return "bg-success-50 text-success-700";
+  if (s === "em_analise") return "bg-warning-50 text-warning-700";
+  return "bg-primary-50 text-primary-800";
+}
+
 function Exames() {
+  const diagnosticos = useStore((s) => s.diagnosticos);
+  const [busca, setBusca] = useState("");
+
+  const solicitacoes = useMemo<Solicitacao[]>(() => {
+    const lista: Solicitacao[] = [];
+    for (const d of diagnosticos) {
+      const c = d.conteudo as Record<string, unknown>;
+      const exames = (c.examesSolicitados as string[] | undefined) ?? [];
+      const statusMap = (c.statusExames as Record<string, StatusExame> | undefined) ?? {};
+      for (const exId of exames) {
+        const info = acharExame(exId);
+        if (!info) continue;
+        lista.push({
+          key: `${d.id}:${exId}`,
+          diagnosticoId: d.id,
+          exameId: exId,
+          exameLabel: info.label,
+          categoria: info.categoria,
+          modalidade: info.modalidade,
+          pacienteNome: String(c.pacienteNome ?? "Paciente"),
+          especie: String(c.especie ?? ""),
+          raca: String(c.raca ?? ""),
+          tutorNome: String(c.tutorNome ?? ""),
+          solicitanteNome: String(c.solicitanteNome ?? "Equipe clínica"),
+          protocolo: c.protocolo as string | undefined,
+          justificativa: String(c.justificativa ?? c.suspeitaPrincipal ?? ""),
+          criadoEm: d.criadoEm,
+          status: statusMap[exId] ?? "solicitado",
+        });
+      }
+    }
+    return lista;
+  }, [diagnosticos]);
+
+  const filtradas = useMemo(
+    () =>
+      solicitacoes.filter((s) =>
+        `${s.pacienteNome} ${s.exameLabel} ${s.tutorNome} ${s.categoria}`
+          .toLowerCase()
+          .includes(busca.toLowerCase()),
+      ),
+    [solicitacoes, busca],
+  );
+
+  const hojeStr = new Date().toDateString();
+  const pendentes = solicitacoes.filter((s) => s.status !== "concluido").length;
+  const hoje = solicitacoes.filter((s) => new Date(s.criadoEm).toDateString() === hojeStr).length;
+  const concluidos = solicitacoes.filter((s) => s.status === "concluido").length;
+  const laboratorio = solicitacoes.filter((s) => s.modalidade === "laboratorio").length;
+  const imagem = solicitacoes.filter((s) => s.modalidade === "imagem").length;
+  const emAnalise = solicitacoes.filter((s) => s.status === "em_analise").length;
+
   const stats = [
-    { Icon: Clock, label: "Pendentes", valor: 24, bg: "bg-destructive-50 text-destructive" },
-    { Icon: Calendar, label: "Hoje", valor: 12, bg: "bg-primary-50 text-primary" },
-    { Icon: Droplet, label: "Hemograma", valor: 45, bg: "bg-success-50 text-success-700" },
-    { Icon: Activity, label: "Raio X", valor: 18, bg: "bg-warning-50 text-warning-700" },
-    { Icon: Microscope, label: "Ultrassom", valor: 9, bg: "bg-primary-50 text-primary" },
-    { Icon: CheckCircle2, label: "Concluídos", valor: 104, bg: "bg-success-50 text-success-700" },
+    { Icon: Clock, label: "Pendentes", valor: pendentes, bg: "bg-destructive-50 text-destructive" },
+    { Icon: Calendar, label: "Hoje", valor: hoje, bg: "bg-primary-50 text-primary" },
+    { Icon: Droplet, label: "Laboratório", valor: laboratorio, bg: "bg-success-50 text-success-700" },
+    { Icon: Activity, label: "Imagem", valor: imagem, bg: "bg-warning-50 text-warning-700" },
+    { Icon: Microscope, label: "Em análise", valor: emAnalise, bg: "bg-primary-50 text-primary" },
+    { Icon: CheckCircle2, label: "Concluídos", valor: concluidos, bg: "bg-success-50 text-success-700" },
   ];
 
   return (
@@ -33,10 +151,19 @@ function Exames() {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input className="w-48 pl-9" placeholder="Buscar..." />
+            <Input
+              className="w-56 pl-9"
+              placeholder="Buscar paciente ou exame..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
           </div>
-          <Button variant="outline" size="sm"><Filter className="mr-1.5 h-3.5 w-3.5" /> Filtros</Button>
-          <Button size="sm" className="bg-success hover:bg-success/90"><Plus className="mr-1 h-3.5 w-3.5" /> Nova Solicitação</Button>
+          <Button variant="outline" size="sm">
+            <Filter className="mr-1.5 h-3.5 w-3.5" /> Filtros
+          </Button>
+          <Button size="sm" className="bg-success hover:bg-success/90">
+            <Plus className="mr-1 h-3.5 w-3.5" /> Nova Solicitação
+          </Button>
         </div>
       </div>
 
@@ -57,162 +184,96 @@ function Exames() {
         })}
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-base font-semibold text-text-strong">Lista de Solicitações</h2>
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-              <Filter className="h-3.5 w-3.5" /> Ordenar por Data
-            </span>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary">
-                  <Droplet className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="font-semibold text-text-strong">
-                    Hemograma Completo + Perfil Renal{" "}
-                    <span className="ml-1 rounded-full bg-primary-50 px-2 py-0.5 font-mono text-[10px] text-primary-800">#EXM-4092</span>
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Paciente: <span className="font-medium text-text-strong">Bolinha</span> (Canino, Poodle) · Tutor: João Silva
-                  </p>
-                  <p className="mt-0.5 text-xs text-text-soft">Hoje, 10:30 · Solicitado por Dra. Amanda</p>
-                </div>
-              </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-50 px-2.5 py-1 text-[11px] font-semibold text-warning-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-warning" /> Em Análise
-              </span>
-            </div>
-
-            <div className="mt-5 grid grid-cols-4 gap-1">
-              {[
-                { l: "Solicitado", c: true, Icon: Check },
-                { l: "Coletado", c: true, Icon: Check },
-                { l: "Em Análise", a: true, Icon: Activity },
-                { l: "Laudo", Icon: FileText },
-              ].map((s, i, arr) => (
-                <div key={s.l} className="relative flex flex-col items-center">
-                  {i < arr.length - 1 && (
-                    <span className={cn("absolute left-1/2 top-4 h-0.5 w-full", s.c ? "bg-primary" : "bg-border")} />
-                  )}
-                  <span className={cn(
-                    "relative z-10 grid h-8 w-8 place-items-center rounded-full",
-                    s.c ? "bg-primary text-primary-foreground" : s.a ? "bg-primary-50 text-primary border-2 border-primary" : "bg-muted text-muted-foreground",
-                  )}>
-                    <s.Icon className="h-3.5 w-3.5" />
-                  </span>
-                  <p className={cn("mt-1.5 text-[11px] font-medium", s.a ? "text-primary" : s.c ? "text-text-strong" : "text-text-soft")}>{s.l}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">Informações Clínicas</p>
-                <div className="mt-2 rounded-lg border border-border bg-background p-3 text-sm">
-                  <p className="text-xs text-text-soft">Justificativa</p>
-                  <p className="mt-1 text-text-strong">
-                    Paciente apresenta letargia, poliúria e polidipsia há 3 dias. Suspeita de insuficiência renal aguda ou diabetes mellitus.
-                  </p>
-                  <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <p className="text-text-soft">Prioridade</p>
-                      <p className="font-semibold text-destructive">▲ Alta</p>
-                    </div>
-                    <div>
-                      <p className="text-text-soft">Amostra</p>
-                      <p className="font-medium text-text-strong">Sangue Total (EDTA) + Soro</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">Ações Rápidas</p>
-                <div className="mt-2 space-y-2">
-                  <Button className="w-full" size="sm">Digitar Resultados / Emitir Laudo</Button>
-                  <Button variant="outline" className="w-full" size="sm"><Printer className="mr-1.5 h-3.5 w-3.5" /> Imprimir Etiquetas</Button>
-                  <Button variant="outline" className="w-full" size="sm"><X className="mr-1.5 h-3.5 w-3.5" /> Cancelar Solicitação</Button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary">
-                  <Activity className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="font-semibold text-text-strong">
-                    Raio X Tórax (VD/LL){" "}
-                    <span className="ml-1 rounded-full bg-primary-50 px-2 py-0.5 font-mono text-[10px] text-primary-800">#EXM-4091</span>
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Paciente: <span className="font-medium text-text-strong">Mia</span> (Felino, SRD) · Tutor: Carlos Mendes
-                  </p>
-                  <p className="mt-0.5 text-xs text-text-soft">Ontem, 16:45 · Solicitado por Dr. Roberto</p>
-                </div>
-              </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-success-50 px-2.5 py-1 text-[11px] font-semibold text-success-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-success" /> Concluído
-              </span>
-            </div>
-            <div className="mt-4 flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-xs">
-              <span className="font-medium text-text-strong">Imagens e Laudo</span>
-              <Button variant="ghost" size="sm" className="text-primary"><Eye className="mr-1 h-3.5 w-3.5" /> Baixar PDF</Button>
-            </div>
-          </div>
+      <div className="mt-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold text-text-strong">
+            Lista de Solicitações ({filtradas.length})
+          </h2>
+          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+            <Filter className="h-3.5 w-3.5" /> Ordenar por Data
+          </span>
         </div>
 
-        <aside className="space-y-4">
-          <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
-            <h3 className="font-display text-base font-semibold text-text-strong">Contexto do Paciente</h3>
-            <div className="mt-3 text-center">
-              <span className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-primary-50 text-2xl text-primary">🐩</span>
-              <p className="mt-2 font-semibold text-text-strong">Bolinha</p>
-              <p className="text-xs text-text-soft">Canino · Poodle · 8 anos</p>
-              <Button variant="outline" size="sm" className="mt-3 w-full">Abrir Prontuário Completo</Button>
-            </div>
+        {filtradas.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border bg-surface p-12 text-center">
+            <FileText className="mx-auto h-10 w-10 text-muted-foreground" />
+            <p className="mt-3 font-display text-base font-semibold text-text-strong">
+              Nenhuma solicitação de exame
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Os exames prescritos pela Ficha Médica aparecerão aqui em tempo real.
+            </p>
           </div>
-          <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">Alertas Clínicos</p>
-            <div className="mt-2 rounded-lg bg-destructive-50 p-3 text-sm">
-              <p className="font-semibold text-destructive">▲ Paciente idoso</p>
-              <p className="mt-0.5 text-xs text-text-strong">Atenção à função renal em anestesias.</p>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">Histórico Recente</p>
-            <ul className="mt-3 space-y-3 text-sm">
-              <li className="flex gap-3">
-                <span className="mt-1 h-2 w-2 rounded-full bg-primary" />
-                <div>
-                  <p className="font-medium text-text-strong">Consulta de Retorno</p>
-                  <p className="text-xs text-text-soft">Hoje, 09:15 · Dra. Amanda</p>
+        ) : (
+          filtradas.map((s) => {
+            const IconExame = s.modalidade === "imagem" ? Activity : Droplet;
+            return (
+              <div key={s.key} className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex gap-3">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary">
+                      <IconExame className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <p className="font-semibold text-text-strong">
+                        {s.exameLabel}
+                        {s.protocolo && (
+                          <span className="ml-2 rounded-full bg-primary-50 px-2 py-0.5 font-mono text-[10px] text-primary-800">
+                            {s.protocolo}
+                          </span>
+                        )}
+                        <span className="ml-2 text-[10px] font-medium uppercase tracking-wide text-text-soft">
+                          {s.categoria}
+                        </span>
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        Paciente:{" "}
+                        <span className="font-medium text-text-strong">{s.pacienteNome}</span>
+                        {s.especie && ` (${s.especie}${s.raca ? `, ${s.raca}` : ""})`}
+                        {s.tutorNome && ` · Tutor: ${s.tutorNome}`}
+                      </p>
+                      <p className="mt-0.5 text-xs text-text-soft">
+                        {formatarData(s.criadoEm)} · Solicitado por {s.solicitanteNome}
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold",
+                      statusTone(s.status),
+                    )}
+                  >
+                    {s.status === "concluido" ? (
+                      <Check className="h-3 w-3" />
+                    ) : (
+                      <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
+                    )}
+                    {statusLabel(s.status)}
+                  </span>
                 </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-1 h-2 w-2 rounded-full bg-text-soft" />
-                <div>
-                  <p className="font-medium text-text-strong">Ultrassom Abdominal</p>
-                  <p className="text-xs text-text-soft">Há 6 meses · Sem alterações</p>
+
+                {s.justificativa && (
+                  <div className="mt-4 rounded-lg border border-border bg-background p-3 text-sm">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-text-soft">
+                      Justificativa
+                    </p>
+                    <p className="mt-1 text-text-strong">{s.justificativa}</p>
+                  </div>
+                )}
+
+                <div className="mt-4 flex justify-end">
+                  <Button asChild variant="outline" size="sm">
+                    <Link
+                      to={s.modalidade === "imagem" ? "/painel/imagem" : "/painel/laboratorio"}
+                    >
+                      Abrir em {s.modalidade === "imagem" ? "Imagem" : "Laboratório"}
+                    </Link>
+                  </Button>
                 </div>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-1 h-2 w-2 rounded-full bg-text-soft" />
-                <div>
-                  <p className="font-medium text-text-strong">Vacina V10 + Raiva</p>
-                  <p className="text-xs text-text-soft">Há 8 meses · Dr. Carlos</p>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </aside>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

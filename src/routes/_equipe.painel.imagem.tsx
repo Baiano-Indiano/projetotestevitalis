@@ -42,7 +42,9 @@ interface SolicitacaoImg {
   observacoesExame: string;
   suspeita: string;
   criadoEm: string;
+  status: "solicitado" | "em_analise" | "concluido";
 }
+
 
 function formatarData(iso: string): string {
   const d = new Date(iso);
@@ -51,14 +53,15 @@ function formatarData(iso: string): string {
 
 function ImagemRoute() {
   const diagnosticos = useStore((s) => s.diagnosticos);
+  const atualizarStatusExame = useStore((s) => s.atualizarStatusExame);
   const [busca, setBusca] = useState("");
-  const [concluidos, setConcluidos] = useState<Record<string, boolean>>({});
 
   const solicitacoes = useMemo<SolicitacaoImg[]>(() => {
     const lista: SolicitacaoImg[] = [];
     for (const d of diagnosticos) {
       const c = d.conteudo as Record<string, unknown>;
       const exames = (c.examesSolicitados as string[] | undefined) ?? [];
+      const statusMap = (c.statusExames as Record<string, SolicitacaoImg["status"]> | undefined) ?? {};
       for (const exId of exames) {
         const info = acharExameImagem(exId);
         if (!info) continue;
@@ -77,6 +80,7 @@ function ImagemRoute() {
           observacoesExame: String(c.observacoesExame ?? ""),
           suspeita: String(c.suspeitaPrincipal ?? ""),
           criadoEm: d.criadoEm,
+          status: statusMap[exId] ?? "solicitado",
         });
       }
     }
@@ -91,7 +95,7 @@ function ImagemRoute() {
     [solicitacoes, busca],
   );
 
-  const totalConcluidos = Object.values(concluidos).filter(Boolean).length;
+  const totalConcluidos = solicitacoes.filter((s) => s.status === "concluido").length;
   const totalPendentes = solicitacoes.length - totalConcluidos;
 
   const stats = [
@@ -101,7 +105,9 @@ function ImagemRoute() {
     { label: "Hoje", valor: solicitacoes.filter((s) => new Date(s.criadoEm).toDateString() === new Date().toDateString()).length, Icon: FileText, tone: "bg-muted text-text-strong" },
   ];
 
-  const marcarConcluido = (key: string) => setConcluidos((p) => ({ ...p, [key]: true }));
+  const marcarConcluido = (s: SolicitacaoImg) =>
+    atualizarStatusExame(s.diagnosticoId, s.exameId, "concluido");
+
 
   return (
     <div className="mx-auto max-w-[1400px]">
@@ -156,7 +162,7 @@ function ImagemRoute() {
           </div>
         ) : (
           filtrados.map((s) => {
-            const concluido = !!concluidos[s.key];
+            const concluido = s.status === "concluido";
             return (
               <div key={s.key} className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -223,7 +229,7 @@ function ImagemRoute() {
                   ) : (
                     <>
                       <Button variant="outline" size="sm">Abrir visualizador</Button>
-                      <Button size="sm" onClick={() => marcarConcluido(s.key)}>
+                      <Button size="sm" onClick={() => marcarConcluido(s)}>
                         Emitir laudo
                       </Button>
                     </>
