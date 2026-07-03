@@ -49,39 +49,13 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { useVitalisStore } from "@/data/store";
 
 export const Route = createFileRoute("/_equipe/painel/estoque")({
   component: EstoquePage,
 });
 
 type StatusEstoque = "Estoque baixo" | "Em estoque" | "Vencendo em 30 dias" | "Sem estoque";
-
-interface ItemEstoque {
-  produto: string;
-  codigo: string;
-  categoria: string;
-  categoriaColor: string;
-  local: string;
-  quantidade: number;
-  unidade: string;
-  lote: string;
-  validade: string;
-  status: StatusEstoque;
-  Icon: React.ComponentType<{ className?: string }>;
-  iconBg: string;
-  iconColor: string;
-}
-
-const itens: ItemEstoque[] = [
-  { produto: "Dipirona 50%", codigo: "MED-0001", categoria: "Medicamentos", categoriaColor: "text-foreground", local: "Farmácia Principal", quantidade: 28, unidade: "Frasco (20ml)", lote: "L240523", validade: "25/06/2025", status: "Estoque baixo", Icon: Pill, iconBg: "bg-red-50", iconColor: "text-red-500" },
-  { produto: "Seringa 3ml", codigo: "MAT-0008", categoria: "Materiais Descartáveis", categoriaColor: "text-primary", local: "Almoxarifado", quantidade: 120, unidade: "Unidade", lote: "SNG0324", validade: "-", status: "Em estoque", Icon: Syringe, iconBg: "bg-blue-50", iconColor: "text-blue-500" },
-  { produto: "Luvas Cirúrgicas nº 7,5", codigo: "MAT-0015", categoria: "Materiais Descartáveis", categoriaColor: "text-primary", local: "Centro Cirúrgico", quantidade: 18, unidade: "Caixa (50 un.)", lote: "LG750324", validade: "10/08/2026", status: "Estoque baixo", Icon: Box, iconBg: "bg-slate-50", iconColor: "text-slate-500" },
-  { produto: "Clorexidina 2%", codigo: "MED-0022", categoria: "Medicamentos", categoriaColor: "text-foreground", local: "Centro Cirúrgico", quantidade: 5, unidade: "Frasco (100ml)", lote: "CX20324", validade: "15/05/2025", status: "Vencendo em 30 dias", Icon: Droplet, iconBg: "bg-amber-50", iconColor: "text-amber-600" },
-  { produto: "Tubo EDTA", codigo: "LAB-0003", categoria: "Materiais Laboratoriais", categoriaColor: "text-primary", local: "Laboratório", quantidade: 15, unidade: "Unidade", lote: "ED2404", validade: "20/04/2025", status: "Vencendo em 30 dias", Icon: TestTube, iconBg: "bg-purple-50", iconColor: "text-indigo-500" },
-  { produto: "Soro Fisiológico 0,9%", codigo: "MED-0045", categoria: "Medicamentos", categoriaColor: "text-foreground", local: "Internação", quantidade: 2, unidade: "Frasco (500ml)", lote: "SF02424", validade: "12/03/2025", status: "Estoque baixo", Icon: FlaskConical, iconBg: "bg-blue-50", iconColor: "text-blue-500" },
-  { produto: "Compressa Gaze 7,5x7,5", codigo: "MAT-0028", categoria: "Materiais Descartáveis", categoriaColor: "text-primary", local: "Almoxarifado", quantidade: 0, unidade: "Pacote (500 un.)", lote: "CG750324", validade: "-", status: "Sem estoque", Icon: Box, iconBg: "bg-slate-50", iconColor: "text-slate-500" },
-  { produto: "Vacina V10", codigo: "LAC-0002", categoria: "Vacinas", categoriaColor: "text-primary", local: "Câmara de Vacinas", quantidade: 12, unidade: "Frasco (1 dose)", lote: "VAC100524", validade: "01/07/2025", status: "Estoque baixo", Icon: Syringe, iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
-];
 
 const statusStyles: Record<StatusEstoque, string> = {
   "Estoque baixo": "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-50",
@@ -90,8 +64,48 @@ const statusStyles: Record<StatusEstoque, string> = {
   "Sem estoque": "bg-red-50 text-red-700 border-red-200 hover:bg-red-50",
 };
 
+function getCategoriaVisual(categoria: string) {
+  switch (categoria) {
+    case "Medicamentos":
+      return { color: "text-foreground", Icon: Pill, bg: "bg-red-50", iconColor: "text-red-500" };
+    case "Materiais Descartáveis":
+      return { color: "text-primary", Icon: Box, bg: "bg-slate-50", iconColor: "text-slate-500" };
+    case "Materiais Laboratoriais":
+      return { color: "text-primary", Icon: TestTube, bg: "bg-purple-50", iconColor: "text-indigo-500" };
+    case "Vacinas":
+      return { color: "text-primary", Icon: Syringe, bg: "bg-emerald-50", iconColor: "text-emerald-600" };
+    default:
+      return { color: "text-primary", Icon: Package, bg: "bg-blue-50", iconColor: "text-blue-500" };
+  }
+}
+
+function getStatusEstoque(quantidade: number, alertaMinimo: number): StatusEstoque {
+  if (quantidade === 0) return "Sem estoque";
+  if (quantidade <= alertaMinimo) return "Estoque baixo";
+  return "Em estoque";
+}
+
 function EstoquePage() {
   const [apenasAlertas, setApenasAlertas] = useState(false);
+  const estoqueStore = useVitalisStore((s) => s.estoque);
+  
+  const itens = estoqueStore.map((it) => {
+    const visual = getCategoriaVisual(it.categoria);
+    const status = getStatusEstoque(it.quantidade, it.alertaMinimo);
+    return {
+      ...it,
+      codigo: it.id.toUpperCase(),
+      produto: it.nome,
+      categoriaColor: visual.color,
+      local: "Almoxarifado Geral",
+      lote: "-",
+      validade: "-",
+      status,
+      Icon: visual.Icon,
+      iconBg: visual.bg,
+      iconColor: visual.iconColor,
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -142,7 +156,7 @@ function EstoquePage() {
         <AlertCard
           Icon={XCircle}
           titulo="Vencidos"
-          valor="5"
+          valor="0"
           cta="Ver itens"
           tone="red"
         />
