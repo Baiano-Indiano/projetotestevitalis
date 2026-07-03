@@ -85,10 +85,11 @@ function Internacoes() {
 
   const marcarMed = (internacaoId: string, horario: string, medIdx: number, nome: string) => {
     const key = `${internacaoId}|${horario}|${medIdx}`;
-    if (medStatus[key]) {
-      // Já administrado — permitir desfazer em caso de clique acidental
+    const jaAdministrado = !!medStatus[key];
+
+    if (jaAdministrado) {
       const ok = window.confirm(
-        `Desfazer administração de ${nome} às ${horario}?\n\nUse apenas em caso de clique acidental.`,
+        `Desfazer administração de ${nome} às ${horario}?`,
       );
       if (!ok) return;
       setMedStatus((prev) => {
@@ -99,20 +100,15 @@ function Internacoes() {
       toast.warning(`${nome} — administração desfeita`, { description: `Horário ${horario}` });
       return;
     }
+
+    const ok = window.confirm(
+      `Confirmar administração de ${nome} às ${horario}?`,
+    );
+    if (!ok) return;
     setMedStatus((prev) => ({ ...prev, [key]: true }));
-    toast.success(`${nome} administrado`, {
-      description: `Horário ${horario}`,
-      action: {
-        label: "Desfazer",
-        onClick: () =>
-          setMedStatus((prev) => {
-            const next = { ...prev };
-            delete next[key];
-            return next;
-          }),
-      },
-    });
+    toast.success(`${nome} administrado`, { description: `Horário ${horario}` });
   };
+
 
 
   const filtrados = useMemo(
