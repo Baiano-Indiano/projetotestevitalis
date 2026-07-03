@@ -203,9 +203,13 @@ export function EquipeShell() {
             <button type="button" className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted" aria-label="Ajuda">
               <HelpCircle className="h-4 w-4" />
             </button>
-            <button type="button" className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted" aria-label="Configurações">
+            <Link
+              to="/painel/configuracoes"
+              className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+              aria-label="Configurações"
+            >
               <Settings className="h-4 w-4" />
-            </button>
+            </Link>
             <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
               AS
             </span>
