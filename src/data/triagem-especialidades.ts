@@ -149,7 +149,7 @@ export const blocosTriagem: BlocoEspecialidadeTriagem[] = [
     perguntas: [
       { id: "nodulos", tipo: "simnao", label: "O animal possui caroços ou nódulos visíveis?" },
       { id: "crescimento", tipo: "simnao", label: "Houve crescimento recente dessas alterações?" },
-      { id: "dor", tipo: "simnao", label: "O animal demonstra dor ou sensibilidade na região?" },
+      { id: "dor", tipo: "checkbox", label: "O animal demonstra algum destes sinais na região? (Selecione todos aplicáveis)", opcoes: ["Dor", "Sensibilidade ao toque", "Nenhum"] },
       { id: "peso", tipo: "simnao", label: "Existe perda de peso sem causa aparente?" },
       { id: "apetite", tipo: "simnao", label: "Houve perda de apetite recentemente?" },
       { id: "associados", tipo: "checkbox", label: "Sinais clínicos associados:", opcoes: ["Cansaço excessivo", "Apatia", "Feridas que não cicatrizam"] },
