@@ -228,7 +228,7 @@ function Laboratorio() {
                   ) : (
                     <>
                       <Button variant="outline" size="sm">Imprimir etiquetas</Button>
-                      <Button size="sm" onClick={() => marcarConcluido(s.key)}>
+                      <Button size="sm" onClick={() => marcarConcluido(s)}>
                         Analisar e liberar
                       </Button>
                     </>
