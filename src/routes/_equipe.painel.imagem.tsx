@@ -202,13 +202,11 @@ function ImagemRoute() {
                   <span
                     className={cn(
                       "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold",
-                      concluido
-                        ? "bg-success-50 text-success-700"
-                        : "bg-warning-50 text-warning-700",
+                      badge.tone,
                     )}
                   >
-                    <span className={cn("h-1.5 w-1.5 rounded-full", concluido ? "bg-success" : "bg-warning")} />
-                    {concluido ? "Laudo emitido" : "Aguardando laudo"}
+                    <span className={cn("h-1.5 w-1.5 rounded-full", badge.dot)} />
+                    {badge.label}
                   </span>
                 </div>
 
