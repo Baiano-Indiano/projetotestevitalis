@@ -118,6 +118,21 @@ function Detalhe() {
     else navigate({ to: "/painel/validacao" });
   };
 
+  const decidirCaso = (acao: "confirmar" | "redirecionar" | "urgencia") => {
+    if (jaDecidido) {
+      toast.error("Este caso já foi assumido por outro veterinário.");
+      return;
+    }
+    if (acao === "confirmar") {
+      setDecisaoPendente(acao);
+      setLgpdOpen(true);
+      return;
+    }
+    executarDecisao(acao);
+  };
+
+
+
   // Atalhos de teclado
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
