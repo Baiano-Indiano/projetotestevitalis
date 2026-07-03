@@ -128,6 +128,7 @@ function PainelVeterinario() {
   ];
 
   const modulos = [
+    { to: "/painel/aguardando", titulo: "Pacientes Aguardando", desc: "Fila presencial e online", Icon: Users, badge: "Fila" },
     { to: "/painel/em-atendimento", titulo: "Pacientes em Atendimento", desc: "Continue consultas em andamento", Icon: UserSquare2, badge: "3" },
     { to: "/painel/ficha/$id", params: { id: "novo" }, titulo: "Prontuários", desc: "Anamnese, evolução e prescrição", Icon: FileText },
     { to: "/painel/exames", titulo: "Solicitações de Exames", desc: "Requisições e resultados", Icon: FlaskConical, badge: "4" },
