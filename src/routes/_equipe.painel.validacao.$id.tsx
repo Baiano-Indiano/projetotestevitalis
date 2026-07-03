@@ -24,10 +24,21 @@ import {
   RotateCcw,
   Sparkles,
   User,
+  ShieldCheck,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { StatusPill, PrioridadePill } from "@/components/StatusPill";
 import type { EspecialidadeId } from "@/config/municipio";
 import type { Prioridade } from "@/data/types";
+
 
 export const Route = createFileRoute("/_equipe/painel/validacao/$id")({
   head: () => ({ meta: [{ title: "Caso clínico. Validação Vitalis" }] }),
