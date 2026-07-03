@@ -1,10 +1,21 @@
-Vitalis Belém - Hospital Veterinário Público
+# Vitalis Belém — Hospital Veterinário Público Municipal
 
-Vitalis Belém é a plataforma de atendimento veterinário da rede pública municipal de Belém. 
-Oferece um sistema inovador de triagem online onde o tutor pode relatar os sintomas do seu animal (cão ou gato).
-O sistema classifica o risco de acordo com o Protocolo de Manchester Veterinário, direcionando urgências para o atendimento imediato e organizando o fluxo da recepção.
+Vitalis Belém é a plataforma oficial de triagem e atendimento veterinário da rede pública municipal de Belém (PA). Oferece triagem online baseada no Protocolo de Manchester Veterinário, agendamento em unidades municipais e acompanhamento clínico gratuito para munícipes.
 
-Principais funcionalidades:
-- Triagem Online Inteligente (Baseada no Protocolo de Manchester)
+## Páginas principais
+
+- [Página inicial](https://projetotestevitalis.lovable.app/): visão geral do hospital veterinário público, triagem e serviços.
+- [Triagem online](https://projetotestevitalis.lovable.app/triagem): fluxo de triagem em quatro etapas com classificação de risco.
+- [Agendar atendimento](https://projetotestevitalis.lovable.app/agendar): agendamento de consultas por especialidade, data e horário.
+- [Unidades](https://projetotestevitalis.lovable.app/unidades): endereços, telefones e serviços das unidades municipais.
+- [Informações para tutores](https://projetotestevitalis.lovable.app/informacoes): documentos, horários, serviços e dúvidas frequentes (FAQ).
+- [Meus atendimentos](https://projetotestevitalis.lovable.app/meus-atendimentos): histórico de triagens e agendamentos do tutor.
+- [Identificação](https://projetotestevitalis.lovable.app/identificacao): vinculação de triagem ao cadastro do tutor.
+
+## Principais funcionalidades
+
+- Triagem online inteligente baseada no Protocolo de Manchester Veterinário
 - Atendimento gratuito exclusivo para munícipes de Belém
-- Controle de internação, farmácia e exames laboratoriais
+- Agendamento em clínicas e no Hospital Veterinário Municipal
+- Controle de internação (UTI), farmácia municipal e exames laboratoriais
+- Encaminhamento para especialidades e guia de referência externa

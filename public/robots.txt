@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vitalisbelem.com.br/sitemap.xml
+Sitemap: https://projetotestevitalis.lovable.app/sitemap.xml
