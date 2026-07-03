@@ -56,7 +56,12 @@ export const blocosTriagem: BlocoEspecialidadeTriagem[] = [
         label: "Há episódios de tosse frequente? (Selecione todas aplicáveis)",
         opcoes: ["Seca", "Produtiva", "À noite", "Após esforço"],
       },
-      { id: "desmaio", tipo: "simnao", label: "O animal desmaia ou perde equilíbrio?" },
+      {
+        id: "desmaio",
+        tipo: "checkbox",
+        label: "O animal apresenta algum destes sinais? (Selecione todos aplicáveis)",
+        opcoes: ["Desmaia", "Perde o equilíbrio", "Nenhum dos anteriores"],
+      },
       { id: "intensidade", tipo: "slider", label: "Intensidade geral dos sinais clínicos (1 a 5)", min: 1, max: 5, minLabel: "Leve (1)", maxLabel: "Grave/Urgente (5)" },
       { id: "tempo", tipo: "select", label: "Há quanto tempo os sinais clínicos começaram?", opcoes: tempoSelect },
       { id: "obs", tipo: "textarea", label: "Observações Adicionais", placeholder: "Descreva outros sinais clínicos, comportamentos incomuns ou medicações em uso..." },
