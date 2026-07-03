@@ -29,6 +29,7 @@ import {
   ClipboardList,
   Send,
   X,
+  Mic,
 } from "lucide-react";
 import { toast } from "sonner";
 
