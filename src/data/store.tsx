@@ -461,6 +461,41 @@ const createProntuarioSlice: StateCreator<RootState, [], [], ProntuarioSlice> = 
     set((s) => ({ evolucoesSOAP: [reg, ...s.evolucoesSOAP] }));
     return reg;
   },
+  atualizarStatusExame: (diagnosticoId, exameId, novoStatus) =>
+    set((s) => ({
+      diagnosticos: s.diagnosticos.map((d) => {
+        if (d.id !== diagnosticoId) return d;
+        const conteudo = { ...(d.conteudo as Record<string, unknown>) };
+        const atual = (conteudo.statusExames as Record<string, StatusExame> | undefined) ?? {};
+        conteudo.statusExames = { ...atual, [exameId]: novoStatus };
+        return { ...d, conteudo };
+      }),
+    })),
+});
+
+const seedEstoque: ItemEstoque[] = [
+  { id: "est-dipirona", nome: "Dipirona 50%", categoria: "Medicamentos", quantidade: 28, alertaMinimo: 40, unidade: "Frasco 20ml" },
+  { id: "est-seringa-3", nome: "Seringa 3ml", categoria: "Materiais Descartáveis", quantidade: 120, alertaMinimo: 50, unidade: "Unidade" },
+  { id: "est-luva-75", nome: "Luvas Cirúrgicas nº 7,5", categoria: "Materiais Descartáveis", quantidade: 18, alertaMinimo: 20, unidade: "Caixa 50un" },
+  { id: "est-clorex", nome: "Clorexidina 2%", categoria: "Medicamentos", quantidade: 5, alertaMinimo: 10, unidade: "Frasco 100ml" },
+  { id: "est-tubo-edta", nome: "Tubo EDTA", categoria: "Materiais Laboratoriais", quantidade: 15, alertaMinimo: 30, unidade: "Unidade" },
+  { id: "est-soro", nome: "Soro Fisiológico 0,9%", categoria: "Medicamentos", quantidade: 2, alertaMinimo: 20, unidade: "Frasco 500ml" },
+  { id: "est-gaze", nome: "Compressa Gaze 7,5x7,5", categoria: "Materiais Descartáveis", quantidade: 0, alertaMinimo: 10, unidade: "Pacote 500un" },
+  { id: "est-vacina-v10", nome: "Vacina V10", categoria: "Vacinas", quantidade: 12, alertaMinimo: 15, unidade: "Frasco 1 dose" },
+];
+
+const createEstoqueSlice: StateCreator<RootState, [], [], EstoqueSlice> = (set) => ({
+  estoque: seedEstoque,
+  atualizarQuantidadeEstoque: (id, novaQuantidade) =>
+    set((s) => ({
+      estoque: s.estoque.map((i) => (i.id === id ? { ...i, quantidade: Math.max(0, novaQuantidade) } : i)),
+    })),
+  ajustarQuantidadeEstoque: (id, delta) =>
+    set((s) => ({
+      estoque: s.estoque.map((i) =>
+        i.id === id ? { ...i, quantidade: Math.max(0, i.quantidade + delta) } : i,
+      ),
+    })),
 });
 
 // =================================================================
@@ -470,7 +505,9 @@ export const useStore = create<RootState>()((...a) => ({
   ...createTutorSlice(...a),
   ...createTriagemSlice(...a),
   ...createProntuarioSlice(...a),
+  ...createEstoqueSlice(...a),
 }));
+
 
 // =================================================================
 // COMPATIBILIDADE COM A API ANTIGA (Provider + hook agregador)
