@@ -603,6 +603,9 @@ function FaseInicial(props: {
   sexo: "macho" | "femea" | ""; setSexo: (v: "macho" | "femea") => void;
   pelagem: string; setPelagem: (v: string) => void;
   peso: string; setPeso: (v: string) => void;
+  municipe: "sim" | "nao" | ""; setMunicipe: (v: "sim" | "nao") => void;
+  comprovante: { nome: string; url: string } | null;
+  setComprovante: (v: { nome: string; url: string } | null) => void;
 }) {
   return (
     <div>
