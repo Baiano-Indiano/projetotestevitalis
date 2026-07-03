@@ -51,6 +51,46 @@ function Internacoes() {
   const [insumosOpen, setInsumosOpen] = useState(false);
   const [insumosQtd, setInsumosQtd] = useState<Record<string, number>>({});
 
+  // Whiteboard de medicações — estado local por (internacaoId|horario|medIdx)
+  const HORARIOS_WB = ["08:00", "12:00", "14:00", "16:00", "18:00", "22:00"] as const;
+  type MedItem = { tipo: "seringa" | "comprimido"; nome: string };
+  const medsPorPaciente: Record<string, MedItem[]> = useMemo(() => {
+    const out: Record<string, MedItem[]> = {};
+    internacoes.forEach((i, idx) => {
+      out[i.id] = idx % 2 === 0
+        ? [{ tipo: "seringa", nome: "Dipirona" }, { tipo: "comprimido", nome: "Omeprazol" }]
+        : [{ tipo: "seringa", nome: "Ranitidina" }, { tipo: "comprimido", nome: "Cefalexina" }];
+    });
+    return out;
+  }, [internacoes]);
+
+  const agoraH = new Date().getHours();
+  const proximoHorarioIdx = (() => {
+    const idx = HORARIOS_WB.findIndex((h) => parseInt(h) >= agoraH);
+    return idx === -1 ? HORARIOS_WB.length - 1 : idx;
+  })();
+
+  const [medStatus, setMedStatus] = useState<Record<string, boolean>>(() => {
+    const seed: Record<string, boolean> = {};
+    internacoes.forEach((i) => {
+      HORARIOS_WB.forEach((h, hi) => {
+        if (hi < proximoHorarioIdx) {
+          seed[`${i.id}|${h}|0`] = true;
+          seed[`${i.id}|${h}|1`] = true;
+        }
+      });
+    });
+    return seed;
+  });
+
+  const marcarMed = (internacaoId: string, horario: string, medIdx: number, nome: string) => {
+    const key = `${internacaoId}|${horario}|${medIdx}`;
+    if (medStatus[key]) return;
+    setMedStatus((prev) => ({ ...prev, [key]: true }));
+    toast.success(`${nome} administrado`, { description: `Horário ${horario}` });
+  };
+
+
   const filtrados = useMemo(
     () =>
       internacoes.filter((i) =>
