@@ -2,26 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Megaphone, AlertTriangle, Clock, ArrowRight, CalendarDays, FileText, Bed, FlaskConical, GitBranchPlus, PackageX, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useVitalisStore } from "@/data/store";
 
 export const Route = createFileRoute("/_equipe/painel/admin")({
   head: () => ({ meta: [{ title: "Centro de Comando. Vitalis Belém" }] }),
   component: Admin,
 });
 
-const cards = [
-  { v: "14 min", label: "Tempo Médio de Espera", tag: "Abaixo da meta", tone: "success" as const },
-  { v: "142", label: "Triagens Realizadas", tag: "Hoje", tone: "primary" as const },
-  { v: "85%", label: "Taxa de Ocupação da UTI", tag: "Atenção", tone: "destructive" as const },
-  { v: "12", label: "Encaminhamentos Externos", tag: "Alta complexidade", tone: "warning" as const },
-];
-
-const manchester = [
-  { nome: "Vermelho", desc: "Emergência", casos: 3, cor: "bg-red-500", texto: "text-red-700", fundo: "bg-red-50" },
-  { nome: "Laranja", desc: "Muito Urgente", casos: 8, cor: "bg-orange-500", texto: "text-orange-700", fundo: "bg-orange-50" },
-  { nome: "Amarelo", desc: "Urgente", casos: 24, cor: "bg-yellow-500", texto: "text-yellow-700", fundo: "bg-yellow-50" },
-  { nome: "Verde", desc: "Pouco Urgente", casos: 85, cor: "bg-green-500", texto: "text-green-700", fundo: "bg-green-50" },
-  { nome: "Azul", desc: "Não Urgente", casos: 22, cor: "bg-blue-500", texto: "text-blue-700", fundo: "bg-blue-50" },
-];
+const LEITOS_TOTAIS = 8;
 
 const modulos = [
   { to: "/painel/agenda", titulo: "Agenda do Dia", desc: "Visualizar consultas e fluxo de atendimentos", Icon: CalendarDays },
@@ -33,7 +21,37 @@ const modulos = [
 
 function Admin() {
   const data = new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
-  const totalManchester = manchester.reduce((s, m) => s + m.casos, 0);
+  const { triagens, internacoes, diagnosticos } = useVitalisStore();
+
+  const totalTriagens = triagens.length;
+  const utiOcupados = internacoes.filter((i) => i.status === "critico").length;
+  const utiPct = Math.round((utiOcupados / LEITOS_TOTAIS) * 100);
+  const encaminhamentosExternos = diagnosticos.filter((d) => {
+    const c = d.conteudo as Record<string, unknown> | undefined;
+    return Boolean(c?.encaminhamento);
+  }).length;
+
+  const utiTone: "success" | "warning" | "destructive" =
+    utiPct >= 80 ? "destructive" : utiPct >= 50 ? "warning" : "success";
+
+  const cards = [
+    { v: "14 min", label: "Tempo Médio de Espera", tag: "Abaixo da meta", tone: "success" as const },
+    { v: String(totalTriagens), label: "Triagens Realizadas", tag: "Hoje", tone: "primary" as const },
+    { v: `${utiPct}%`, label: "Taxa de Ocupação da UTI", tag: utiTone === "destructive" ? "Atenção" : utiTone === "warning" ? "Monitorar" : "Estável", tone: utiTone },
+    { v: String(encaminhamentosExternos), label: "Encaminhamentos Externos", tag: "Alta complexidade", tone: "warning" as const },
+  ];
+
+  const contagem = { alta: 0, media: 0, baixa: 0 };
+  for (const t of triagens) contagem[t.prioridade] = (contagem[t.prioridade] ?? 0) + 1;
+
+  const manchester = [
+    { nome: "Vermelho", desc: "Emergência", casos: 0, cor: "bg-red-500", texto: "text-red-700", fundo: "bg-red-50" },
+    { nome: "Laranja", desc: "Muito Urgente", casos: contagem.alta, cor: "bg-orange-500", texto: "text-orange-700", fundo: "bg-orange-50" },
+    { nome: "Amarelo", desc: "Urgente", casos: contagem.media, cor: "bg-yellow-500", texto: "text-yellow-700", fundo: "bg-yellow-50" },
+    { nome: "Verde", desc: "Pouco Urgente", casos: contagem.baixa, cor: "bg-green-500", texto: "text-green-700", fundo: "bg-green-50" },
+    { nome: "Azul", desc: "Não Urgente", casos: 0, cor: "bg-blue-500", texto: "text-blue-700", fundo: "bg-blue-50" },
+  ];
+  const totalManchester = manchester.reduce((s, m) => s + m.casos, 0) || 1;
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -49,7 +67,7 @@ function Admin() {
             <span className="h-2 w-2 rounded-full bg-success" /> Sistema Online
           </p>
           <p className="mt-1.5 text-sm text-text-strong">
-            Hoje foram realizadas <strong>142</strong> triagens, com <strong>12</strong> encaminhamentos externos e UTI a <strong>85%</strong>.
+            Hoje foram realizadas <strong>{totalTriagens}</strong> triagens, com <strong>{encaminhamentosExternos}</strong> encaminhamentos externos e UTI a <strong>{utiPct}%</strong>.
           </p>
         </div>
       </div>
