@@ -170,6 +170,8 @@ function Triagem() {
 
   // Aceite
   const [aceite, setAceite] = useState(false);
+  // Termo de reclassificação (só relevante quando há red flag na Fase 3)
+  const [aceiteTermo, setAceiteTermo] = useState(false);
 
   const valida1 = () =>
     Boolean(
