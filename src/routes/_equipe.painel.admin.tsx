@@ -72,25 +72,6 @@ function Admin() {
         </div>
       </div>
 
-  return (
-    <div className="mx-auto max-w-7xl">
-      <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-        <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-text-strong md:text-4xl">
-            Centro de Comando
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">Diretoria · Hospital Veterinário Municipal · {data}</p>
-        </div>
-        <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
-          <p className="inline-flex items-center gap-2 text-sm font-semibold text-success-700">
-            <span className="h-2 w-2 rounded-full bg-success" /> Sistema Online
-          </p>
-          <p className="mt-1.5 text-sm text-text-strong">
-            Hoje foram realizadas <strong>142</strong> triagens, com <strong>12</strong> encaminhamentos externos e UTI a <strong>85%</strong>.
-          </p>
-        </div>
-      </div>
-
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {cards.map((c) => {
           const cor =
