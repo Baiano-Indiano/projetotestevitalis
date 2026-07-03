@@ -172,7 +172,7 @@ export const blocosTriagem: BlocoEspecialidadeTriagem[] = [
       { id: "trauma", tipo: "simnao", label: "Houve alguma queda, trauma ou acidente recente?" },
       { id: "dor", tipo: "simnao", label: "O animal demonstra dor ao se movimentar?" },
       { id: "inchaco", tipo: "simnao", label: "Existe inchaço em patas ou articulações?" },
-      { id: "evita", tipo: "simnao", label: "O animal evita subir, correr ou pular?" },
+      { id: "evita", tipo: "checkbox", label: "O animal evita alguma destas atividades? (Selecione todas aplicáveis)", opcoes: ["Subir", "Correr", "Pular", "Nenhuma"] },
       { id: "intensidade", tipo: "slider", label: "Intensidade da dor (1 a 5)", min: 1, max: 5, minLabel: "Leve (1)", maxLabel: "Grave/Urgente (5)" },
       { id: "regiao", tipo: "checkbox", label: "Qual região do corpo parece afetada?", opcoes: ["Pata Dianteira Direita", "Pata Dianteira Esquerda", "Pata Traseira Direita", "Pata Traseira Esquerda", "Coluna/Dorso"] },
       { id: "tempo", tipo: "select", label: "Há quanto tempo os sinais clínicos começaram?", opcoes: tempoSelect },
