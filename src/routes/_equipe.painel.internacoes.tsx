@@ -267,8 +267,8 @@ function Internacoes() {
                     ))}
 
                     {meds.map((m, mi) => (
-                      <>
-                        <div key={`lbl-${mi}`} className="flex items-center gap-2 text-xs text-text-strong">
+                      <Fragment key={`med-${mi}`}>
+                        <div className="flex items-center gap-2 text-xs text-text-strong">
                           {m.tipo === "seringa" ? <Syringe className="h-3.5 w-3.5 text-primary" /> : <Pill className="h-3.5 w-3.5 text-primary" />}
                           <span className="truncate">{m.nome}</span>
                         </div>
