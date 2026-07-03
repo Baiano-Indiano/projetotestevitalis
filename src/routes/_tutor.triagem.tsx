@@ -417,7 +417,7 @@ function Triagem() {
                             >
                               <img
                                 src={a.url}
-                                alt={a.nome}
+                                alt={`Foto anexada à triagem ${i + 1}`}
                                 className="h-full w-full object-cover"
                               />
                             </button>
