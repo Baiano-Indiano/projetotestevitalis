@@ -94,10 +94,25 @@ export const blocosTriagem: BlocoEspecialidadeTriagem[] = [
     corIcone: "text-primary",
     perguntas: [
       { id: "agua", tipo: "simnao", label: "O animal está bebendo mais água que o normal?" },
-      { id: "peso", tipo: "simnao", label: "Houve aumento ou perda de peso recentemente?" },
+      {
+        id: "peso",
+        tipo: "checkbox",
+        label: "Houve alteração de peso recentemente? (Selecione todas aplicáveis)",
+        opcoes: ["Aumento de peso", "Perda de peso", "Sem alteração"],
+      },
       { id: "apetite", tipo: "simnao", label: "Existe aumento excessivo do apetite?" },
-      { id: "pelagem", tipo: "simnao", label: "O animal apresenta queda de pelos ou alterações na pele?" },
-      { id: "comportamento", tipo: "simnao", label: "Houve mudanças no comportamento ou nível de energia?" },
+      {
+        id: "pelagem",
+        tipo: "checkbox",
+        label: "O animal apresenta alguma destas alterações? (Selecione todas aplicáveis)",
+        opcoes: ["Queda de pelos", "Alterações na pele", "Nenhuma"],
+      },
+      {
+        id: "comportamento",
+        tipo: "checkbox",
+        label: "Houve mudanças em algum dos itens abaixo? (Selecione todas aplicáveis)",
+        opcoes: ["Comportamento", "Nível de energia", "Nenhuma mudança"],
+      },
       { id: "urina", tipo: "simnao", label: "O animal urina com frequência aumentada?" },
       { id: "intensidade", tipo: "slider", label: "Intensidade geral dos sinais clínicos (1 a 5):", min: 1, max: 5, minLabel: "Leve (1)", maxLabel: "Grave/Urgente (5)" },
       { id: "tempo", tipo: "select", label: "Há quanto tempo os sinais clínicos começaram?", opcoes: tempoSelect },
