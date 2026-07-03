@@ -196,8 +196,124 @@ function Internacoes() {
         })}
       </div>
 
+      {/* Whiteboard digital de medicações (inspirado SmartFlow) */}
+      <div className="mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="font-display text-base font-semibold text-text-strong">
+              Quadro Branco — Administração de Medicamentos
+            </h2>
+            <p className="text-xs text-text-soft">
+              Toque num bloco pendente (piscando) para registrar a administração em tempo real.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-[11px] text-text-soft">
+            <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-success-700" /> Concluído</span>
+            <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-warning-500 animate-pulse" /> Pendente</span>
+            <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-muted" /> Futuro</span>
+          </div>
+        </div>
+
+        <div className="mt-3 space-y-3">
+          {ativas.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-border bg-surface p-6 text-center text-sm text-muted-foreground">
+              Nenhum paciente internado no momento.
+            </div>
+          )}
+          {ativas.map((i) => {
+            const meds = medsPorPaciente[i.id] ?? [];
+            const critico = i.status === "critico";
+            return (
+              <div
+                key={i.id}
+                className={cn(
+                  "rounded-2xl border bg-surface p-4 shadow-sm transition-all",
+                  critico ? "border-l-4 border-l-destructive border-border" : "border-l-4 border-l-primary border-border",
+                )}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-10 w-10 place-items-center rounded-full bg-primary-50 font-bold text-primary">
+                      {i.pacienteNome[0]}
+                    </span>
+                    <div>
+                      <p className="font-display text-sm font-semibold text-text-strong">
+                        {i.pacienteNome} <span className="ml-1 text-xs font-normal text-text-soft">· Leito {i.leito}</span>
+                      </p>
+                      <p className="text-xs text-text-soft">{i.diagnostico}</p>
+                    </div>
+                  </div>
+                  <span className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
+                    critico ? "bg-destructive text-destructive-foreground" : "bg-success-50 text-success-700",
+                  )}>
+                    {critico ? "Crítico" : "Estável"}
+                  </span>
+                </div>
+
+                <div className="mt-3 overflow-x-auto">
+                  <div className="grid min-w-max gap-2" style={{ gridTemplateColumns: `140px repeat(${HORARIOS_WB.length}, minmax(72px, 1fr))` }}>
+                    <div />
+                    {HORARIOS_WB.map((h, hi) => (
+                      <div
+                        key={h}
+                        className={cn(
+                          "text-center text-[11px] font-semibold",
+                          hi === proximoHorarioIdx ? "text-warning-700" : "text-text-soft",
+                        )}
+                      >
+                        {h}
+                      </div>
+                    ))}
+
+                    {meds.map((m, mi) => (
+                      <>
+                        <div key={`lbl-${mi}`} className="flex items-center gap-2 text-xs text-text-strong">
+                          {m.tipo === "seringa" ? <Syringe className="h-3.5 w-3.5 text-primary" /> : <Pill className="h-3.5 w-3.5 text-primary" />}
+                          <span className="truncate">{m.nome}</span>
+                        </div>
+                        {HORARIOS_WB.map((h, hi) => {
+                          const key = `${i.id}|${h}|${mi}`;
+                          const done = !!medStatus[key];
+                          const pendente = hi === proximoHorarioIdx && !done;
+                          const futuro = hi > proximoHorarioIdx && !done;
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={() => marcarMed(i.id, h, mi, m.nome)}
+                              disabled={done}
+                              className={cn(
+                                "group grid h-12 place-items-center rounded-md border text-xs font-medium transition-all",
+                                done && "border-success-700/40 bg-success-50 text-success-700 cursor-default",
+                                pendente && "border-warning-500/50 bg-warning-50 text-warning-700 animate-pulse hover:scale-105 hover:shadow-md",
+                                futuro && "border-border bg-muted/30 text-text-soft cursor-not-allowed",
+                              )}
+                              title={done ? "Administrado" : pendente ? "Pendente — clique para administrar" : "Agendado"}
+                            >
+                              {done ? (
+                                <Check className="h-4 w-4" />
+                              ) : m.tipo === "seringa" ? (
+                                <Syringe className="h-4 w-4" />
+                              ) : (
+                                <Pill className="h-4 w-4" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Mapa de leitos */}
       <div className="mt-6">
+
         <h2 className="font-display text-base font-semibold text-text-strong">Mapa de Leitos</h2>
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
           {leitosGrid.map(({ num, internacao }) => {
