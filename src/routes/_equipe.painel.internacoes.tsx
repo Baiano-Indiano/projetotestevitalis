@@ -313,7 +313,7 @@ function Internacoes() {
                                 pendente && "border-warning-500/50 bg-warning-50 text-warning-700 animate-pulse hover:scale-105 hover:shadow-md",
                                 futuro && "border-border bg-muted/30 text-text-soft cursor-not-allowed",
                               )}
-                              title={done ? "Administrado" : pendente ? "Pendente — clique para administrar" : "Agendado"}
+                              title={done ? "Administrado — clique para desfazer" : pendente ? "Pendente — clique para administrar" : "Agendado"}
                             >
                               {done ? (
                                 <Check className="h-4 w-4" />
