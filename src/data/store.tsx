@@ -244,7 +244,12 @@ export interface TutorSlice {
 export interface TriagemSlice {
   triagens: Triagem[];
   decisoes: ValidacaoDecisao[];
-  adicionarTriagem: (parcial: Omit<Triagem, "id" | "protocolo" | "criadoEm" | "status">) => Triagem;
+  adicionarTriagem: (
+    parcial: Omit<
+      Triagem,
+      "id" | "protocolo" | "criadoEm" | "status" | "redFlags" | "scores" | "sugestao" | "prioridade"
+    >
+  ) => Triagem;
   decidir: (d: ValidacaoDecisao) => void;
   ultimaTriagemId?: string;
   setUltimaTriagemId: (id?: string) => void;
@@ -300,12 +305,20 @@ const createTriagemSlice: StateCreator<RootState, [], [], TriagemSlice> = (set) 
   triagens: seedTriagens,
   decisoes: [],
   adicionarTriagem: (parcial) => {
+    // SECURITY: O backend (simulado aqui) sempre recalcula o protocolo de Manchester.
+    // Nunca confie nos scores ou prioridades enviados pelo frontend, para evitar fraudes.
+    const motor = calcularMotor(parcial.etapas.sintomas);
+
     const t: Triagem = {
       ...parcial,
       id: `t-${(++seq).toString().padStart(3, "0")}`,
       protocolo: gerarProtocolo(seq),
       criadoEm: new Date().toISOString(),
-      status: parcial.redFlags.length > 0 ? "urgencia" : "pendente",
+      redFlags: motor.redFlags,
+      scores: motor.scores,
+      sugestao: motor.sugestao,
+      prioridade: motor.prioridade,
+      status: motor.redFlags.length > 0 ? "urgencia" : "pendente",
     };
     set((s) => ({ triagens: [t, ...s.triagens] }));
     return t;

@@ -239,10 +239,6 @@ function Triagem() {
           chipsIA: ids,
           anexos: anexos.length ? anexos : undefined,
         },
-        redFlags: motor.redFlags,
-        scores: motor.scores,
-        sugestao: especialidadeFinal,
-        prioridade: motor.prioridade,
       });
       setUltimaTriagemId(t.id);
       toast.success("Triagem enviada com sucesso!", {

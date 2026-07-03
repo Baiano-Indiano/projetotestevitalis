@@ -161,13 +161,9 @@ function NovoCadastroPage() {
       tutor: { nome: nomeTutor, telefone: telefoneTutor || whatsTutor || "—" },
       canal: "presencial",
       etapas: {
-        sintomas: [],
+        sintomas: redFlags,
         observacoes,
       },
-      redFlags: redFlags.length ? redFlags : motor.redFlags,
-      scores: motor.scores,
-      sugestao: motor.sugestao,
-      prioridade: redFlags.length ? "alta" : motor.prioridade,
     });
 
     toast.success("Cadastro concluído, paciente enviado para a fila de triagem", {
