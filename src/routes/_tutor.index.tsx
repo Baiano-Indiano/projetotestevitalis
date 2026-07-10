@@ -13,6 +13,8 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { revealVariants, staggerContainer, staggerItem } from "@/lib/motion";
 
 export const Route = createFileRoute("/_tutor/")({
   head: () => ({
