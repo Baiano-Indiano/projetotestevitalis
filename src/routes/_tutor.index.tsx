@@ -110,7 +110,7 @@ function Landing() {
             </ul>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Benefícios */}
       <section className="container-app pb-10">
