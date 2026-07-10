@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVitalisStore } from "@/data/store";
+import { motion } from "framer-motion";
+import { staggerContainer, staggerItem } from "@/lib/motion";
 
 export const Route = createFileRoute("/_tutor/agendar")({
   head: () => ({
@@ -244,14 +246,22 @@ function Agendar() {
             <p className="text-sm font-semibold text-text-strong">
               Horários Disponíveis {diaSel ? `(${String(diaSel).padStart(2, "0")} ${mesAtivo.labelCurto.slice(0, 3)})` : ""}
             </p>
-            <div className="mt-3 grid grid-cols-3 gap-2">
+            <motion.div
+              key={`horarios-${diaSel ?? "sem"}-${mesIndex}`}
+              className="mt-3 grid grid-cols-3 gap-2"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="show"
+            >
               {horarios.map((h) => {
                 const indisp = indisponiveis.has(h);
                 const ativo = horaSel === h;
                 return (
-                  <button
+                  <motion.button
                     key={h}
                     type="button"
+                    variants={staggerItem}
+                    whileTap={{ scale: 0.96 }}
                     disabled={indisp || enviando}
                     onClick={() => setHoraSel(h)}
                     className={cn(
@@ -262,10 +272,10 @@ function Agendar() {
                     )}
                   >
                     {h}
-                  </button>
+                  </motion.button>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         </div>
 
