@@ -6,6 +6,7 @@ import { CheckCircle2, Copy, Eye, Download, Info, FileCheck, Clock, Send, PawPri
 import { getItemById } from "@/data/sintomas-categorias";
 import { nomeEspecialidade } from "@/config/municipio";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/_tutor/triagem/resultado")({
   head: () => ({
@@ -62,16 +63,31 @@ function Resultado() {
           )}
           <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm md:p-8">
             {/* Ícone de sucesso */}
-            <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-success-50">
+            <motion.div
+              className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-success-50"
+              initial={{ scale: 0, rotate: -20, opacity: 0 }}
+              animate={{ scale: 1, rotate: 0, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 320, damping: 14, delay: 0.05 }}
+            >
               <CheckCircle2 className="h-9 w-9 text-success" />
-            </div>
+            </motion.div>
 
-            <h1 className="mt-5 text-center font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
+            <motion.h1
+              className="mt-5 text-center font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.35 }}
+            >
               Triagem Recebida com Sucesso!
-            </h1>
-            <p className="mt-2 text-center text-sm text-muted-foreground">
+            </motion.h1>
+            <motion.p
+              className="mt-2 text-center text-sm text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.35 }}
+            >
               Sua solicitação foi enviada e já está na fila de análise da nossa equipe técnica veterinária.
-            </p>
+            </motion.p>
 
             {/* Protocolo */}
             <div className="mt-6 rounded-xl bg-primary-50 px-5 py-4 text-center">
