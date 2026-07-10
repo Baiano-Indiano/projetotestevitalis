@@ -63,7 +63,13 @@ function Landing() {
       </section>
 
       {/* Entenda nossas unidades */}
-      <section className="container-app py-10 md:py-14">
+      <motion.section
+        className="container-app py-10 md:py-14"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={revealVariants}
+      >
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
             Entenda Nossas Unidades
