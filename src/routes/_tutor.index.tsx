@@ -141,7 +141,13 @@ function Landing() {
       </motion.section>
 
       {/* Como funciona */}
-      <section className="border-t border-border bg-surface/60 py-12 md:py-16">
+      <motion.section
+        className="border-t border-border bg-surface/60 py-12 md:py-16"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={staggerContainer}
+      >
         <div className="container-app">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
@@ -157,7 +163,7 @@ function Landing() {
               { n: 2, t: "Orientação", d: "Receba a indicação imediata se é um caso de clínica ou emergência hospitalar." },
               { n: 3, t: "Agendamento", d: "Para casos não urgentes, agende o melhor horário na unidade indicada." },
             ].map((s) => (
-              <div key={s.n} className="rounded-2xl border border-border bg-background p-5 text-center shadow-sm">
+              <motion.div key={s.n} className="rounded-2xl border border-border bg-background p-5 text-center shadow-sm" variants={staggerItem}>
                 <span className={cn(
                   "mx-auto grid h-10 w-10 place-items-center rounded-full font-bold text-white",
                   s.n === 1 ? "bg-primary" : s.n === 2 ? "bg-success" : "bg-primary-700",
@@ -166,7 +172,7 @@ function Landing() {
                 </span>
                 <h3 className="mt-3 font-display text-base font-semibold text-text-strong">{s.t}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{s.d}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -178,10 +184,16 @@ function Landing() {
             </Button>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Unidades */}
-      <section className="container-app py-12 md:py-16">
+      <motion.section
+        className="container-app py-12 md:py-16"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={staggerContainer}
+      >
         <div className="mb-6 text-center">
           <h2 className="font-display text-2xl font-semibold tracking-tight text-text-strong md:text-3xl">
             Rede {municipio.nomeRede}
@@ -190,7 +202,7 @@ function Landing() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {municipio.unidades.map((u) => (
-            <div key={u.id} className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+            <motion.div key={u.id} className="rounded-2xl border border-border bg-surface p-4 shadow-sm" variants={staggerItem}>
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-text-soft">
                   {u.tipo === "movel" ? "Móvel" : u.tipo === "hospital" ? "Hospital" : "Clínica"}
@@ -199,10 +211,10 @@ function Landing() {
               </div>
               <h3 className="mt-2 font-display text-sm font-semibold text-text-strong">{u.nome}</h3>
               <p className="mt-1 text-xs text-muted-foreground">{u.endereco}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
     </>
   );
 }
