@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVitalisStore } from "@/data/store";
+import { motion } from "framer-motion";
+import { staggerContainer, staggerItem } from "@/lib/motion";
 
 export const Route = createFileRoute("/_tutor/agendar")({
   head: () => ({
