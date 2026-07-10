@@ -113,7 +113,13 @@ function Landing() {
       </motion.section>
 
       {/* Benefícios */}
-      <section className="container-app pb-10">
+      <motion.section
+        className="container-app pb-10"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={staggerContainer}
+      >
         <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-3">
           {[
             { Icon: Filter, t: "Menos Filas", d: "Sistema inteligente que organiza o fluxo e reduz o tempo de espera nas unidades." },
@@ -122,17 +128,17 @@ function Landing() {
           ].map((b) => {
             const Icone = b.Icon;
             return (
-              <div key={b.t} className="text-center">
+              <motion.div key={b.t} className="text-center" variants={staggerItem}>
                 <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary-50 text-primary">
                   <Icone className="h-5 w-5" />
                 </span>
                 <h3 className="mt-3 font-display text-base font-semibold text-text-strong">{b.t}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{b.d}</p>
-              </div>
+              </motion.div>
             );
           })}
         </div>
-      </section>
+      </motion.section>
 
       {/* Como funciona */}
       <section className="border-t border-border bg-surface/60 py-12 md:py-16">
