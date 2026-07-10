@@ -1,4 +1,4 @@
-import { Link, Outlet } from "@tanstack/react-router";
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,8 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 import { municipio } from "@/config/municipio";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+import { pageVariants, pageTransition } from "@/lib/motion";
 
 const nav = [
   { to: "/", label: "Início" },
