@@ -20,6 +20,7 @@ import { Route as TutorIdentificacaoRouteImport } from './routes/_tutor.identifi
 import { Route as TutorAgendarRouteImport } from './routes/_tutor.agendar'
 import { Route as EquipePainelIndexRouteImport } from './routes/_equipe.painel.index'
 import { Route as TutorTriagemResultadoRouteImport } from './routes/_tutor.triagem.resultado'
+import { Route as TutorAtendimentoIdRouteImport } from './routes/_tutor.atendimento.$id'
 import { Route as TutorAgendarConfirmacaoRouteImport } from './routes/_tutor.agendar.confirmacao'
 import { Route as EquipePainelVeterinariosRouteImport } from './routes/_equipe.painel.veterinarios'
 import { Route as EquipePainelValidacaoRouteImport } from './routes/_equipe.painel.validacao'
@@ -94,6 +95,11 @@ const TutorTriagemResultadoRoute = TutorTriagemResultadoRouteImport.update({
   id: '/resultado',
   path: '/resultado',
   getParentRoute: () => TutorTriagemRoute,
+} as any)
+const TutorAtendimentoIdRoute = TutorAtendimentoIdRouteImport.update({
+  id: '/atendimento/$id',
+  path: '/atendimento/$id',
+  getParentRoute: () => TutorRoute,
 } as any)
 const TutorAgendarConfirmacaoRoute = TutorAgendarConfirmacaoRouteImport.update({
   id: '/confirmacao',
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
   '/painel/veterinarios': typeof EquipePainelVeterinariosRoute
   '/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
+  '/atendimento/$id': typeof TutorAtendimentoIdRoute
   '/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/painel/': typeof EquipePainelIndexRoute
   '/painel/ficha/$id': typeof EquipePainelFichaIdRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/painel/unidade-movel': typeof EquipePainelUnidadeMovelRoute
   '/painel/veterinarios': typeof EquipePainelVeterinariosRoute
   '/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
+  '/atendimento/$id': typeof TutorAtendimentoIdRoute
   '/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/painel': typeof EquipePainelIndexRoute
   '/painel/ficha/$id': typeof EquipePainelFichaIdRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/_equipe/painel/validacao': typeof EquipePainelValidacaoRouteWithChildren
   '/_equipe/painel/veterinarios': typeof EquipePainelVeterinariosRoute
   '/_tutor/agendar/confirmacao': typeof TutorAgendarConfirmacaoRoute
+  '/_tutor/atendimento/$id': typeof TutorAtendimentoIdRoute
   '/_tutor/triagem/resultado': typeof TutorTriagemResultadoRoute
   '/_equipe/painel/': typeof EquipePainelIndexRoute
   '/_equipe/painel/ficha/$id': typeof EquipePainelFichaIdRoute
@@ -334,6 +343,7 @@ export interface FileRouteTypes {
     | '/painel/validacao'
     | '/painel/veterinarios'
     | '/agendar/confirmacao'
+    | '/atendimento/$id'
     | '/triagem/resultado'
     | '/painel/'
     | '/painel/ficha/$id'
@@ -365,6 +375,7 @@ export interface FileRouteTypes {
     | '/painel/unidade-movel'
     | '/painel/veterinarios'
     | '/agendar/confirmacao'
+    | '/atendimento/$id'
     | '/triagem/resultado'
     | '/painel'
     | '/painel/ficha/$id'
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/_equipe/painel/validacao'
     | '/_equipe/painel/veterinarios'
     | '/_tutor/agendar/confirmacao'
+    | '/_tutor/atendimento/$id'
     | '/_tutor/triagem/resultado'
     | '/_equipe/painel/'
     | '/_equipe/painel/ficha/$id'
@@ -489,6 +501,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/triagem/resultado'
       preLoaderRoute: typeof TutorTriagemResultadoRouteImport
       parentRoute: typeof TutorTriagemRoute
+    }
+    '/_tutor/atendimento/$id': {
+      id: '/_tutor/atendimento/$id'
+      path: '/atendimento/$id'
+      fullPath: '/atendimento/$id'
+      preLoaderRoute: typeof TutorAtendimentoIdRouteImport
+      parentRoute: typeof TutorRoute
     }
     '/_tutor/agendar/confirmacao': {
       id: '/_tutor/agendar/confirmacao'
@@ -734,6 +753,7 @@ interface TutorRouteChildren {
   TutorTriagemRoute: typeof TutorTriagemRouteWithChildren
   TutorUnidadesRoute: typeof TutorUnidadesRoute
   TutorIndexRoute: typeof TutorIndexRoute
+  TutorAtendimentoIdRoute: typeof TutorAtendimentoIdRoute
 }
 
 const TutorRouteChildren: TutorRouteChildren = {
@@ -744,6 +764,7 @@ const TutorRouteChildren: TutorRouteChildren = {
   TutorTriagemRoute: TutorTriagemRouteWithChildren,
   TutorUnidadesRoute: TutorUnidadesRoute,
   TutorIndexRoute: TutorIndexRoute,
+  TutorAtendimentoIdRoute: TutorAtendimentoIdRoute,
 }
 
 const TutorRouteWithChildren = TutorRoute._addFileChildren(TutorRouteChildren)
