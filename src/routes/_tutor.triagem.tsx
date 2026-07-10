@@ -44,6 +44,7 @@ import { nomeEspecialidade, type EspecialidadeId } from "@/config/municipio";
 import { cn } from "@/lib/utils";
 import { blocosTriagem, type RespostasEspecialidades } from "@/data/triagem-especialidades";
 import { BlocoEspecialidade } from "@/components/triagem/BlocoEspecialidade";
+import { AnimatePresence, motion } from "framer-motion";
 
 export const Route = createFileRoute("/_tutor/triagem")({
   validateSearch: (s: Record<string, unknown>) => ({
