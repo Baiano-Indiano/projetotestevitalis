@@ -325,6 +325,14 @@ function Triagem() {
           <p className="mt-3 text-sm text-muted-foreground">{tituloFase(fase).subtitulo}</p>
 
 
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={fase}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ type: "spring", stiffness: 260, damping: 26 }}
+            >
           {fase === 1 && (
             <FaseInicial
               especie={especie}
@@ -502,6 +510,8 @@ function Triagem() {
               setAceite={setAceite}
             />
           )}
+            </motion.div>
+          </AnimatePresence>
 
           {/* Ações */}
           <div className="mt-6 flex flex-col gap-3">
